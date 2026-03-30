@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en" x-data="{}" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Statamic — Fields</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['Syne', 'sans-serif'],
+            mono:    ['Space Mono', 'monospace'],
+          },
+          colors: {
+            gem: {
+              50:  '#f0fdf9', 100: '#ccfbef', 200: '#99f3df',
+              300: '#58e4c6', 400: '#22cda8', 500: '#0ab28e',
+              600: '#048f73', 700: '#07725d', 800: '#095a4b', 900: '#0a4a3e',
+            },
+            ink: {
+              950: '#04100d', 900: '#081a14', 800: '#0d2a20',
+              700: '#133d2f', 600: '#1c5440',
+            },
+            acid: '#39ff84',
+          },
+        }
+      }
+    }
+  </script>
+
+  <style>
+    :root { --acid: #39ff84; --ink-dark: #04100d; }
+    * { box-sizing: border-box; }
+
+    body {
+      background-color: #04100d;
+      color: #c8ddd6;
+      font-family: 'Syne', sans-serif;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image:
+        linear-gradient(rgba(57,255,132,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(57,255,132,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none; z-index: 0;
+    }
+
+    body::after {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 0; opacity: 0.4;
+    }
+
+    .cl { position: relative; z-index: 1; }
+
+    .code-block {
+      background: #020c09;
+      border: 1px solid rgba(57,255,132,0.18);
+      border-left: 3px solid var(--acid);
+      border-radius: 6px;
+      font-family: 'Space Mono', monospace;
+      position: relative; overflow: hidden;
+    }
+    .code-block::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 100%;
+      background: linear-gradient(180deg, transparent 0%, rgba(57,255,132,0.03) 50%, transparent 100%);
+      background-size: 100% 8px;
+      pointer-events: none;
+      animation: scan 6s linear infinite;
+    }
+    @keyframes scan { 0%{background-position:0 -100%} 100%{background-position:0 200%} }
+
+    .s-card {
+      border: 1px solid rgba(57,255,132,0.1);
+      background: linear-gradient(135deg, rgba(13,42,32,0.65) 0%, rgba(4,16,13,0.9) 100%);
+      backdrop-filter: blur(8px);
+      border-radius: 12px;
+      transition: border-color 0.3s;
+    }
+    .s-card:hover { border-color: rgba(57,255,132,0.28); }
+
+    code.il {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.78em;
+      background: rgba(57,255,132,0.08);
+      border: 1px solid rgba(57,255,132,0.18);
+      color: var(--acid);
+      padding: 2px 7px;
+      border-radius: 4px;
+    }
+
+    .acid-badge {
+      background: rgba(57,255,132,0.1);
+      border: 1px solid rgba(57,255,132,0.28);
+      color: var(--acid);
+    }
+
+    .info-chip {
+      background: rgba(10,178,142,0.08);
+      border: 1px solid rgba(10,178,142,0.22);
+      border-radius: 8px;
+      transition: all 0.22s;
+    }
+    .info-chip:hover { background: rgba(10,178,142,0.16); border-color: rgba(10,178,142,0.45); }
+
+    .tip-box {
+      background: rgba(57,255,132,0.04);
+      border-left: 3px solid var(--acid);
+      border-radius: 0 6px 6px 0;
+    }
+
+    .warn-box {
+      background: rgba(251,191,36,0.04);
+      border-left: 3px solid #fbbf24;
+      border-radius: 0 6px 6px 0;
+    }
+
+    .acid-underline { position: relative; display: inline-block; }
+    .acid-underline::after {
+      content: ''; position: absolute; bottom: -3px; left: 0; right: 0;
+      height: 2px; background: var(--acid);
+      box-shadow: 0 0 10px var(--acid);
+      transform: scaleX(0); transform-origin: left; transition: transform 0.35s ease;
+    }
+    .acid-underline:hover::after { transform: scaleX(1); }
+
+    @keyframes pulseDot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.7)} }
+    .pulse-dot { animation: pulseDot 2s ease-in-out infinite; }
+
+    .t-r{background:#ff5f56} .t-y{background:#ffbd2e} .t-g{background:#27c93f}
+
+    .sec-label { font-family: 'Space Mono', monospace; font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: #0ab28e; }
+
+    .doc-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+    .doc-table th { font-family: 'Space Mono', monospace; font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: #0ab28e; padding: 10px 14px; border-bottom: 1px solid rgba(57,255,132,0.15); text-align: left; }
+    .doc-table td { padding: 11px 14px; border-bottom: 1px solid rgba(57,255,132,0.06); color: #c8ddd6; vertical-align: top; }
+    .doc-table tr:last-child td { border-bottom: none; }
+    .doc-table tr:hover td { background: rgba(57,255,132,0.03); }
+
+    .toc-link { font-family: 'Space Mono', monospace; font-size: 0.72rem; color: #0ab28e; display: block; padding: 5px 0 5px 12px; border-left: 2px solid transparent; transition: all 0.2s; }
+    .toc-link:hover { color: var(--acid); border-left-color: var(--acid); }
+
+    .tag-pill {
+      border-radius: 20px;
+      border: 1px solid rgba(57,255,132,0.25);
+      background: rgba(57,255,132,0.07);
+      color: var(--acid);
+      font-family: 'Space Mono', monospace;
+      font-size: 0.72rem;
+      padding: 4px 12px;
+      transition: all 0.2s;
+      display: inline-block;
+    }
+    .tag-pill:hover { background: rgba(57,255,132,0.18); border-color: rgba(57,255,132,0.5); }
+
+    .check-item { display: flex; align-items: flex-start; gap: 10px; }
+    .check-item::before { content: '✓'; color: var(--acid); font-family: 'Space Mono', monospace; font-size: 0.8rem; margin-top: 2px; flex-shrink: 0; }
+
+    .cross-item { display: flex; align-items: flex-start; gap: 10px; }
+    .cross-item::before { content: '✗'; color: #f87171; font-family: 'Space Mono', monospace; font-size: 0.8rem; margin-top: 2px; flex-shrink: 0; }
+
+    @keyframes fadeUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
+    .animate-fade-up { animation: fadeUp 0.65s ease both; }
+    .d1{animation-delay:0.1s} .d2{animation-delay:0.2s} .d3{animation-delay:0.3s}
+
+    @keyframes glowPulse {
+      0%,100%{box-shadow:0 0 0 1px rgba(57,255,132,0.2),0 0 40px rgba(57,255,132,0.08)}
+      50%{box-shadow:0 0 0 1px rgba(57,255,132,0.4),0 0 80px rgba(57,255,132,0.2)}
+    }
+    .cta-glow { animation: glowPulse 3s ease-in-out infinite; }
+    .hero-glow { text-shadow: 0 0 60px rgba(57,255,132,0.2); }
+
+    ::-webkit-scrollbar{width:6px} ::-webkit-scrollbar-track{background:#04100d} ::-webkit-scrollbar-thumb{background:rgba(57,255,132,0.22);border-radius:3px}
+
+    .yaml-key     { color: #22cda8; }
+    .yaml-val     { color: #c8ddd6; }
+    .yaml-str     { color: #39ff84; }
+    .yaml-comment { color: rgba(57,255,132,0.35); }
+    .yaml-num     { color: #fbbf24; }
+
+    /* visibility badge colours */
+    .vis-visible  { background: rgba(57,255,132,0.1);  border: 1px solid rgba(57,255,132,0.3);  color: var(--acid); }
+    .vis-readonly { background: rgba(251,191,36,0.08); border: 1px solid rgba(251,191,36,0.3);  color: #fbbf24; }
+    .vis-computed { background: rgba(96,165,250,0.08); border: 1px solid rgba(96,165,250,0.3);  color: #93c5fd; }
+    .vis-hidden   { background: rgba(248,113,113,0.08);border: 1px solid rgba(248,113,113,0.3); color: #fca5a5; }
+    .vis-badge    { font-family: 'Space Mono', monospace; font-size: 0.7rem; padding: 3px 10px; border-radius: 20px; display: inline-block; }
+
+    /* flow row */
+    .flow-row {
+      display: flex; align-items: center; gap: 0;
+      font-family: 'Space Mono', monospace; font-size: 0.72rem;
+    }
+    .flow-step {
+      background: rgba(13,42,32,0.8);
+      border: 1px solid rgba(57,255,132,0.15);
+      padding: 8px 14px; border-radius: 6px;
+      color: #c8ddd6; white-space: nowrap;
+    }
+    .flow-arrow {
+      color: rgba(57,255,132,0.4); padding: 0 6px; font-size: 1rem;
+    }
+
+    /* fieldtype grid card */
+    .ft-card {
+      background: rgba(13,42,32,0.5);
+      border: 1px solid rgba(57,255,132,0.1);
+      border-radius: 8px;
+      padding: 14px;
+      transition: all 0.2s;
+      text-align: center;
+    }
+    .ft-card:hover {
+      border-color: rgba(57,255,132,0.3);
+      background: rgba(13,42,32,0.8);
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body>
+
+<!-- ─── NAV ─────────────────────────────────────────────────── -->
+<nav class="cl sticky top-0 z-50 border-b border-gem-800/40 bg-ink-950/85 backdrop-blur-md">
+  <div class="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <a href="statamic-docs.html" class="flex items-center gap-2 group">
+        <div class="w-7 h-7 rounded border border-gem-500/50 flex items-center justify-center bg-gem-800/30 group-hover:border-acid/60 transition-colors">
+          <svg viewBox="0 0 20 20" fill="none" class="w-4 h-4 text-acid" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="10,2 18,7 18,13 10,18 2,13 2,7" stroke="currentColor" stroke-width="1.5" fill="none"/>
+            <polygon points="10,6 14,8.5 14,11.5 10,14 6,11.5 6,8.5" fill="currentColor" opacity="0.6"/>
+          </svg>
+        </div>
+        <span class="font-display font-700 text-white text-sm tracking-widest uppercase">Statamic</span>
+      </a>
+      <span class="text-gem-700">/</span>
+      <a href="statamic-fieldsets.html" class="text-gem-500 text-xs font-mono hover:text-gem-300 transition-colors">Fieldsets</a>
+      <span class="text-gem-700">/</span>
+      <span class="acid-badge text-xs px-2 py-0.5 rounded font-mono">Fields</span>
+    </div>
+    <div class="hidden md:flex items-center gap-5 text-xs text-gem-400 font-mono">
+      <a href="#what-is"    class="acid-underline hover:text-white transition-colors">Overview</a>
+      <a href="#config"     class="acid-underline hover:text-white transition-colors">Config</a>
+      <a href="#visibility" class="acid-underline hover:text-white transition-colors">Visibility</a>
+      <a href="#dataflow"   class="acid-underline hover:text-white transition-colors">Data Flow</a>
+      <a href="#fieldtypes" class="acid-underline hover:text-white transition-colors">Fieldtypes</a>
+    </div>
+    <div class="flex items-center gap-2">
+      <div class="pulse-dot w-2 h-2 rounded-full bg-acid"></div>
+      <span class="text-xs font-mono text-gem-400">v5.x</span>
+    </div>
+  </div>
+</nav>
+
+<!-- ─── HERO ─────────────────────────────────────────────────── -->
+<section class="cl pt-20 pb-14 px-6 text-center relative overflow-hidden">
+  <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[380px] rounded-full opacity-15 pointer-events-none"
+       style="background:radial-gradient(ellipse,#39ff84 0%,transparent 70%);filter:blur(60px)"></div>
+  <div class="max-w-3xl mx-auto">
+    <div class="inline-flex items-center gap-2 acid-badge px-3 py-1 rounded-full text-xs font-mono mb-5 animate-fade-up">
+      <span>🔲</span> Content Modelling
+    </div>
+    <h1 class="hero-glow font-display font-800 text-5xl md:text-6xl text-white leading-[1.06] mb-5 animate-fade-up d1">
+      Fields &amp;<br/>
+      <span style="color:var(--acid)">Fieldtypes</span>
+    </h1>
+    <p class="text-gem-300 text-lg leading-relaxed max-w-2xl mx-auto mb-8 animate-fade-up d2">
+      Fields are the atoms of your content model. Every input an editor touches — text box, image picker, toggle, date — is a field. 40+ fieldtypes, one consistent config API.
+    </p>
+    <div class="flex flex-wrap justify-center gap-3 animate-fade-up d3">
+      <a href="#what-is" class="inline-flex items-center gap-2 bg-acid text-ink-950 font-display font-700 px-5 py-2.5 rounded text-sm hover:bg-white transition-colors">Start Reading ↓</a>
+      <a href="#recap"   class="inline-flex items-center gap-2 border border-gem-600/40 text-gem-200 font-display px-5 py-2.5 rounded text-sm hover:border-acid/40 hover:text-white transition-colors">Quick Recap</a>
+    </div>
+  </div>
+
+  <!-- fieldtype pill strip -->
+  <div class="max-w-2xl mx-auto mt-12 animate-fade-up d3">
+    <div class="flex flex-wrap justify-center gap-2">
+      <span class="tag-pill">📝 text</span>
+      <span class="tag-pill">📄 textarea</span>
+      <span class="tag-pill">✍️ markdown</span>
+      <span class="tag-pill">🧱 bard</span>
+      <span class="tag-pill">🖼️ assets</span>
+      <span class="tag-pill">🔀 toggle</span>
+      <span class="tag-pill">📋 select</span>
+      <span class="tag-pill">📆 date</span>
+      <span class="tag-pill">🔢 integer</span>
+      <span class="tag-pill">🔗 link</span>
+      <span class="tag-pill">🎨 color</span>
+    </div>
+    <p class="text-gem-600 text-xs font-mono mt-3">↑ A sample of the 40+ available fieldtypes</p>
+  </div>
+</section>
+
+<!-- ─── MAIN LAYOUT ──────────────────────────────────────────── -->
+<div class="cl max-w-6xl mx-auto px-4 pb-24 flex gap-8">
+
+  <!-- TOC Sidebar -->
+  <aside class="hidden lg:block w-52 flex-shrink-0 pt-2">
+    <div class="sticky top-20">
+      <div class="sec-label mb-4">On This Page</div>
+      <nav class="space-y-0.5">
+        <a href="#what-is"     class="toc-link">What is a Field?</a>
+        <a href="#config"      class="toc-link">Common Settings</a>
+        <a href="#visibility"  class="toc-link">Field Visibility</a>
+        <a href="#dataflow"    class="toc-link">Field Data Flow</a>
+        <a href="#blueprints"  class="toc-link">Blueprints &amp; Fieldsets</a>
+        <a href="#fieldtypes"  class="toc-link">Fieldtypes</a>
+        <a href="#tips"        class="toc-link">Pro Tips</a>
+        <a href="#recap"       class="toc-link">Quick Recap</a>
+      </nav>
+    </div>
+  </aside>
+
+  <!-- Content -->
+  <main class="flex-1 min-w-0 space-y-8 pt-2">
+
+    <!-- ── WHAT IS ── -->
+    <section id="what-is" class="s-card p-7 md:p-9">
+      <div class="sec-label mb-2">The Concept</div>
+      <h2 class="font-display font-700 text-white text-2xl mb-4">🔲 What is a Field?</h2>
+      <p class="text-gem-300 leading-relaxed mb-4">
+        A field is a <strong class="text-white">single input in the control panel</strong>. It has a type that determines what it looks like and how it stores data, and a handle that becomes the variable name in your templates.
+      </p>
+      <p class="text-gem-300 leading-relaxed mb-5">
+        Fields live inside <strong class="text-white">Blueprints</strong> (which attach to content areas) or <strong class="text-white">Fieldsets</strong> (which are reusable libraries). Every field shares the same core config settings regardless of its type.
+      </p>
+      <div class="tip-box p-4 rounded">
+        <div class="flex items-start gap-2">
+          <span class="text-acid font-mono text-xs font-700 uppercase tracking-widest mt-0.5 flex-shrink-0">Simple idea</span>
+          <p class="text-gem-200 text-sm font-display font-600">Field = <span class="text-acid">one input</span> with a type, a handle, and a bunch of shared settings</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── COMMON CONFIG ── -->
+    <section id="config" class="s-card p-7 md:p-9">
+      <div class="sec-label mb-2">Configuration</div>
+      <h2 class="font-display font-700 text-white text-2xl mb-2">⚙️ Common Settings</h2>
+      <p class="text-gem-400 text-sm leading-relaxed mb-5">Every field — regardless of type — shares these settings. Configure them in the control panel's field editor or directly in YAML.</p>
+
+      <div class="overflow-x-auto rounded-lg border border-gem-800/25 mb-5">
+        <table class="doc-table">
+          <thead>
+            <tr><th>Setting</th><th>What it does</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code class="il">display</code></td>
+              <td class="text-gem-300">The label shown to editors in the control panel</td>
+            </tr>
+            <tr>
+              <td><code class="il">handle</code></td>
+              <td class="text-gem-300">The variable name used in Antlers templates — e.g. <code class="il">{{ title }}</code></td>
+            </tr>
+            <tr>
+              <td><code class="il">instructions</code></td>
+              <td class="text-gem-300">Help text displayed below the field to guide authors</td>
+            </tr>
+            <tr>
+              <td><code class="il">listable</code></td>
+              <td class="text-gem-300">Whether to show this field as a column in the CP listing table</td>
+            </tr>
+            <tr>
+              <td><code class="il">sortable</code></td>
+              <td class="text-gem-300">Whether editors can sort the listing table by this field</td>
+            </tr>
+            <tr>
+              <td><code class="il">visibility</code></td>
+              <td class="text-gem-300">Controls how the field appears on publish forms (see below)</td>
+            </tr>
+            <tr>
+              <td><code class="il">always_save</code></td>
+              <td class="text-gem-300">Overrides data flow — forces value to be submitted even when hidden</td>
+            </tr>
+            <tr>
+              <td><code class="il">localizable</code></td>
+              <td class="text-gem-300">Whether this field can have different values per site in a multi-site setup</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="code-block rounded-lg">
+        <div class="flex items-center justify-between px-4 py-2 border-b border-gem-800/30">
+          <div class="flex items-center gap-2">
+            <div class="t-r w-2.5 h-2.5 rounded-full"></div><div class="t-y w-2.5 h-2.5 rounded-full"></div><div class="t-g w-2.5 h-2.5 rounded-full"></div>
+          </div>
+          <span class="font-mono text-gem-500 text-xs">a fully-configured field</span>
+        </div>
+        <pre class="p-5 text-sm leading-7 overflow-x-auto"><span class="yaml-val">-</span>
+  <span class="yaml-key">handle</span><span class="yaml-val">: </span><span class="yaml-str">hero_title</span>
+  <span class="yaml-key">field</span><span class="yaml-val">:</span>
+    <span class="yaml-key">type</span><span class="yaml-val">: </span><span class="yaml-str">text</span>
+    <span class="yaml-key">display</span><span class="yaml-val">: </span><span class="yaml-str">Hero Title</span>
+    <span class="yaml-key">instructions</span><span class="yaml-val">: </span><span class="yaml-str">Keep it punchy — max 60 chars</span>
+    <span class="yaml-key">validate</span><span class="yaml-val">: </span><span class="yaml-str">required|max:60</span>
+    <span class="yaml-key">listable</span><span class="yaml-val">: </span><span class="yaml-num">true</span>
+    <span class="yaml-key">localizable</span><span class="yaml-val">: </span><span class="yaml-num">true</span></pre>
+      </div>
+    </section>
+
+    <!-- ── VISIBILITY ── -->
+    <section id="visibility" class="s-card p-7 md:p-9">
+      <div class="sec-label mb-2">Display Control</div>
+      <h2 class="font-display font-700 text-white text-2xl mb-4">👁️ Field Visibility</h2>
+      <p class="text-gem-300 leading-relaxed mb-6">
+        Every field is visible by default. Use the <code class="il">visibility</code> setting to control exactly how it behaves in the publish form — four modes to choose from.
+      </p>
+
+      <div class="space-y-3 mb-6">
+        <!-- Visible -->
+        <div class="flex items-start gap-4 bg-ink-800/40 border border-gem-800/20 rounded-xl p-4">
+          <span class="vis-badge vis-visible flex-shrink-0 mt-0.5">Visible</span>
+          <div>
+            <div class="font-display font-600 text-white text-sm mb-1">Always shown, always editable</div>
+            <p class="text-gem-400 text-xs leading-relaxed">The default. Editors see the field, they can change it, the value is saved on submit.</p>
+          </div>
+        </div>
+        <!-- Read Only -->
+        <div class="flex items-start gap-4 bg-ink-800/40 border border-gem-800/20 rounded-xl p-4">
+          <span class="vis-badge vis-readonly flex-shrink-0 mt-0.5">Read Only</span>
+          <div>
+            <div class="font-display font-600 text-white text-sm mb-1">Shown, but not editable</div>
+            <p class="text-gem-400 text-xs leading-relaxed">Editors can see the current value but can't change it. The value is still saved on submit.</p>
+          </div>
+        </div>
+        <!-- Computed -->
+        <div class="flex items-start gap-4 bg-ink-800/40 border border-gem-800/20 rounded-xl p-4">
+          <span class="vis-badge vis-computed flex-shrink-0 mt-0.5">Computed</span>
+          <div>
+            <div class="font-display font-600 text-white text-sm mb-1">Read-only computed display — value is <em>never</em> saved</div>
+            <p class="text-gem-400 text-xs leading-relaxed">Shows a dynamically calculated value for reference. Nothing is submitted on save — the value always comes from the compute logic.</p>
+          </div>
+        </div>
+        <!-- Hidden -->
+        <div class="flex items-start gap-4 bg-ink-800/40 border border-gem-800/20 rounded-xl p-4">
+          <span class="vis-badge vis-hidden flex-shrink-0 mt-0.5">Hidden</span>
+          <div>
+            <div class="font-display font-600 text-white text-sm mb-1">Not shown — but current value <em>is</em> saved</div>
+            <p class="text-gem-400 text-xs leading-relaxed">The field is invisible in the publish form, but whatever value it already has will be carried forward on save. Great for internal/system fields.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="tip-box p-4 rounded mb-3">
+        <div class="flex items-start gap-2">
+          <span class="text-acid font-mono text-xs font-700 uppercase tracking-widest mt-0.5 flex-shrink-0">Hot Tip</span>
+          <p class="text-gem-300 text-sm">You can also <strong class="text-white">dynamically</strong> show and hide fields using <strong class="text-white">Conditional Fields</strong> and <strong class="text-white">Revealer Fields</strong> — great for form UX that adapts to what the editor picks.</p>
+        </div>
+      </div>
+      <div class="warn-box p-4 rounded">
+        <div class="flex items-start gap-2">
+          <span class="text-yellow-400 font-mono text-xs font-700 uppercase tracking-widest mt-0.5 flex-shrink-0">Note</span>
+          <p class="text-gem-300 text-sm">Hiding a field via <strong class="text-white">conditions</strong> (not static visibility) will generally prevent its value from being submitted on save. See <strong class="text-white">Field Data Flow</strong> below for the full picture.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── DATA FLOW ── -->
+    <section id="dataflow" class="s-card p-7 md:p-9">
+      <div class="sec-label mb-2">Save Behaviour</div>
+      <h2 class="font-display font-700 text-white text-2xl mb-4">🌊 Field Data Flow</h2>
+      <p class="text-gem-300 leading-relaxed mb-5">
+        By default, <strong class="text-white">every field submits its value on save</strong>. There are only two situations where a field's value is <em>not</em> submitted:
+      </p>
+
+      <div class="grid sm:grid-cols-2 gap-3 mb-6">
+        <div class="cross-item bg-ink-800/40 border border-gem-800/20 rounded-lg p-4 text-gem-200 text-sm">
+          <span>Field visibility is set to <span class="vis-badge vis-computed" style="font-size:0.65rem;padding:2px 8px;">Computed</span></span>
+        </div>
+        <div class="cross-item bg-ink-800/40 border border-gem-800/20 rounded-lg p-4 text-gem-200 text-sm">
+          <span>Field is <strong class="text-white">dynamically hidden</strong> by a field condition</span>
+        </div>
+      </div>
+
+      <p class="text-gem-300 leading-relaxed mb-5">
+        Need to override the condition behaviour? Two options:
+      </p>
+
+      <div class="space-y-3 mb-5">
+        <div class="flex items-start gap-4 info-chip p-4">
+          <span class="text-2xl flex-shrink-0">🔓</span>
+          <div>
+            <div class="font-display font-600 text-white text-sm mb-1">Use a Revealer Field</div>
+            <p class="text-gem-400 text-xs leading-relaxed">A Revealer is a special fieldtype that toggles the visibility of surrounding fields while always allowing their values to be saved — no data loss.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-4 info-chip p-4">
+          <span class="text-2xl flex-shrink-0">💾</span>
+          <div>
+            <div class="font-display font-600 text-white text-sm mb-1">Set <code class="il">always_save: true</code></div>
+            <p class="text-gem-400 text-xs leading-relaxed">Forces the field's current value to be included in the save payload regardless of visibility — even if hidden by a condition.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Flow diagram -->
+      <div class="sec-label mb-3">Save decision flow</div>
+      <div class="overflow-x-auto pb-2">
+        <div class="flex items-center gap-1 min-w-max">
+          <div class="flow-step bg-gem-800/30 border-gem-700/30 text-gem-200">Editor saves</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step">Is field computed?</div>
+          <div class="flow-arrow text-red-400">→ yes →</div>
+          <div class="flow-step border-red-800/40 text-red-300 bg-red-900/10">Skip value</div>
+        </div>
+        <div class="flex items-center gap-1 min-w-max mt-2 ml-28">
+          <div class="flow-arrow">↓ no</div>
+        </div>
+        <div class="flex items-center gap-1 min-w-max mt-1 ml-16">
+          <div class="flow-step">Hidden by condition?</div>
+          <div class="flow-arrow text-yellow-400">→ yes →</div>
+          <div class="flow-step border-yellow-800/40 text-yellow-300 bg-yellow-900/10">Skip value</div>
+          <div class="text-gem-600 font-mono text-xs ml-2">(unless always_save: true)</div>
+        </div>
+        <div class="flex items-center gap-1 min-w-max mt-2 ml-28">
+          <div class="flow-arrow">↓ no</div>
+        </div>
+        <div class="flex items-center gap-1 min-w-max mt-1 ml-16">
+          <div class="flow-step border-gem-600/40 text-acid bg-gem-900/20">✓ Submit value</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── BLUEPRINTS & FIELDSETS ── -->
+    <section id="blueprints" class="s-card p-7 md:p-9">
+      <div class="sec-label mb-2">Where Fields Live</div>
+      <h2 class="font-display font-700 text-white text-2xl mb-4">🗂️ Blueprints &amp; Fieldsets</h2>
+      <p class="text-gem-300 leading-relaxed mb-5">Fields always live inside one of two containers. The choice depends on whether you need them in one place or many.</p>
+
+      <div class="grid sm:grid-cols-2 gap-4 mb-5">
+        <div class="bg-ink-800/50 border border-gem-800/30 rounded-xl p-5">
+          <div class="flex items-center gap-2 mb-3">
+            <span class="text-lg">📐</span>
+            <span class="font-display font-700 text-white">Blueprint</span>
+          </div>
+          <p class="text-gem-400 text-xs leading-relaxed mb-3">Attached to collections, taxonomies, globals, assets, forms, and users. Controls the publish form layout — field order, width, sections (tabs).</p>
+          <div class="check-item text-gem-300 text-xs"><span>Define inline for one-off fields</span></div>
+          <div class="check-item text-gem-300 text-xs mt-1"><span>Reference fieldset fields for reuse</span></div>
+        </div>
+        <div class="bg-ink-800/50 border border-gem-800/30 rounded-xl p-5">
+          <div class="flex items-center gap-2 mb-3">
+            <span class="text-lg">🧩</span>
+            <span class="font-display font-700 text-white">Fieldset</span>
+          </div>
+          <p class="text-gem-400 text-xs leading-relaxed mb-3">Not attached to anything — a library of pre-configured fields. Import individual fields or the whole fieldset into blueprints.</p>
+          <div class="check-item text-gem-300 text-xs"><span>DRY: update once, reflects everywhere</span></div>
+          <div class="check-item text-gem-300 text-xs mt-1"><span>Also works inside Grid, Replicator &amp; Bard</span></div>
+        </div>
+      </div>
+
+      <div class="tip-box p-4 rounded">
+        <div class="flex items-start gap-2">
+          <span class="text-acid font-mono text-xs font-700 uppercase tracking-widest mt-0.5 flex-shrink-0">Quick rule</span>
+          <p class="text-gem-300 text-sm">Used in one blueprint? Define it inline. Used in two or more? Move it to a fieldset. Future-you will be grateful.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── FIELDTYPES ── -->
+    <section id="fieldtypes" class="s-card p-7 md:p-9">
+      <div class="sec-label mb-2">The Input Types</div>
+      <h2 class="font-display font-700 text-white text-2xl mb-2">🎛️ Fieldtypes</h2>
+      <p class="text-gem-300 leading-relaxed mb-6">
+        The <code class="il">type</code> key on a field sets its <strong class="text-white">fieldtype</strong> — which controls both the UI widget editors see and the storage format in your YAML. Statamic ships with <strong class="text-white">40+ built-in fieldtypes</strong>.
+      </p>
+
+      <!-- Fieldtype grid -->
+      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mb-6">
+        <div class="ft-card"><div class="text-2xl mb-2">📝</div><div class="text-white text-xs font-display font-600">text</div><div class="text-gem-500 text-xs font-mono mt-1">single line</div></div>
+        <div class="ft-card"><div class="text-2xl mb-2">📄</div><div class="text-white text-xs font-display font-600">textarea</div><div class="text-gem-500 text-xs font-mono mt-1">plain multiline</div></div>
+        <div class="ft-card"><div class="text-2xl mb-2">✍️</div><div class="text-white text-xs font-display font-600">markdown</div><div class="text-gem-500 text-xs font-mono mt-1">md editor</div></div>
+        <div class="ft-card"><div class="text-2xl mb-2">🧱</div><div class="text-white text-xs font-display font-600">bard</div><div class="text-gem-500 text-xs font-mono mt-1">rich text + sets</div></div>
+        <div class="ft-card"><div class="text-2xl mb-2">🖼️</div><div class="text-white text-xs font-display font-600">assets</div><div class="text-gem-500 text-xs font-mono mt-1">image picker</div></div>
+        <div class="ft-card"><div class="text-2xl mb-2">🔀</div><div class="text-white text-xs font-display font-600">toggle</div><div class="text-gem-500 text-xs font-mono mt-1">true / false</div></div>
+        <div class="ft-card"><div class="text-2xl mb-2">📋</div><div class="text-white text-xs font-display font-600">select</div><div class="text-gem-500 text-xs font-mono mt-1">dropdown</div></div>
+        <div class="ft-card"><div class="text-2xl mb-2">☑️</div><div class="text-white text-xs font-display font-600">checkboxes</div><div class="text-gem-500 text-xs font-mono mt-1">multi-select</div></div>
+        <div class="ft-card"><div class="text-2xl mb-2">📆</div><div class="text-white text-xs font-display font-600">date</div><div class="text-gem-500 text-xs font-mono mt-1">date / datetime</div></div>
+        <div class="ft-card"><div class="text-2xl mb-2">🔢</div><div class="text-white text-xs font-display font-600">integer</div><div class="text-gem-500 text-xs font-mono mt-1">whole numbers</div></div>
+        <div class="ft-card"><div class="text-2xl mb-2">🔗</div><div class="text-white text-xs font-display font-600">link</div><div class="text-gem-500 text-xs font-mono mt-1">url / entry ref</div></div>
+        <div class="ft-card"><div class="text-2xl mb-2">🎨</div><div class="text-white text-xs font-display font-600">color</div><div class="text-gem-500 text-xs font-mono mt-1">colour picker</div></div>
+        <div class="ft-card"><div class="text-2xl mb-2">🔁</div><div class="text-white text-xs font-display font-600">replicator</div><div class="text-gem-500 text-xs font-mono mt-1">repeatable sets</div></div>
+        <div class="ft-card"><div class="text-2xl mb-2">🔢</div><div class="text-white text-xs font-display font-600">grid</div><div class="text-gem-500 text-xs font-mono mt-1">tabular rows</div></div>
+        <div class="ft-card"><div class="text-2xl mb-2">🏷️</div><div class="text-white text-xs font-display font-600">tags</div><div class="text-gem-500 text-xs font-mono mt-1">free-entry list</div></div>
+        <div class="ft-card border-dashed border-gem-700/30">
+          <div class="text-2xl mb-2 opacity-40">＋</div>
+          <div class="text-gem-500 text-xs font-mono">25+ more</div>
+        </div>
+      </div>
+
+      <div class="tip-box p-4 rounded">
+        <div class="flex items-start gap-2">
+          <span class="text-acid font-mono text-xs font-700 uppercase tracking-widest mt-0.5 flex-shrink-0">Dev tip</span>
+          <p class="text-gem-300 text-sm">You can build <strong class="text-white">custom fieldtypes</strong> as Statamic addons — if the built-in 40+ don't cover your use case, you're not stuck.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── PRO TIPS ── -->
+    <section id="tips" class="s-card p-7 md:p-9">
+      <div class="sec-label mb-2">Best Practices</div>
+      <h2 class="font-display font-700 text-white text-2xl mb-5">💡 Pro Tips</h2>
+      <div class="space-y-3">
+        <div class="flex items-start gap-4 info-chip p-4">
+          <span class="text-2xl flex-shrink-0">🏷️</span>
+          <div>
+            <div class="font-display font-600 text-white text-sm mb-1">Handle = your template variable — name it well</div>
+            <p class="text-gem-400 text-xs leading-relaxed"><code class="il">hero_title</code> not <code class="il">ht</code>. <code class="il">featured_image</code> not <code class="il">img</code>. You'll be typing these in Antlers for years.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-4 info-chip p-4">
+          <span class="text-2xl flex-shrink-0">✍️</span>
+          <div>
+            <div class="font-display font-600 text-white text-sm mb-1">Write good instructions</div>
+            <p class="text-gem-400 text-xs leading-relaxed">The <code class="il">instructions</code> field is prime real estate. Use it — "Keep under 60 chars for SEO" beats "Title" alone every time.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-4 info-chip p-4">
+          <span class="text-2xl flex-shrink-0">👁️</span>
+          <div>
+            <div class="font-display font-600 text-white text-sm mb-1">Use Hidden visibility for system fields</div>
+            <p class="text-gem-400 text-xs leading-relaxed">Fields like internal IDs, computed slugs, or migration flags don't need to be visible. <code class="il">visibility: hidden</code> keeps them out of the way while still saving the value.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-4 info-chip p-4">
+          <span class="text-2xl flex-shrink-0">🌍</span>
+          <div>
+            <div class="font-display font-600 text-white text-sm mb-1">Set <code class="il">localizable: true</code> from the start</div>
+            <p class="text-gem-400 text-xs leading-relaxed">If there's any chance the project goes multi-site, flip this on now. Retrofitting localisation onto existing content is painful.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── RECAP ── -->
+    <section id="recap" class="s-card p-7 md:p-9">
+      <div class="sec-label mb-2">Summary</div>
+      <h2 class="font-display font-700 text-white text-2xl mb-5">🧠 Quick Recap</h2>
+      <div class="space-y-2 mb-6">
+        <div class="check-item bg-ink-800/40 border border-gem-800/20 rounded-lg p-4 text-gem-200 text-sm">
+          <span><strong class="text-white">Field</strong> = one input — a type, a handle, and shared settings</span>
+        </div>
+        <div class="check-item bg-ink-800/40 border border-gem-800/20 rounded-lg p-4 text-gem-200 text-sm">
+          <span>All fields share: <code class="il">display</code>, <code class="il">handle</code>, <code class="il">instructions</code>, <code class="il">visibility</code>, <code class="il">localizable</code></span>
+        </div>
+        <div class="check-item bg-ink-800/40 border border-gem-800/20 rounded-lg p-4 text-gem-200 text-sm">
+          <span>Four visibility modes: <strong class="text-white">Visible</strong>, <strong class="text-white">Read Only</strong>, <strong class="text-white">Computed</strong>, <strong class="text-white">Hidden</strong></span>
+        </div>
+        <div class="check-item bg-ink-800/40 border border-gem-800/20 rounded-lg p-4 text-gem-200 text-sm">
+          <span>Values are always saved — except when <strong class="text-white">Computed</strong> or <strong class="text-white">conditionally hidden</strong></span>
+        </div>
+        <div class="check-item bg-ink-800/40 border border-gem-800/20 rounded-lg p-4 text-gem-200 text-sm">
+          <span>40+ built-in <strong class="text-white">fieldtypes</strong> — the type controls the UI and storage format</span>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto rounded-lg border border-gem-800/25">
+        <table class="doc-table">
+          <thead>
+            <tr><th>Concept</th><th>Meaning</th><th>Example</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code class="il">handle</code></td>
+              <td class="text-gem-300">Template variable name</td>
+              <td class="text-gem-500 font-mono text-xs">{{ hero_title }}</td>
+            </tr>
+            <tr>
+              <td><code class="il">type</code></td>
+              <td class="text-gem-300">Fieldtype — sets UI and storage</td>
+              <td class="text-gem-500 font-mono text-xs">text, bard, assets</td>
+            </tr>
+            <tr>
+              <td><code class="il">visibility</code></td>
+              <td class="text-gem-300">Static display mode</td>
+              <td class="text-gem-500 font-mono text-xs">hidden, computed</td>
+            </tr>
+            <tr>
+              <td><code class="il">always_save</code></td>
+              <td class="text-gem-300">Force save even when hidden</td>
+              <td class="text-gem-500 font-mono text-xs">always_save: true</td>
+            </tr>
+            <tr>
+              <td><code class="il">localizable</code></td>
+              <td class="text-gem-300">Per-site translation support</td>
+              <td class="text-gem-500 font-mono text-xs">localizable: true</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ── FINAL CTA ── -->
+    <section class="cta-glow bg-ink-800/60 rounded-2xl p-10 border border-gem-800/30 text-center">
+      <div class="text-5xl mb-5">🔲</div>
+      <h2 class="font-display font-800 text-3xl text-white mb-4">The Content Model Stack</h2>
+      <div class="flex flex-wrap items-center justify-center gap-3 mb-6 text-base">
+        <div class="acid-badge px-4 py-3 rounded-xl font-display font-600 text-center">
+          <div class="text-xl mb-1">🔲</div>
+          Fields<br/>
+          <span class="text-gem-400 font-mono text-xs font-400">the atoms</span>
+        </div>
+        <div class="text-acid text-2xl font-display">→</div>
+        <div class="acid-badge px-4 py-3 rounded-xl font-display font-600 text-center">
+          <div class="text-xl mb-1">🧩</div>
+          Fieldsets<br/>
+          <span class="text-gem-400 font-mono text-xs font-400">reusable groups</span>
+        </div>
+        <div class="text-acid text-2xl font-display">→</div>
+        <div class="acid-badge px-4 py-3 rounded-xl font-display font-600 text-center">
+          <div class="text-xl mb-1">📐</div>
+          Blueprints<br/>
+          <span class="text-gem-400 font-mono text-xs font-400">the schema</span>
+        </div>
+        <div class="text-acid text-2xl font-display">→</div>
+        <div class="bg-acid/15 border border-acid/40 px-4 py-3 rounded-xl font-display font-700 text-acid text-center">
+          <div class="text-xl mb-1">🚀</div>
+          Content<br/>
+          <span class="text-gem-300 font-mono text-xs font-400">in the CP</span>
+        </div>
+      </div>
+      <p class="text-gem-400 mb-8 leading-relaxed max-w-lg mx-auto">
+        Fields are the foundation. Get them right — good handles, clear instructions, correct fieldtypes — and everything built on top of them will be a pleasure to work with.
+      </p>
+      <div class="flex flex-wrap gap-3 justify-center">
+        <a href="https://statamic.dev/fields" target="_blank"
+           class="inline-flex items-center gap-2 bg-acid text-ink-950 font-display font-700 px-5 py-2.5 rounded text-sm hover:bg-white transition-colors">
+          Full Fields Docs ↗
+        </a>
+        <a href="statamic-fieldsets.html"
+           class="inline-flex items-center gap-2 border border-gem-600/40 text-gem-200 font-display px-5 py-2.5 rounded text-sm hover:border-acid/40 hover:text-white transition-colors">
+          ← Fieldsets
+        </a>
+        <a href="statamic-blueprints.html"
+           class="inline-flex items-center gap-2 border border-gem-600/40 text-gem-200 font-display px-5 py-2.5 rounded text-sm hover:border-acid/40 hover:text-white transition-colors">
+          ← Blueprints
+        </a>
+      </div>
+    </section>
+
+    <div class="flex flex-wrap gap-3 justify-center">
+      <a href="statamic-globals.html"
+         class="inline-flex items-center gap-2 bg-acid text-ink-950 font-display font-700 px-5 py-2.5 rounded text-sm hover:bg-white transition-colors">
+        Content Modeling — Globals
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M13 5l7 7-7 7"/>
+        </svg>
+      </a>
+    </div>
+
+  </main>
+</div>
+
+<!-- ─── FOOTER ─────────────────────────────────────────────── -->
+<footer class="cl border-t border-gem-900/50 py-8 px-6">
+  <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+    <div class="flex items-center gap-2">
+      <div class="w-5 h-5 rounded border border-gem-600/30 flex items-center justify-center bg-gem-800/20">
+        <svg viewBox="0 0 20 20" fill="none" class="w-3 h-3 text-gem-400" xmlns="http://www.w3.org/2000/svg">
+          <polygon points="10,2 18,7 18,13 10,18 2,13 2,7" stroke="currentColor" stroke-width="1.5" fill="none"/>
+        </svg>
+      </div>
+      <span class="text-gem-500 text-xs font-mono">Statamic — Fields Guide</span>
+    </div>
+    <div class="flex items-center gap-4 text-xs font-mono text-gem-600">
+      <a href="#what-is" class="hover:text-gem-400 transition-colors">↑ Back to top</a>
+      <span>·</span>
+      <span>v5.x docs</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

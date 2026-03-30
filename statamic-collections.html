@@ -254,13 +254,6 @@
       <span class="text-gem-700">/</span>
       <span class="acid-badge text-xs px-2 py-0.5 rounded font-mono">Collections</span>
     </div>
-    <div class="hidden md:flex items-center gap-5 text-xs text-gem-400 font-mono">
-      <a href="#what-is" class="acid-underline hover:text-white transition-colors">What is a Collection</a>
-      <a href="#file-structure" class="acid-underline hover:text-white transition-colors">File Structure</a>
-      <a href="#entries" class="acid-underline hover:text-white transition-colors">Entries</a>
-      <a href="#blueprints" class="acid-underline hover:text-white transition-colors">Blueprints</a>
-      <a href="#routing" class="acid-underline hover:text-white transition-colors">Routing</a>
-    </div>
     <div class="flex items-center gap-2">
       <div class="pulse-dot w-2 h-2 rounded-full bg-acid"></div>
       <span class="text-xs font-mono text-gem-400">v5.x</span>
@@ -355,6 +348,14 @@
           </p>
         </div>
       </div>
+      <div class="img-placeholder h-[350px] mt-5 rounded-lg" id="img-cp">
+        <!-- REPLACE THIS IMAGE URL WITH YOUR ACTUAL SCREENSHOT -->
+        <img src="./asserts/img/Screenshot from 2026-03-30 12-58-49.png"
+             alt="Statamic Control Panel Entry Editor"
+             />
+
+      </div>
+      <p class="text-gem-500 text-xs font-mono text-center mt-2">👉 What you write in the UI is saved as Markdown behind the scenes.</p>
     </section>
 
     <!-- ── CONCEPT OVERVIEW ── -->
@@ -570,6 +571,68 @@
 
       </div>
       <p class="text-gem-500 text-xs font-mono text-center mt-2">👉 Blueprint field schema for the pages</p>
+    </section>
+
+    <!-- ── TEMPLETING THE COLLECTION ── -->
+    <section id="taxonomies" class="s-card p-7 md:p-9">
+      <div class="sec-label mb-2">Theming and templetes</div>
+      <h2 class="font-display font-700 text-white text-2xl mb-4">Templetes</h2>
+      <p class="text-gem-300 leading-relaxed mb-5"> The collection field will be theming with the fields like this </p>
+
+      <div class="code-block rounded-lg mb-5" x-data="{copied:false}">
+        <div class="flex items-center justify-between px-4 py-2 border-b border-gem-800/30">
+          <div class="flex items-center gap-2">
+            <div class="t-r w-2.5 h-2.5 rounded-full"></div>
+            <div class="t-y w-2.5 h-2.5 rounded-full"></div>
+            <div class="t-g w-2.5 h-2.5 rounded-full"></div>
+            <span class="font-mono text-gem-500 text-xs ml-1">collection.yaml</span>
+          </div>
+          <button class="copy-btn text-gem-500 flex items-center gap-1.5"
+            @click="navigator.clipboard.writeText('taxonomies:\n  - categories\n  - tags'); copied=true; setTimeout(()=>copied=false,2000)">
+            <template x-if="!copied"><span class="flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2"/></svg>Copy</span></template>
+            <template x-if="copied"><span class="flex items-center gap-1 text-acid"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Copied!</span></template>
+          </button>
+        </div>
+        <div class="p-4 text-sm leading-7">
+        <code>
+          <span class="text-gem-600">&lt;div</span> <span class="text-acid">class</span>=<span class="text-amber-500">"grid sm:grid-cols-2 lg:grid-cols-3 gap-6"</span><span class="text-gem-600">&gt;</span><br/><br/>
+
+          <span class="text-gem-400 font-bold text-lg ">{{ collection:blog limit="3" }}</span><br/><br/>
+
+          <span class="text-gem-600">&nbsp;&nbsp;&lt;article</span> <span class="text-acid">class</span>=<span class="text-amber-500">"card-lift bg-white rounded-3xl border border-slate-100 overflow-hidden shadow-sm"</span><span class="text-gem-600">&gt;</span><br/>
+
+          <span class="text-gem-600">&nbsp;&nbsp;&nbsp;&nbsp;&lt;div</span> <span class="text-acid">class</span>=<span class="text-amber-500">"overflow-hidden img-zoom h-52"</span><span class="text-gem-600">&gt;</span><br/>
+          
+          <span class="text-gem-400">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ blog_image }}</span><br/>
+          
+          <span class="text-gem-600">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;img</span><br/>
+          <span class="text-acid">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;src</span>=<span class="text-amber-500">"{{ url }}"</span><br/>
+          <span class="text-acid">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;alt</span>=<span class="text-amber-500">"{{ alt }}"</span><br/>
+          <span class="text-acid">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;class</span>=<span class="text-amber-500">"w-full h-full object-cover"</span><br/>
+          <span class="text-gem-600">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/&gt;</span><br/>
+          
+          <span class="text-gem-400">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ /blog_image }}</span><br/>
+          
+          <span class="text-gem-600">&nbsp;&nbsp;&nbsp;&nbsp;&lt;/div&gt;</span><br/><br/>
+
+          <span class="text-gem-600">&nbsp;&nbsp;&nbsp;&nbsp;&lt;div</span> <span class="text-acid">class</span>=<span class="text-amber-500">"p-7"</span><span class="text-gem-600">&gt;</span><br/>
+
+          <span class="text-gem-600">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;h3&gt;</span><span class="text-gem-400">{{ title }}</span><span class="text-gem-600">&lt;/h3&gt;</span><br/>
+
+          <span class="text-gem-600">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;p&gt;</span>
+          <span class="text-gem-400">{{ content | safe_truncate:75 }}</span>...
+          <span class="text-gem-600">&lt;/p&gt;</span><br/>
+
+          <span class="text-gem-600">&nbsp;&nbsp;&nbsp;&nbsp;&lt;/div&gt;</span><br/>
+
+          <span class="text-gem-600">&nbsp;&nbsp;&lt;/article&gt;</span><br/><br/>
+
+          <span class="text-gem-400 font-bold text-lg">{{ /collection:blog }}</span><br/><br/>
+
+          <span class="text-gem-600">&lt;/div&gt;</span>
+        </code>
+        </div>
+      </div>
     </section>
 
     <!-- ── TITLES ── -->
@@ -1021,7 +1084,7 @@
     </section>
   
   <div class="flex flex-wrap gap-3 justify-center">
-    <a href="/statamic-taxonomies.html"
+    <a href="/statamic-raw-dics/statamic-taxonomies.html"
         class="inline-flex items-center gap-2 bg-acid text-ink-950 font-display font-700 px-5 py-2.5 rounded text-sm hover:bg-white transition-colors">
       Content Modeling - Taxonomies
       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

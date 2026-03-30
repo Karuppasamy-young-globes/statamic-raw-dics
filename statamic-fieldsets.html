@@ -257,18 +257,6 @@
       <a href="#recap"   class="inline-flex items-center gap-2 border border-gem-600/40 text-gem-200 font-display px-5 py-2.5 rounded text-sm hover:border-acid/40 hover:text-white transition-colors">Quick Recap</a>
     </div>
   </div>
-
-  <!-- fieldset file strip -->
-  <div class="max-w-lg mx-auto mt-12 animate-fade-up d3">
-    <div class="flex flex-wrap justify-center gap-2">
-      <span class="tag-pill">📄 common.yaml</span>
-      <span class="tag-pill">📄 seo.yaml</span>
-      <span class="tag-pill">📄 bard-image.yaml</span>
-      <span class="tag-pill">📄 bard-quote.yaml</span>
-      <span class="tag-pill">📄 social.yaml</span>
-    </div>
-    <p class="text-gem-600 text-xs font-mono mt-3">↑ These are fieldsets — each one a reusable field library</p>
-  </div>
 </section>
 
 <!-- ─── MAIN LAYOUT ──────────────────────────────────────────── -->
@@ -301,10 +289,13 @@
       <div class="sec-label mb-2">The Concept</div>
       <h2 class="font-display font-700 text-white text-2xl mb-4">🧩 What is a Fieldset?</h2>
       <p class="text-gem-300 leading-relaxed mb-4">
-        A Fieldset is a <strong class="text-white">named collection of pre-configured fields</strong> that lives on its own — not attached to any content area. Think of it as your field library.
+        <strong class="text-white">Fieldsets are used to store and organize reusable fields. ( like a paragraph in DRUPAL )</strong> 
       </p>
       <p class="text-gem-300 leading-relaxed mb-5">
-        You build a fieldset once, then pull its fields into as many blueprints as you like. Update the fieldset → every blueprint that references it gets the change instantly.
+        Fieldsets are almost functionally equivalent to Blueprints, except that they exist for you to be able to create reusable fields. <br><br>
+        While Blueprints attach directly to content like collections or forms, Fieldsets are not directly attached to anything.<br><br>
+        Fieldsets contain fields, just like Blueprints, but the benefit of using a Fieldset is that you can import their fields (or the whole thing) into other Blueprints. You can even import fieldsets into certain fieldtypes, like Grid, Replicator, or Bard.<br><br>
+        Fieldsets can only have fields. They don't have sections like Blueprints can.
       </p>
       <div class="tip-box p-4 rounded">
         <div class="flex items-start gap-2">
@@ -733,9 +724,9 @@
     </section>
 
     <div class="flex flex-wrap gap-3 justify-center">
-      <a href="statamic-globals.html"
+      <a href="/statamic-raw-dics/statamic-fields.html"
          class="inline-flex items-center gap-2 bg-acid text-ink-950 font-display font-700 px-5 py-2.5 rounded text-sm hover:bg-white transition-colors">
-        Content Modeling — Globals
+        Content Modeling — Fields
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M13 5l7 7-7 7"/>
         </svg>

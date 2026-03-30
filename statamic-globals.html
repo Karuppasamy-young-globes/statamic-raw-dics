@@ -2,12 +2,14 @@
 <html lang="en" x-data="{}" class="scroll-smooth">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Statamic — Globals</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap"
+    rel="stylesheet">
 
   <script>
     tailwind.config = {
@@ -15,17 +17,27 @@
         extend: {
           fontFamily: {
             display: ['Syne', 'sans-serif'],
-            mono:    ['Space Mono', 'monospace'],
+            mono: ['Space Mono', 'monospace'],
           },
           colors: {
             gem: {
-              50:  '#f0fdf9', 100: '#ccfbef', 200: '#99f3df',
-              300: '#58e4c6', 400: '#22cda8', 500: '#0ab28e',
-              600: '#048f73', 700: '#07725d', 800: '#095a4b', 900: '#0a4a3e',
+              50: '#f0fdf9',
+              100: '#ccfbef',
+              200: '#99f3df',
+              300: '#58e4c6',
+              400: '#22cda8',
+              500: '#0ab28e',
+              600: '#048f73',
+              700: '#07725d',
+              800: '#095a4b',
+              900: '#0a4a3e',
             },
             ink: {
-              950: '#04100d', 900: '#081a14', 800: '#0d2a20',
-              700: '#133d2f', 600: '#1c5440',
+              950: '#04100d',
+              900: '#081a14',
+              800: '#0d2a20',
+              700: '#133d2f',
+              600: '#1c5440',
             },
             acid: '#39ff84',
           },
@@ -35,9 +47,14 @@
   </script>
 
   <style>
-    :root { --acid: #39ff84; --ink-dark: #04100d; }
+    :root {
+      --acid: #39ff84;
+      --ink-dark: #04100d;
+    }
 
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
 
     body {
       background-color: #04100d;
@@ -49,62 +66,85 @@
     /* Grid texture */
     body::before {
       content: '';
-      position: fixed; inset: 0;
+      position: fixed;
+      inset: 0;
       background-image:
-        linear-gradient(rgba(57,255,132,0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(57,255,132,0.03) 1px, transparent 1px);
+        linear-gradient(rgba(57, 255, 132, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(57, 255, 132, 0.03) 1px, transparent 1px);
       background-size: 40px 40px;
-      pointer-events: none; z-index: 0;
+      pointer-events: none;
+      z-index: 0;
     }
 
     /* Noise */
     body::after {
       content: '';
-      position: fixed; inset: 0;
+      position: fixed;
+      inset: 0;
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-      pointer-events: none; z-index: 0; opacity: 0.4;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.4;
     }
 
-    .cl { position: relative; z-index: 1; }
+    .cl {
+      position: relative;
+      z-index: 1;
+    }
 
     /* Code block */
     .code-block {
       background: #020c09;
-      border: 1px solid rgba(57,255,132,0.18);
+      border: 1px solid rgba(57, 255, 132, 0.18);
       border-left: 3px solid var(--acid);
       border-radius: 6px;
       font-family: 'Space Mono', monospace;
-      position: relative; overflow: hidden;
+      position: relative;
+      overflow: hidden;
     }
+
     .code-block::before {
       content: '';
-      position: absolute; top: 0; left: 0; right: 0; height: 100%;
-      background: linear-gradient(180deg, transparent 0%, rgba(57,255,132,0.03) 50%, transparent 100%);
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 100%;
+      background: linear-gradient(180deg, transparent 0%, rgba(57, 255, 132, 0.03) 50%, transparent 100%);
       background-size: 100% 8px;
       pointer-events: none;
       animation: scan 6s linear infinite;
     }
+
     @keyframes scan {
-      0%   { background-position: 0 -100%; }
-      100% { background-position: 0 200%; }
+      0% {
+        background-position: 0 -100%;
+      }
+
+      100% {
+        background-position: 0 200%;
+      }
     }
 
     /* Section cards */
     .s-card {
-      border: 1px solid rgba(57,255,132,0.1);
-      background: linear-gradient(135deg, rgba(13,42,32,0.65) 0%, rgba(4,16,13,0.9) 100%);
+      border: 1px solid rgba(57, 255, 132, 0.1);
+      background: linear-gradient(135deg, rgba(13, 42, 32, 0.65) 0%, rgba(4, 16, 13, 0.9) 100%);
       backdrop-filter: blur(8px);
       border-radius: 12px;
       transition: border-color 0.3s;
     }
-    .s-card:hover { border-color: rgba(57,255,132,0.28); }
+
+    .s-card:hover {
+      border-color: rgba(57, 255, 132, 0.28);
+    }
 
     /* Inline code */
     code.il {
       font-family: 'Space Mono', monospace;
       font-size: 0.78em;
-      background: rgba(57,255,132,0.08);
-      border: 1px solid rgba(57,255,132,0.18);
+      background: rgba(57, 255, 132, 0.08);
+      border: 1px solid rgba(57, 255, 132, 0.18);
       color: var(--acid);
       padding: 2px 7px;
       border-radius: 4px;
@@ -112,682 +152,985 @@
 
     /* Acid badge */
     .acid-badge {
-      background: rgba(57,255,132,0.1);
-      border: 1px solid rgba(57,255,132,0.28);
+      background: rgba(57, 255, 132, 0.1);
+      border: 1px solid rgba(57, 255, 132, 0.28);
       color: var(--acid);
     }
 
     /* Prereq-style chip */
     .info-chip {
-      background: rgba(10,178,142,0.08);
-      border: 1px solid rgba(10,178,142,0.22);
+      background: rgba(10, 178, 142, 0.08);
+      border: 1px solid rgba(10, 178, 142, 0.22);
       border-radius: 8px;
       transition: all 0.22s;
     }
-    .info-chip:hover { background: rgba(10,178,142,0.16); border-color: rgba(10,178,142,0.45); }
+
+    .info-chip:hover {
+      background: rgba(10, 178, 142, 0.16);
+      border-color: rgba(10, 178, 142, 0.45);
+    }
 
     /* Tip box */
     .tip-box {
-      background: rgba(57,255,132,0.04);
+      background: rgba(57, 255, 132, 0.04);
       border-left: 3px solid var(--acid);
       border-radius: 0 6px 6px 0;
     }
 
     /* Acid underline nav */
-    .acid-underline { position: relative; display: inline-block; }
-    .acid-underline::after {
-      content: ''; position: absolute; bottom: -3px; left: 0; right: 0;
-      height: 2px; background: var(--acid);
-      box-shadow: 0 0 10px var(--acid);
-      transform: scaleX(0); transform-origin: left; transition: transform 0.35s ease;
+    .acid-underline {
+      position: relative;
+      display: inline-block;
     }
-    .acid-underline:hover::after { transform: scaleX(1); }
+
+    .acid-underline::after {
+      content: '';
+      position: absolute;
+      bottom: -3px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--acid);
+      box-shadow: 0 0 10px var(--acid);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.35s ease;
+    }
+
+    .acid-underline:hover::after {
+      transform: scaleX(1);
+    }
 
     /* Pulse dot */
-    @keyframes pulseDot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.7)} }
-    .pulse-dot { animation: pulseDot 2s ease-in-out infinite; }
+    @keyframes pulseDot {
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1)
+      }
+
+      50% {
+        opacity: 0.5;
+        transform: scale(0.7)
+      }
+    }
+
+    .pulse-dot {
+      animation: pulseDot 2s ease-in-out infinite;
+    }
 
     /* Copy button */
-    .copy-btn { font-family: 'Space Mono', monospace; font-size: 11px; transition: all 0.2s; }
-    .copy-btn:hover { color: var(--acid); }
+    .copy-btn {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      transition: all 0.2s;
+    }
+
+    .copy-btn:hover {
+      color: var(--acid);
+    }
 
     /* Terminal dots */
-    .t-r{background:#ff5f56} .t-y{background:#ffbd2e} .t-g{background:#27c93f}
+    .t-r {
+      background: #ff5f56
+    }
+
+    .t-y {
+      background: #ffbd2e
+    }
+
+    .t-g {
+      background: #27c93f
+    }
 
     /* Section label */
-    .sec-label { font-family: 'Space Mono', monospace; font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: #0ab28e; }
+    .sec-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #0ab28e;
+    }
 
     /* Table */
-    .doc-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
-    .doc-table th { font-family: 'Space Mono', monospace; font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: #0ab28e; padding: 10px 14px; border-bottom: 1px solid rgba(57,255,132,0.15); text-align: left; }
-    .doc-table td { padding: 11px 14px; border-bottom: 1px solid rgba(57,255,132,0.06); color: #c8ddd6; vertical-align: top; }
-    .doc-table tr:last-child td { border-bottom: none; }
-    .doc-table tr:hover td { background: rgba(57,255,132,0.03); }
+    .doc-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+    }
+
+    .doc-table th {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #0ab28e;
+      padding: 10px 14px;
+      border-bottom: 1px solid rgba(57, 255, 132, 0.15);
+      text-align: left;
+    }
+
+    .doc-table td {
+      padding: 11px 14px;
+      border-bottom: 1px solid rgba(57, 255, 132, 0.06);
+      color: #c8ddd6;
+      vertical-align: top;
+    }
+
+    .doc-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .doc-table tr:hover td {
+      background: rgba(57, 255, 132, 0.03);
+    }
 
     /* Image placeholder */
     .img-placeholder {
       background: linear-gradient(135deg, #081a14 0%, #0d2a20 100%);
-      border: 1px dashed rgba(57,255,132,0.25);
+      border: 1px dashed rgba(57, 255, 132, 0.25);
       border-radius: 8px;
       position: relative;
       overflow: hidden;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
       gap: 10px;
     }
+
     .img-placeholder::before {
       content: '';
-      position: absolute; inset: 0;
-      background: repeating-linear-gradient(
-        45deg,
-        transparent, transparent 8px,
-        rgba(57,255,132,0.025) 8px, rgba(57,255,132,0.025) 9px
-      );
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(45deg,
+          transparent, transparent 8px,
+          rgba(57, 255, 132, 0.025) 8px, rgba(57, 255, 132, 0.025) 9px);
     }
 
     /* Fade-up animation */
-    @keyframes fadeUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
-    .animate-fade-up { animation: fadeUp 0.65s ease both; }
-    .d1{animation-delay:0.1s} .d2{animation-delay:0.2s} .d3{animation-delay:0.3s} .d4{animation-delay:0.4s}
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(24px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    .animate-fade-up {
+      animation: fadeUp 0.65s ease both;
+    }
+
+    .d1 {
+      animation-delay: 0.1s
+    }
+
+    .d2 {
+      animation-delay: 0.2s
+    }
+
+    .d3 {
+      animation-delay: 0.3s
+    }
+
+    .d4 {
+      animation-delay: 0.4s
+    }
 
     /* Glow pulse CTA */
     @keyframes glowPulse {
-      0%,100%{box-shadow:0 0 0 1px rgba(57,255,132,0.2),0 0 40px rgba(57,255,132,0.08)}
-      50%{box-shadow:0 0 0 1px rgba(57,255,132,0.4),0 0 80px rgba(57,255,132,0.2)}
+
+      0%,
+      100% {
+        box-shadow: 0 0 0 1px rgba(57, 255, 132, 0.2), 0 0 40px rgba(57, 255, 132, 0.08)
+      }
+
+      50% {
+        box-shadow: 0 0 0 1px rgba(57, 255, 132, 0.4), 0 0 80px rgba(57, 255, 132, 0.2)
+      }
     }
-    .cta-glow { animation: glowPulse 3s ease-in-out infinite; }
+
+    .cta-glow {
+      animation: glowPulse 3s ease-in-out infinite;
+    }
 
     /* Hero glow text */
-    .hero-glow { text-shadow: 0 0 60px rgba(57,255,132,0.2); }
+    .hero-glow {
+      text-shadow: 0 0 60px rgba(57, 255, 132, 0.2);
+    }
 
     /* Scrollbar */
-    ::-webkit-scrollbar{width:6px} ::-webkit-scrollbar-track{background:#04100d} ::-webkit-scrollbar-thumb{background:rgba(57,255,132,0.22);border-radius:3px}
+    ::-webkit-scrollbar {
+      width: 6px
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #04100d
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(57, 255, 132, 0.22);
+      border-radius: 3px
+    }
 
     /* Section divider */
-    .sec-divider { border: none; border-top: 1px solid rgba(57,255,132,0.07); margin: 0; }
+    .sec-divider {
+      border: none;
+      border-top: 1px solid rgba(57, 255, 132, 0.07);
+      margin: 0;
+    }
 
     /* TOC sidebar */
-    .toc-link { font-family: 'Space Mono', monospace; font-size: 0.72rem; color: #0ab28e; transition: color 0.2s; display: block; padding: 5px 0; border-left: 2px solid transparent; padding-left: 12px; transition: all 0.2s; }
-    .toc-link:hover { color: var(--acid); border-left-color: var(--acid); }
+    .toc-link {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.72rem;
+      color: #0ab28e;
+      transition: color 0.2s;
+      display: block;
+      padding: 5px 0;
+      border-left: 2px solid transparent;
+      padding-left: 12px;
+      transition: all 0.2s;
+    }
+
+    .toc-link:hover {
+      color: var(--acid);
+      border-left-color: var(--acid);
+    }
 
     /* Tree view */
-    .tree-line { border-left: 1px solid rgba(57,255,132,0.2); }
-    .tree-connector { color: rgba(57,255,132,0.4); }
+    .tree-line {
+      border-left: 1px solid rgba(57, 255, 132, 0.2);
+    }
+
+    .tree-connector {
+      color: rgba(57, 255, 132, 0.4);
+    }
 
     /* Tab switcher */
-    .tab-btn { font-family: 'Space Mono', monospace; font-size: 0.72rem; padding: 6px 14px; border-radius: 4px; transition: all 0.2s; color: #0ab28e; }
-    .tab-btn.active { background: rgba(57,255,132,0.12); color: var(--acid); border: 1px solid rgba(57,255,132,0.28); }
-    .tab-btn:not(.active) { border: 1px solid transparent; }
-    .tab-btn:not(.active):hover { color: var(--acid); }
+    .tab-btn {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.72rem;
+      padding: 6px 14px;
+      border-radius: 4px;
+      transition: all 0.2s;
+      color: #0ab28e;
+    }
+
+    .tab-btn.active {
+      background: rgba(57, 255, 132, 0.12);
+      color: var(--acid);
+      border: 1px solid rgba(57, 255, 132, 0.28);
+    }
+
+    .tab-btn:not(.active) {
+      border: 1px solid transparent;
+    }
+
+    .tab-btn:not(.active):hover {
+      color: var(--acid);
+    }
   </style>
 </head>
 <body>
 
-<!-- ─── NAV ─────────────────────────────────────────────────── -->
-<nav class="cl sticky top-0 z-50 border-b border-gem-800/40 bg-ink-950/85 backdrop-blur-md">
-  <div class="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
-    <div class="flex items-center gap-3">
-      <a href="statamic-docs.html" class="flex items-center gap-2 group">
-        <div class="w-7 h-7 rounded border border-gem-500/50 flex items-center justify-center bg-gem-800/30 group-hover:border-acid/60 transition-colors">
-          <svg viewBox="0 0 20 20" fill="none" class="w-4 h-4 text-acid" xmlns="http://www.w3.org/2000/svg">
-            <polygon points="10,2 18,7 18,13 10,18 2,13 2,7" stroke="currentColor" stroke-width="1.5" fill="none"/>
-            <polygon points="10,6 14,8.5 14,11.5 10,14 6,11.5 6,8.5" fill="currentColor" opacity="0.6"/>
-          </svg>
-        </div>
-        <span class="font-display font-700 text-white text-sm tracking-widest uppercase">Statamic</span>
-      </a>
-      <span class="text-gem-700">/</span>
-      <span class="acid-badge text-xs px-2 py-0.5 rounded font-mono">Globals</span>
+  <!-- ─── NAV ─────────────────────────────────────────────────── -->
+  <nav class="cl sticky top-0 z-50 border-b border-gem-800/40 bg-ink-950/85 backdrop-blur-md">
+    <div class="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <a href="statamic-docs.html" class="flex items-center gap-2 group">
+          <div
+            class="w-7 h-7 rounded border border-gem-500/50 flex items-center justify-center bg-gem-800/30 group-hover:border-acid/60 transition-colors">
+            <svg viewBox="0 0 20 20" fill="none" class="w-4 h-4 text-acid" xmlns="http://www.w3.org/2000/svg">
+              <polygon points="10,2 18,7 18,13 10,18 2,13 2,7" stroke="currentColor" stroke-width="1.5" fill="none" />
+              <polygon points="10,6 14,8.5 14,11.5 10,14 6,11.5 6,8.5" fill="currentColor" opacity="0.6" />
+            </svg>
+          </div>
+          <span class="font-display font-700 text-white text-sm tracking-widest uppercase">Statamic</span>
+        </a>
+        <span class="text-gem-700">/</span>
+        <span class="acid-badge text-xs px-2 py-0.5 rounded font-mono">Globals</span>
+      </div>
+      <div class="hidden md:flex items-center gap-5 text-xs text-gem-400 font-mono">
+        <a href="#overview" class="acid-underline hover:text-white transition-colors">Overview</a>
+        <a href="#global-sets" class="acid-underline hover:text-white transition-colors">Global Sets</a>
+        <a href="#storage" class="acid-underline hover:text-white transition-colors">Storage</a>
+        <a href="#templating" class="acid-underline hover:text-white transition-colors">Templating</a>
+      </div>
+      <div class="flex items-center gap-2">
+        <div class="pulse-dot w-2 h-2 rounded-full bg-acid"></div>
+        <span class="text-xs font-mono text-gem-400">v5.x</span>
+      </div>
     </div>
-    <div class="hidden md:flex items-center gap-5 text-xs text-gem-400 font-mono">
-      <a href="#overview"       class="acid-underline hover:text-white transition-colors">Overview</a>
-      <a href="#global-sets"    class="acid-underline hover:text-white transition-colors">Global Sets</a>
-      <a href="#storage"        class="acid-underline hover:text-white transition-colors">Storage</a>
-      <a href="#templating"     class="acid-underline hover:text-white transition-colors">Templating</a>
-    </div>
-    <div class="flex items-center gap-2">
-      <div class="pulse-dot w-2 h-2 rounded-full bg-acid"></div>
-      <span class="text-xs font-mono text-gem-400">v5.x</span>
-    </div>
-  </div>
-</nav>
+  </nav>
 
-<!-- ─── HERO ─────────────────────────────────────────────────── -->
-<section class="cl pt-20 pb-14 px-6 text-center relative overflow-hidden">
-  <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[380px] rounded-full opacity-15 pointer-events-none"
-       style="background:radial-gradient(ellipse,#39ff84 0%,transparent 70%);filter:blur(60px)"></div>
-  <div class="max-w-3xl mx-auto">
-    <div class="inline-flex items-center gap-2 acid-badge px-3 py-1 rounded-full text-xs font-mono mb-5 animate-fade-up">
-      <span>🌐</span> Site-Wide Variables Guide
-    </div>
-    <h1 class="hero-glow font-display font-800 text-5xl md:text-6xl text-white leading-[1.06] mb-5 animate-fade-up d1">
-      Globals &amp;<br/>
-      <span style="color:var(--acid)">Global Variables</span>
-    </h1>
-    <p class="text-gem-300 text-lg leading-relaxed max-w-2xl mx-auto mb-8 animate-fade-up d2">
-      Content that belongs to the whole site — available everywhere, in all views, all the time. Just like the memory of eating your first hot pepper. 🌶
-    </p>
-    <div class="flex flex-wrap justify-center gap-3 animate-fade-up d3">
-      <a href="#overview"    class="inline-flex items-center gap-2 bg-acid text-ink-950 font-display font-700 px-5 py-2.5 rounded text-sm hover:bg-white transition-colors">Start Reading ↓</a>
-      <a href="#quick-recap" class="inline-flex items-center gap-2 border border-gem-600/40 text-gem-200 font-display px-5 py-2.5 rounded text-sm hover:border-acid/40 hover:text-white transition-colors">Quick Recap</a>
-    </div>
-  </div>
-</section>
-
-<!-- ─── MAIN LAYOUT ──────────────────────────────────────────── -->
-<div class="cl max-w-6xl mx-auto px-4 pb-24 flex gap-8">
-
-  <!-- TOC Sidebar -->
-  <aside class="hidden lg:block w-52 flex-shrink-0 pt-2">
-    <div class="sticky top-20">
-      <div class="sec-label mb-4">On This Page</div>
-      <nav class="space-y-0.5">
-        <a href="#overview"        class="toc-link">Overview</a>
-        <a href="#use-cases"       class="toc-link">Use Cases</a>
-        <a href="#global-sets"     class="toc-link">Global Sets</a>
-        <a href="#storage"         class="toc-link">Storage</a>
-        <a href="#file-structure"  class="toc-link">File Structure</a>
-        <a href="#yaml-files"      class="toc-link">YAML Files</a>
-        <a href="#templating"      class="toc-link">Frontend Templating</a>
-        <a href="#antlers"         class="toc-link">Antlers</a>
-        <a href="#blade"           class="toc-link">Blade</a>
-        <a href="#scope"           class="toc-link">Scoping &amp; Access</a>
-        <a href="#quick-recap"     class="toc-link">Quick Recap</a>
-        <a href="#tips"            class="toc-link">Dev Tips</a>
-      </nav>
-    </div>
-  </aside>
-
-  <!-- Content -->
-  <main class="flex-1 min-w-0 space-y-10 pt-2">
-
-    <!-- ── OVERVIEW ── -->
-    <section id="overview" class="s-card p-7 md:p-9">
-      <div class="sec-label mb-2">Introduction</div>
-      <h2 class="font-display font-700 text-white text-2xl md:text-3xl mb-4">🌐 What are Globals?</h2>
-      <p class="text-gem-300 leading-relaxed mb-6">
-        <strong class="text-white">Global variables</strong> store content that belongs to the whole site, not just a single page or URL. Globals are available <strong class="text-acid">everywhere</strong> — in all of your views, all of the time.
+  <!-- ─── HERO ─────────────────────────────────────────────────── -->
+  <section class="cl pt-20 pb-14 px-6 text-center relative overflow-hidden">
+    <div
+      class="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[380px] rounded-full opacity-15 pointer-events-none"
+      style="background:radial-gradient(ellipse,#39ff84 0%,transparent 70%);filter:blur(60px)"></div>
+    <div class="max-w-3xl mx-auto">
+      <div
+        class="inline-flex items-center gap-2 acid-badge px-3 py-1 rounded-full text-xs font-mono mb-5 animate-fade-up">
+        <span>🌐</span> Site-Wide Variables Guide
+      </div>
+      <h1
+        class="hero-glow font-display font-800 text-5xl md:text-6xl text-white leading-[1.06] mb-5 animate-fade-up d1">
+        Globals &amp;<br />
+        <span style="color:var(--acid)">Global Variables</span>
+      </h1>
+      <p class="text-gem-300 text-lg leading-relaxed max-w-2xl mx-auto mb-8 animate-fade-up d2">
+        Content that belongs to the whole site — available everywhere, in all views, all the time. Just like the memory
+        of eating your first hot pepper. 🌶
       </p>
-      <div class="grid sm:grid-cols-3 gap-3 mb-6">
-        <div class="info-chip p-4">
-          <div class="text-2xl mb-2">🌍</div>
-          <div class="font-display font-600 text-white text-sm mb-1">Always Available</div>
-          <p class="text-gem-400 text-xs leading-relaxed">Accessible from every template, partial, and layout without passing data manually.</p>
-        </div>
-        <div class="info-chip p-4">
-          <div class="text-2xl mb-2">🗂️</div>
-          <div class="font-display font-600 text-white text-sm mb-1">Flat Files</div>
-          <p class="text-gem-400 text-xs leading-relaxed">Stored as simple YAML files — no database, fully version-controllable.</p>
-        </div>
-        <div class="info-chip p-4">
-          <div class="text-2xl mb-2">🧩</div>
-          <div class="font-display font-600 text-white text-sm mb-1">Organised in Sets</div>
-          <p class="text-gem-400 text-xs leading-relaxed">Grouped into named sets for structure and scoped template access.</p>
-        </div>
+      <div class="flex flex-wrap justify-center gap-3 animate-fade-up d3">
+        <a href="#overview"
+          class="inline-flex items-center gap-2 bg-acid text-ink-950 font-display font-700 px-5 py-2.5 rounded text-sm hover:bg-white transition-colors">Start
+          Reading ↓</a>
+        <a href="#quick-recap"
+          class="inline-flex items-center gap-2 border border-gem-600/40 text-gem-200 font-display px-5 py-2.5 rounded text-sm hover:border-acid/40 hover:text-white transition-colors">Quick
+          Recap</a>
       </div>
-      <div class="tip-box p-4 rounded">
-        <div class="flex items-start gap-3">
-          <span class="text-acid font-mono text-xs font-700 uppercase tracking-widest mt-0.5 flex-shrink-0">In simple terms</span>
-          <p class="text-gem-200 text-sm font-display font-600">
-            Globals = <span class="text-acid">Site-Wide</span> + <span class="text-acid">Always Accessible</span> + <span class="text-acid">Reusable Content</span>
-          </p>
-        </div>
+    </div>
+  </section>
+
+  <!-- ─── MAIN LAYOUT ──────────────────────────────────────────── -->
+  <div class="cl max-w-6xl mx-auto px-4 pb-24 flex gap-8">
+
+    <!-- TOC Sidebar -->
+    <aside class="hidden lg:block w-52 flex-shrink-0 pt-2">
+      <div class="sticky top-20">
+        <div class="sec-label mb-4">On This Page</div>
+        <nav class="space-y-0.5">
+          <a href="#overview" class="toc-link">Overview</a>
+          <a href="#use-cases" class="toc-link">Use Cases</a>
+          <a href="#global-sets" class="toc-link">Global Sets</a>
+          <a href="#storage" class="toc-link">Storage</a>
+          <a href="#file-structure" class="toc-link">File Structure</a>
+          <a href="#yaml-files" class="toc-link">YAML Files</a>
+          <a href="#templating" class="toc-link">Frontend Templating</a>
+          <a href="#antlers" class="toc-link">Antlers</a>
+          <a href="#blade" class="toc-link">Blade</a>
+          <a href="#scope" class="toc-link">Scoping &amp; Access</a>
+          <a href="#quick-recap" class="toc-link">Quick Recap</a>
+          <a href="#tips" class="toc-link">Dev Tips</a>
+        </nav>
       </div>
-    </section>
+    </aside>
 
-    <!-- ── USE CASES ── -->
-    <section id="use-cases" class="s-card p-7 md:p-9">
-      <div class="sec-label mb-2">When to Use</div>
-      <h2 class="font-display font-700 text-white text-2xl mb-4">🎯 What Globals Are For</h2>
-      <p class="text-gem-300 leading-relaxed mb-6">Globals are intended for reusable content or content that belongs to the site rather than a single page. Common examples include:</p>
-      <div class="space-y-3">
-        <div class="flex items-start gap-4 bg-ink-800/50 border border-gem-800/30 rounded-lg p-4">
-          <span class="text-acid font-mono text-lg mt-0.5">01</span>
-          <div>
-            <div class="font-display font-600 text-white mb-1">Company Information</div>
-            <p class="text-gem-400 text-sm">Phone number, address, logo, social media handles — things that appear across many pages.</p>
-          </div>
-        </div>
-        <div class="flex items-start gap-4 bg-ink-800/50 border border-gem-800/30 rounded-lg p-4">
-          <span class="text-acid font-mono text-lg mt-0.5">02</span>
-          <div>
-            <div class="font-display font-600 text-white mb-1">Footer &amp; Navigation Content</div>
-            <p class="text-gem-400 text-sm">Footer text, copyright notices, nav labels — shared layout content that editors control without touching code.</p>
-          </div>
-        </div>
-        <div class="flex items-start gap-4 bg-ink-800/50 border border-gem-800/30 rounded-lg p-4">
-          <span class="text-acid font-mono text-lg mt-0.5">03</span>
-          <div>
-            <div class="font-display font-600 text-white mb-1">Testimonials &amp; Quotes</div>
-            <p class="text-gem-400 text-sm">Customer quotes, pull quotes, or featured reviews that rotate across the site.</p>
-          </div>
-        </div>
-        <div class="flex items-start gap-4 bg-ink-800/50 border border-gem-800/30 rounded-lg p-4">
-          <span class="text-acid font-mono text-lg mt-0.5">04</span>
-          <div>
-            <div class="font-display font-600 text-white mb-1">Site Settings &amp; Toggles</div>
-            <p class="text-gem-400 text-sm">On/off feature flags, maintenance mode banners, cookie consent copy — operational knobs for editors.</p>
-          </div>
-        </div>
-        <div class="flex items-start gap-4 bg-ink-800/50 border border-gem-800/30 rounded-lg p-4">
-          <span class="text-acid font-mono text-lg mt-0.5">05</span>
-          <div>
-            <div class="font-display font-600 text-white mb-1">Success &amp; Error Messages</div>
-            <p class="text-gem-400 text-sm">Form feedback text, 404 page copy, validation messages — centralised and editable without deployments.</p>
-          </div>
-        </div>
-      </div>
-    </section>
+    <!-- Content -->
+    <main class="flex-1 min-w-0 space-y-10 pt-2">
 
-    <!-- ── GLOBAL SETS ── -->
-    <section id="global-sets" class="s-card p-7 md:p-9">
-      <div class="sec-label mb-2">Organisation</div>
-      <h2 class="font-display font-700 text-white text-2xl mb-4">📦 Global Sets</h2>
-      <p class="text-gem-300 leading-relaxed mb-5">
-        Globals are organised into <strong class="text-white">sets</strong>, each containing a group of related fields. This keeps things tidy and each set also acts as a <strong class="text-acid">scope</strong> for templating purposes.
-      </p>
-
-      <div class="grid sm:grid-cols-2 gap-4 mb-6">
-        <div class="info-chip p-5">
-          <div class="text-2xl mb-3">🗃️</div>
-          <div class="font-display font-600 text-white text-sm mb-2">Grouping</div>
-          <p class="text-gem-400 text-xs leading-relaxed">Keep related globals together — <code class="il">footer</code>, <code class="il">company</code>, <code class="il">settings</code> — rather than one giant flat list.</p>
-        </div>
-        <div class="info-chip p-5">
-          <div class="text-2xl mb-3">🔭</div>
-          <div class="font-display font-600 text-white text-sm mb-2">Scoping</div>
-          <p class="text-gem-400 text-xs leading-relaxed">Each set name becomes a template prefix — <code class="il">footer:copyright</code>, <code class="il">company:phone</code>.</p>
-        </div>
-      </div>
-
-      <!-- Global Set diagram -->
-      <div class="bg-ink-800/50 border border-gem-800/30 rounded-lg p-5">
-        <div class="sec-label mb-4">Example Global Sets</div>
-        <div class="grid sm:grid-cols-3 gap-3">
-          <div class="bg-ink-900/60 border border-gem-800/25 rounded-lg p-4">
-            <div class="flex items-center gap-2 mb-3">
-              <span class="text-acid font-mono text-xs">global</span>
-              <span class="acid-badge text-xs px-1.5 py-0.5 rounded font-mono">default</span>
-            </div>
-            <div class="space-y-1.5 text-xs font-mono">
-              <div class="text-gem-300">site_name</div>
-              <div class="text-gem-300">tagline</div>
-              <div class="text-gem-300">logo</div>
-            </div>
+      <!-- ── OVERVIEW ── -->
+      <section id="overview" class="s-card p-7 md:p-9">
+        <div class="sec-label mb-2">Introduction</div>
+        <h2 class="font-display font-700 text-white text-2xl md:text-3xl mb-4">🌐 What are Globals?</h2>
+        <p class="text-gem-300 leading-relaxed mb-6">
+          <strong class="text-white">Global variables</strong> store content that belongs to the whole site, not just a
+          single page or URL. Globals are available <strong class="text-acid">everywhere</strong> — in all of your
+          views, all of the time.
+        </p>
+        <div class="grid sm:grid-cols-3 gap-3 mb-6">
+          <div class="info-chip p-4">
+            <div class="text-2xl mb-2">🌍</div>
+            <div class="font-display font-600 text-white text-sm mb-1">Always Available</div>
+            <p class="text-gem-400 text-xs leading-relaxed">Accessible from every template, partial, and layout without
+              passing data manually.</p>
           </div>
-          <div class="bg-ink-900/60 border border-gem-800/25 rounded-lg p-4">
-            <div class="flex items-center gap-2 mb-3">
-              <span class="text-acid font-mono text-xs">footer</span>
-            </div>
-            <div class="space-y-1.5 text-xs font-mono">
-              <div class="text-gem-300">copyright</div>
-              <div class="text-gem-300">flair</div>
-              <div class="text-gem-300">address</div>
-            </div>
+          <div class="info-chip p-4">
+            <div class="text-2xl mb-2">🗂️</div>
+            <div class="font-display font-600 text-white text-sm mb-1">Flat Files</div>
+            <p class="text-gem-400 text-xs leading-relaxed">Stored as simple YAML files — no database, fully
+              version-controllable.</p>
           </div>
-          <div class="bg-ink-900/60 border border-gem-800/25 rounded-lg p-4">
-            <div class="flex items-center gap-2 mb-3">
-              <span class="text-acid font-mono text-xs">settings</span>
-            </div>
-            <div class="space-y-1.5 text-xs font-mono">
-              <div class="text-gem-300">maintenance_mode</div>
-              <div class="text-gem-300">cookie_banner</div>
-              <div class="text-gem-300">show_blog</div>
-            </div>
+          <div class="info-chip p-4">
+            <div class="text-2xl mb-2">🧩</div>
+            <div class="font-display font-600 text-white text-sm mb-1">Organised in Sets</div>
+            <p class="text-gem-400 text-xs leading-relaxed">Grouped into named sets for structure and scoped template
+              access.</p>
           </div>
         </div>
-      </div>
-    </section>
-
-    <!-- ── STORAGE ── -->
-    <section id="storage" class="s-card p-7 md:p-9">
-      <div class="sec-label mb-2">On Disk</div>
-      <h2 class="font-display font-700 text-white text-2xl mb-4">💾 Storage</h2>
-      <p class="text-gem-300 leading-relaxed mb-5">
-        Globals are stored in the <code class="il">content/globals</code> directory. Each global set has two YAML files — a <strong class="text-white">metadata file</strong> and a <strong class="text-white">data file</strong>.
-      </p>
-
-      <!-- File structure tree -->
-      <section id="file-structure">
-        <div class="code-block rounded-lg mb-5" x-data="{copied:false}">
-          <div class="flex items-center justify-between px-4 py-2 border-b border-gem-800/30">
-            <div class="flex items-center gap-2">
-              <div class="t-r w-2.5 h-2.5 rounded-full"></div>
-              <div class="t-y w-2.5 h-2.5 rounded-full"></div>
-              <div class="t-g w-2.5 h-2.5 rounded-full"></div>
-              <span class="font-mono text-gem-500 text-xs ml-1">project structure</span>
-            </div>
-            <button class="copy-btn text-gem-500 flex items-center gap-1.5"
-              @click="navigator.clipboard.writeText('content/\n└── globals/\n    ├── global.yaml\n    ├── footer.yaml\n    └── default/\n        ├── global.yaml\n        └── footer.yaml'); copied=true; setTimeout(()=>copied=false,2000)">
-              <template x-if="!copied"><span class="flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2"/></svg>Copy</span></template>
-              <template x-if="copied"><span class="flex items-center gap-1 text-acid"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Copied!</span></template>
-            </button>
-          </div>
-          <div class="p-5 text-sm leading-7">
-            <span class="text-gem-400">content/</span><br/>
-            <span class="text-gem-500">└── </span><span class="text-gem-300">globals/</span><br/>
-            <span class="text-gem-500">&nbsp;&nbsp;&nbsp;&nbsp;├── </span><span class="text-white">global.yaml</span><br/>
-            <span class="text-gem-500">&nbsp;&nbsp;&nbsp;&nbsp;├── </span><span class="text-white">footer.yaml</span><br/>
-            <span class="text-gem-500">&nbsp;&nbsp;&nbsp;&nbsp;└── </span><span class="text-acid">default/</span><br/>
-            <span class="text-gem-500">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── </span><span class="text-white">global.yaml</span><br/>
-            <span class="text-gem-500">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── </span><span class="text-white">footer.yaml</span>
+        <div class="tip-box p-4 rounded">
+          <div class="flex items-start gap-3">
+            <span class="text-acid font-mono text-xs font-700 uppercase tracking-widest mt-0.5 flex-shrink-0">In simple
+              terms</span>
+            <p class="text-gem-200 text-sm font-display font-600">
+              Globals = <span class="text-acid">Site-Wide</span> + <span class="text-acid">Always Accessible</span> +
+              <span class="text-acid">Reusable Content</span>
+            </p>
           </div>
         </div>
       </section>
 
-      <div class="grid sm:grid-cols-2 gap-3 mb-6">
-        <div class="flex items-start gap-3 bg-ink-800/40 border border-gem-800/25 rounded-lg p-4">
-          <span class="text-acid font-mono text-sm mt-0.5">{handle}.yaml</span>
-          <p class="text-gem-400 text-sm">The <strong class="text-gem-200">metadata file</strong> — contains the set title and field configuration.</p>
+      <!-- ── USE CASES ── -->
+      <section id="use-cases" class="s-card p-7 md:p-9">
+        <div class="sec-label mb-2">When to Use</div>
+        <h2 class="font-display font-700 text-white text-2xl mb-4">🎯 What Globals Are For</h2>
+        <p class="text-gem-300 leading-relaxed mb-6">Globals are intended for reusable content or content that belongs
+          to the site rather than a single page. Common examples include:</p>
+        <div class="space-y-3">
+          <div class="flex items-start gap-4 bg-ink-800/50 border border-gem-800/30 rounded-lg p-4">
+            <span class="text-acid font-mono text-lg mt-0.5">01</span>
+            <div>
+              <div class="font-display font-600 text-white mb-1">Company Information</div>
+              <p class="text-gem-400 text-sm">Phone number, address, logo, social media handles — things that appear
+                across many pages.</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-4 bg-ink-800/50 border border-gem-800/30 rounded-lg p-4">
+            <span class="text-acid font-mono text-lg mt-0.5">02</span>
+            <div>
+              <div class="font-display font-600 text-white mb-1">Footer &amp; Navigation Content</div>
+              <p class="text-gem-400 text-sm">Footer text, copyright notices, nav labels — shared layout content that
+                editors control without touching code.</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-4 bg-ink-800/50 border border-gem-800/30 rounded-lg p-4">
+            <span class="text-acid font-mono text-lg mt-0.5">03</span>
+            <div>
+              <div class="font-display font-600 text-white mb-1">Testimonials &amp; Quotes</div>
+              <p class="text-gem-400 text-sm">Customer quotes, pull quotes, or featured reviews that rotate across the
+                site.</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-4 bg-ink-800/50 border border-gem-800/30 rounded-lg p-4">
+            <span class="text-acid font-mono text-lg mt-0.5">04</span>
+            <div>
+              <div class="font-display font-600 text-white mb-1">Site Settings &amp; Toggles</div>
+              <p class="text-gem-400 text-sm">On/off feature flags, maintenance mode banners, cookie consent copy —
+                operational knobs for editors.</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-4 bg-ink-800/50 border border-gem-800/30 rounded-lg p-4">
+            <span class="text-acid font-mono text-lg mt-0.5">05</span>
+            <div>
+              <div class="font-display font-600 text-white mb-1">Success &amp; Error Messages</div>
+              <p class="text-gem-400 text-sm">Form feedback text, 404 page copy, validation messages — centralised and
+                editable without deployments.</p>
+            </div>
+          </div>
         </div>
-        <div class="flex items-start gap-3 bg-ink-800/40 border border-gem-800/25 rounded-lg p-4">
-          <span class="text-gem-300 font-mono text-sm mt-0.5">{site}/{handle}.yaml</span>
-          <p class="text-gem-400 text-sm">The <strong class="text-gem-200">data file</strong> — stores the actual values per site.</p>
+      </section>
+
+      <!-- ── GLOBAL SETS ── -->
+      <section id="global-sets" class="s-card p-7 md:p-9">
+        <div class="sec-label mb-2">Organisation</div>
+        <h2 class="font-display font-700 text-white text-2xl mb-4">📦 Global Sets</h2>
+        <p class="text-gem-300 leading-relaxed mb-5">
+          Globals are organised into <strong class="text-white">sets</strong>, each containing a group of related
+          fields. This keeps things tidy and each set also acts as a <strong class="text-acid">scope</strong> for
+          templating purposes.
+        </p>
+
+        <div class="grid sm:grid-cols-2 gap-4 mb-6">
+          <div class="info-chip p-5">
+            <div class="text-2xl mb-3">🗃️</div>
+            <div class="font-display font-600 text-white text-sm mb-2">Grouping</div>
+            <p class="text-gem-400 text-xs leading-relaxed">Keep related globals together — <code
+                class="il">footer</code>, <code class="il">company</code>, <code class="il">settings</code> — rather
+              than one giant flat list.</p>
+          </div>
+          <div class="info-chip p-5">
+            <div class="text-2xl mb-3">🔭</div>
+            <div class="font-display font-600 text-white text-sm mb-2">Scoping</div>
+            <p class="text-gem-400 text-xs leading-relaxed">Each set name becomes a template prefix — <code
+                class="il">footer:copyright</code>, <code class="il">company:phone</code>.</p>
+          </div>
         </div>
-      </div>
 
-      <div class="tip-box p-4 rounded">
-        <div class="flex items-start gap-3">
-          <span class="text-acid font-mono text-xs font-700 uppercase tracking-widest mt-0.5 flex-shrink-0">Note</span>
-          <p class="text-gem-300 text-sm leading-relaxed">
-            The <code class="il">content/globals/{handle}.yaml</code> file holds metadata like the set title, while actual field data is in <code class="il">content/globals/{site}/{handle}.yaml</code>.
-          </p>
+        <!-- Global Set diagram -->
+        <div class="bg-ink-800/50 border border-gem-800/30 rounded-lg p-5">
+          <div class="sec-label mb-4">Example Global Sets</div>
+          <div class="grid sm:grid-cols-3 gap-3">
+            <div class="bg-ink-900/60 border border-gem-800/25 rounded-lg p-4">
+              <div class="flex items-center gap-2 mb-3">
+                <span class="text-acid font-mono text-xs">global</span>
+                <span class="acid-badge text-xs px-1.5 py-0.5 rounded font-mono">default</span>
+              </div>
+              <div class="space-y-1.5 text-xs font-mono">
+                <div class="text-gem-300">site_name</div>
+                <div class="text-gem-300">tagline</div>
+                <div class="text-gem-300">logo</div>
+              </div>
+            </div>
+            <div class="bg-ink-900/60 border border-gem-800/25 rounded-lg p-4">
+              <div class="flex items-center gap-2 mb-3">
+                <span class="text-acid font-mono text-xs">footer</span>
+              </div>
+              <div class="space-y-1.5 text-xs font-mono">
+                <div class="text-gem-300">copyright</div>
+                <div class="text-gem-300">flair</div>
+                <div class="text-gem-300">address</div>
+              </div>
+            </div>
+            <div class="bg-ink-900/60 border border-gem-800/25 rounded-lg p-4">
+              <div class="flex items-center gap-2 mb-3">
+                <span class="text-acid font-mono text-xs">settings</span>
+              </div>
+              <div class="space-y-1.5 text-xs font-mono">
+                <div class="text-gem-300">maintenance_mode</div>
+                <div class="text-gem-300">cookie_banner</div>
+                <div class="text-gem-300">show_blog</div>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <!-- ── YAML FILES ── -->
-    <section id="yaml-files" class="s-card p-7 md:p-9">
-      <div class="sec-label mb-2">Configuration</div>
-      <h2 class="font-display font-700 text-white text-2xl mb-4">📄 YAML File Examples</h2>
-      <p class="text-gem-300 leading-relaxed mb-6">Here's how the two YAML files relate to each other for a <code class="il">footer</code> global set:</p>
+      <!-- ── STORAGE ── -->
+      <section id="storage" class="s-card p-7 md:p-9">
+        <div class="sec-label mb-2">On Disk</div>
+        <h2 class="font-display font-700 text-white text-2xl mb-4">💾 Storage</h2>
+        <p class="text-gem-300 leading-relaxed mb-5">
+          Globals are stored in the <code class="il">content/globals</code> directory. Each global set has two YAML
+          files — a <strong class="text-white">metadata file</strong> and a <strong class="text-white">data
+            file</strong>.
+        </p>
 
-      <div class="space-y-5">
-        <!-- Metadata file -->
-        <div>
-          <p class="text-gem-400 text-xs font-mono mb-2 flex items-center gap-2">
-            <span class="text-gem-600">#</span> Metadata — <span class="text-acid">content/globals/footer.yaml</span>
-          </p>
+        <!-- File structure tree -->
+        <section id="file-structure">
+          <div class="code-block rounded-lg mb-5" x-data="{copied:false}">
+            <div class="flex items-center justify-between px-4 py-2 border-b border-gem-800/30">
+              <div class="flex items-center gap-2">
+                <div class="t-r w-2.5 h-2.5 rounded-full"></div>
+                <div class="t-y w-2.5 h-2.5 rounded-full"></div>
+                <div class="t-g w-2.5 h-2.5 rounded-full"></div>
+                <span class="font-mono text-gem-500 text-xs ml-1">project structure</span>
+              </div>
+              <button class="copy-btn text-gem-500 flex items-center gap-1.5"
+                @click="navigator.clipboard.writeText('content/\n└── globals/\n    ├── global.yaml\n    ├── footer.yaml\n    └── default/\n        ├── global.yaml\n        └── footer.yaml'); copied=true; setTimeout(()=>copied=false,2000)">
+                <template x-if="!copied"><span class="flex items-center gap-1"><svg class="w-3 h-3" fill="none"
+                      stroke="currentColor" viewBox="0 0 24 24">
+                      <rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2" />
+                      <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2" />
+                    </svg>Copy</span></template>
+                <template x-if="copied"><span class="flex items-center gap-1 text-acid"><svg class="w-3 h-3" fill="none"
+                      stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>Copied!</span></template>
+              </button>
+            </div>
+            <div class="p-5 text-sm leading-7">
+              <span class="text-gem-400">content/</span><br />
+              <span class="text-gem-500">└── </span><span class="text-gem-300">globals/</span><br />
+              <span class="text-gem-500">&nbsp;&nbsp;&nbsp;&nbsp;├── </span><span
+                class="text-white">global.yaml</span><br />
+              <span class="text-gem-500">&nbsp;&nbsp;&nbsp;&nbsp;├── </span><span
+                class="text-white">footer.yaml</span><br />
+              <span class="text-gem-500">&nbsp;&nbsp;&nbsp;&nbsp;└── </span><span
+                class="text-acid">default/</span><br />
+              <span class="text-gem-500">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── </span><span
+                class="text-white">global.yaml</span><br />
+              <span class="text-gem-500">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── </span><span
+                class="text-white">footer.yaml</span>
+            </div>
+          </div>
+        </section>
+
+        <div class="grid sm:grid-cols-2 gap-3 mb-6">
+          <div class="flex items-start gap-3 bg-ink-800/40 border border-gem-800/25 rounded-lg p-4">
+            <span class="text-acid font-mono text-sm mt-0.5">{handle}.yaml</span>
+            <p class="text-gem-400 text-sm">The <strong class="text-gem-200">metadata file</strong> — contains the set
+              title and field configuration.</p>
+          </div>
+          <div class="flex items-start gap-3 bg-ink-800/40 border border-gem-800/25 rounded-lg p-4">
+            <span class="text-gem-300 font-mono text-sm mt-0.5">{site}/{handle}.yaml</span>
+            <p class="text-gem-400 text-sm">The <strong class="text-gem-200">data file</strong> — stores the actual
+              values per site.</p>
+          </div>
+        </div>
+
+        <div class="tip-box p-4 rounded">
+          <div class="flex items-start gap-3">
+            <span
+              class="text-acid font-mono text-xs font-700 uppercase tracking-widest mt-0.5 flex-shrink-0">Note</span>
+            <p class="text-gem-300 text-sm leading-relaxed">
+              The <code class="il">content/globals/{handle}.yaml</code> file holds metadata like the set title, while
+              actual field data is in <code class="il">content/globals/{site}/{handle}.yaml</code>.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── YAML FILES ── -->
+      <section id="yaml-files" class="s-card p-7 md:p-9">
+        <div class="sec-label mb-2">Configuration</div>
+        <h2 class="font-display font-700 text-white text-2xl mb-4">📄 YAML File Examples</h2>
+        <p class="text-gem-300 leading-relaxed mb-6">Here's how the two YAML files relate to each other for a <code
+            class="il">footer</code> global set:</p>
+
+        <div class="space-y-5">
+          <!-- Metadata file -->
+          <div>
+            <p class="text-gem-400 text-xs font-mono mb-2 flex items-center gap-2">
+              <span class="text-gem-600">#</span> Metadata — <span class="text-acid">content/globals/footer.yaml</span>
+            </p>
+            <div class="code-block rounded-lg" x-data="{copied:false}">
+              <div class="flex items-center justify-between px-4 py-2 border-b border-gem-800/30">
+                <div class="flex items-center gap-2">
+                  <div class="t-r w-2.5 h-2.5 rounded-full"></div>
+                  <div class="t-y w-2.5 h-2.5 rounded-full"></div>
+                  <div class="t-g w-2.5 h-2.5 rounded-full"></div>
+                  <span class="font-mono text-gem-500 text-xs ml-1">footer.yaml</span>
+                </div>
+                <button class="copy-btn text-gem-500 flex items-center gap-1.5"
+                  @click="navigator.clipboard.writeText('title: Footer'); copied=true; setTimeout(()=>copied=false,2000)">
+                  <template x-if="!copied"><span class="flex items-center gap-1"><svg class="w-3 h-3" fill="none"
+                        stroke="currentColor" viewBox="0 0 24 24">
+                        <rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2" />
+                        <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2" />
+                      </svg>Copy</span></template>
+                  <template x-if="copied"><span class="flex items-center gap-1 text-acid"><svg class="w-3 h-3"
+                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                      </svg>Copied!</span></template>
+                </button>
+              </div>
+              <div class="p-4 text-sm leading-7">
+                <span class="text-gem-500"># content/globals/footer.yaml</span><br /><br />
+                <span class="text-gem-400">title</span><span class="text-gem-600">: </span><span
+                  class="text-white">Footer</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Data file -->
+          <div>
+            <p class="text-gem-400 text-xs font-mono mb-2 flex items-center gap-2">
+              <span class="text-gem-600">#</span> Data — <span
+                class="text-acid">content/globals/default/footer.yaml</span>
+            </p>
+            <div class="code-block rounded-lg" x-data="{copied:false}">
+              <div class="flex items-center justify-between px-4 py-2 border-b border-gem-800/30">
+                <div class="flex items-center gap-2">
+                  <div class="t-r w-2.5 h-2.5 rounded-full"></div>
+                  <div class="t-y w-2.5 h-2.5 rounded-full"></div>
+                  <div class="t-g w-2.5 h-2.5 rounded-full"></div>
+                  <span class="font-mono text-gem-500 text-xs ml-1">default/footer.yaml</span>
+                </div>
+                <button class="copy-btn text-gem-500 flex items-center gap-1.5"
+                  @click="navigator.clipboard.writeText('copyright: 2021 Neat Fake Company, LLC\nflair: Made with ❤️ by humans'); copied=true; setTimeout(()=>copied=false,2000)">
+                  <template x-if="!copied"><span class="flex items-center gap-1"><svg class="w-3 h-3" fill="none"
+                        stroke="currentColor" viewBox="0 0 24 24">
+                        <rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2" />
+                        <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2" />
+                      </svg>Copy</span></template>
+                  <template x-if="copied"><span class="flex items-center gap-1 text-acid"><svg class="w-3 h-3"
+                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                      </svg>Copied!</span></template>
+                </button>
+              </div>
+              <div class="p-4 text-sm leading-7">
+                <span class="text-gem-500"># content/globals/default/footer.yaml</span><br /><br />
+                <span class="text-gem-400">copyright</span><span class="text-gem-600">: </span><span
+                  class="text-white">2021 Neat Fake Company, LLC</span><br />
+                <span class="text-gem-400">flair</span><span class="text-gem-600">: </span><span class="text-white">Made
+                  with ❤️ by humans</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── FRONTEND TEMPLATING ── -->
+      <section id="templating" class="s-card p-7 md:p-9">
+        <div class="sec-label mb-2">Frontend</div>
+        <h2 class="font-display font-700 text-white text-2xl mb-4">🖥️ Frontend Templating</h2>
+        <p class="text-gem-300 leading-relaxed mb-6">
+          All variables inside a global set are accessed through a <strong class="text-white">scoped prefix</strong>
+          matching the set handle — for example, <code class="il">footer:copyright</code>.
+        </p>
+
+        <!-- Tab switcher -->
+        <div class="flex items-center gap-2 mb-4" x-data="{tab:'antlers'}">
+          <button class="tab-btn" :class="tab==='antlers' ? 'active' : ''" @click="tab='antlers'">Antlers</button>
+          <button class="tab-btn" :class="tab==='blade' ? 'active' : ''" @click="tab='blade'">Blade</button>
+
+          <!-- Antlers example -->
+          <div class="w-full" x-show="tab==='antlers'" id="antlers">
+          </div>
+          <div class="w-full" x-show="tab==='blade'" id="blade">
+          </div>
+        </div>
+
+        <!-- Antlers -->
+        <div id="antlers" class="space-y-5">
           <div class="code-block rounded-lg" x-data="{copied:false}">
             <div class="flex items-center justify-between px-4 py-2 border-b border-gem-800/30">
               <div class="flex items-center gap-2">
                 <div class="t-r w-2.5 h-2.5 rounded-full"></div>
                 <div class="t-y w-2.5 h-2.5 rounded-full"></div>
                 <div class="t-g w-2.5 h-2.5 rounded-full"></div>
-                <span class="font-mono text-gem-500 text-xs ml-1">footer.yaml</span>
+                <span class="font-mono text-gem-500 text-xs ml-1">footer.antlers.html</span>
               </div>
               <button class="copy-btn text-gem-500 flex items-center gap-1.5"
-                @click="navigator.clipboard.writeText('title: Footer'); copied=true; setTimeout(()=>copied=false,2000)">
-                <template x-if="!copied"><span class="flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2"/></svg>Copy</span></template>
-                <template x-if="copied"><span class="flex items-center gap-1 text-acid"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Copied!</span></template>
+                @click="navigator.clipboard.writeText('<footer class=\'site-footer\'>\n  <p>{{ footer:copyright }}</p>\n  <p class=\'text-sm\'>{{ footer:flair }}</p>\n</footer>'); copied=true; setTimeout(()=>copied=false,2000)">
+                <template x-if="!copied"><span class="flex items-center gap-1"><svg class="w-3 h-3" fill="none"
+                      stroke="currentColor" viewBox="0 0 24 24">
+                      <rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2" />
+                      <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2" />
+                    </svg>Copy</span></template>
+                <template x-if="copied"><span class="flex items-center gap-1 text-acid"><svg class="w-3 h-3" fill="none"
+                      stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>Copied!</span></template>
               </button>
             </div>
-            <div class="p-4 text-sm leading-7">
-              <span class="text-gem-500"># content/globals/footer.yaml</span><br/><br/>
-              <span class="text-gem-400">title</span><span class="text-gem-600">: </span><span class="text-white">Footer</span>
+            <div class="p-5 text-sm leading-7">
+              <span class="text-gem-600">&lt;</span><span class="text-gem-400">footer</span> <span
+                class="text-gem-300">class</span><span class="text-gem-600">="</span><span
+                class="text-white">site-footer</span><span class="text-gem-600">"&gt;</span><br />
+              <span class="text-gem-600">&nbsp;&nbsp;&lt;</span><span class="text-gem-400">p</span><span
+                class="text-gem-600">&gt;</span><span
+                class="text-acid">{{ < /span > < span class="text-white" class="text-acid" }}</span><span
+                class="text-gem-600">&lt;/</span><span class="text-gem-400">p</span><span
+                class="text-gem-600">&gt;</span><br />
+              <span class="text-gem-600">&nbsp;&nbsp;&lt;</span><span class="text-gem-400">p</span> <span
+                class="text-gem-300">class</span><span class="text-gem-600">="</span><span
+                class="text-white">text-sm</span><span class="text-gem-600">"&gt;</span><span
+                class="text-acid">{{ < /span > < span class="text-white" class="text-acid" }}</span><span
+                class="text-gem-600">&lt;/</span><span class="text-gem-400">p</span><span
+                class="text-gem-600">&gt;</span><br />
+              <span class="text-gem-600">&lt;/</span><span class="text-gem-400">footer</span><span
+                class="text-gem-600">&gt;</span>
             </div>
           </div>
         </div>
 
-        <!-- Data file -->
-        <div>
-          <p class="text-gem-400 text-xs font-mono mb-2 flex items-center gap-2">
-            <span class="text-gem-600">#</span> Data — <span class="text-acid">content/globals/default/footer.yaml</span>
-          </p>
-          <div class="code-block rounded-lg" x-data="{copied:false}">
-            <div class="flex items-center justify-between px-4 py-2 border-b border-gem-800/30">
-              <div class="flex items-center gap-2">
-                <div class="t-r w-2.5 h-2.5 rounded-full"></div>
-                <div class="t-y w-2.5 h-2.5 rounded-full"></div>
-                <div class="t-g w-2.5 h-2.5 rounded-full"></div>
-                <span class="font-mono text-gem-500 text-xs ml-1">default/footer.yaml</span>
+        <!-- Scoping tip -->
+        <div class="mt-6 tip-box p-4 rounded">
+          <div class="flex items-start gap-3">
+            <span class="text-acid font-mono text-xs font-700 uppercase tracking-widest mt-0.5 flex-shrink-0">Tip</span>
+            <p class="text-gem-300 text-sm leading-relaxed">
+              In this example, all variables inside the <code class="il">footer</code> global set are accessed via <code
+                class="il">footer:&lt;var_name&gt;</code>. The set handle becomes the scope prefix in your templates.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── SCOPE ── -->
+      <section id="scope" class="s-card p-7 md:p-9">
+        <div class="sec-label mb-2">Access Patterns</div>
+        <h2 class="font-display font-700 text-white text-2xl mb-4">🔭 Scoping &amp; Variable Access</h2>
+        <p class="text-gem-300 leading-relaxed mb-6">
+          If you only have one default global set (typically named <strong class="text-white">"Globals"</strong>), the
+          scope prefix is <strong class="text-acid">optional</strong>. You can access variables two ways:
+        </p>
+
+        <div class="grid sm:grid-cols-2 gap-4 mb-6">
+          <div class="bg-ink-800/50 border border-gem-800/30 rounded-lg p-5">
+            <div class="sec-label mb-3">Without Scope</div>
+            <div class="code-block rounded-lg">
+              <div class="p-4 text-sm leading-7">
+                <span
+                  class="text-acid">{{ < /span > < span class="text-white" class="text-acid" }}</span>
               </div>
-              <button class="copy-btn text-gem-500 flex items-center gap-1.5"
-                @click="navigator.clipboard.writeText('copyright: 2021 Neat Fake Company, LLC\nflair: Made with ❤️ by humans'); copied=true; setTimeout(()=>copied=false,2000)">
-                <template x-if="!copied"><span class="flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2"/></svg>Copy</span></template>
-                <template x-if="copied"><span class="flex items-center gap-1 text-acid"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Copied!</span></template>
-              </button>
             </div>
-            <div class="p-4 text-sm leading-7">
-              <span class="text-gem-500"># content/globals/default/footer.yaml</span><br/><br/>
-              <span class="text-gem-400">copyright</span><span class="text-gem-600">: </span><span class="text-white">2021 Neat Fake Company, LLC</span><br/>
-              <span class="text-gem-400">flair</span><span class="text-gem-600">: </span><span class="text-white">Made with ❤️ by humans</span>
+            <p class="text-gem-500 text-xs mt-3 font-mono">Works for the default "global" set only</p>
+          </div>
+          <div class="bg-ink-800/50 border border-gem-800/30 rounded-lg p-5">
+            <div class="sec-label mb-3">With Scope</div>
+            <div class="code-block rounded-lg">
+              <div class="p-4 text-sm leading-7">
+                <span
+                  class="text-acid">{{ < /span > < span class="text-gem-300" class="text-white" class="text-acid" }}</span>
+              </div>
+            </div>
+            <p class="text-gem-500 text-xs mt-3 font-mono">Explicit — always works, always clear</p>
+          </div>
+        </div>
+
+        <div class="space-y-3">
+          <div class="flex items-start gap-3">
+            <code class="il flex-shrink-0 mt-0.5">{{ footer:copyright }}</code>
+            <p class="text-gem-300 text-sm leading-relaxed">Scoped access — reaches into the <code
+                class="il">footer</code> set for the <code class="il">copyright</code> field.</p>
+          </div>
+          <div class="flex items-start gap-3">
+            <code class="il flex-shrink-0 mt-0.5">{{ global:site_name }}</code>
+            <p class="text-gem-300 text-sm leading-relaxed">Explicit scope on the default set — equivalent to <code
+                class="il">{{ site_name }}</code>.</p>
+          </div>
+          <div class="flex items-start gap-3">
+            <code class="il flex-shrink-0 mt-0.5">{{ site_name }}</code>
+            <p class="text-gem-300 text-sm leading-relaxed">Unscoped — works only for the default global set (named
+              "global").</p>
+          </div>
+        </div>
+
+        <div class="mt-6 tip-box p-4 rounded">
+          <div class="flex items-start gap-3">
+            <span class="text-acid font-mono text-xs font-700 uppercase tracking-widest mt-0.5 flex-shrink-0">Best
+              Practice</span>
+            <p class="text-gem-300 text-sm leading-relaxed">
+              Always use the explicit scope (<code class="il">global:var_name</code>) even for the default set — it
+              avoids variable naming conflicts and makes templates easier to understand at a glance.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── QUICK RECAP TABLE ── -->
+      <section id="quick-recap" class="s-card p-7 md:p-9">
+        <div class="sec-label mb-2">Reference</div>
+        <h2 class="font-display font-700 text-white text-2xl mb-5">🧠 Quick Recap</h2>
+        <div class="overflow-x-auto rounded-lg border border-gem-800/25">
+          <table class="doc-table">
+            <thead>
+              <tr>
+                <th>Concept</th>
+                <th>Meaning</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code class="il">Global</code></td>
+                <td class="text-gem-300">Site-wide variable accessible in every view and template</td>
+              </tr>
+              <tr>
+                <td><code class="il">Global Set</code></td>
+                <td class="text-gem-300">A named group of related global fields (e.g. "footer", "settings")</td>
+              </tr>
+              <tr>
+                <td><code class="il">Handle</code></td>
+                <td class="text-gem-300">The machine-readable identifier for a set — used as the template scope prefix
+                </td>
+              </tr>
+              <tr>
+                <td><code class="il">Scope</code></td>
+                <td class="text-gem-300">The set handle prefix used in templates (<code
+                    class="il">footer:copyright</code>)</td>
+              </tr>
+              <tr>
+                <td><code class="il">Metadata file</code></td>
+                <td class="text-gem-300"><code class="il">content/globals/{handle}.yaml</code> — stores title and
+                  blueprint info</td>
+              </tr>
+              <tr>
+                <td><code class="il">Data file</code></td>
+                <td class="text-gem-300"><code class="il">content/globals/{site}/{handle}.yaml</code> — stores actual
+                  field values</td>
+              </tr>
+              <tr>
+                <td><code class="il">Default set</code></td>
+                <td class="text-gem-300">The "global" set — its scope prefix is optional in templates</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ── DEV TIPS ── -->
+      <section id="tips" class="s-card p-7 md:p-9">
+        <div class="sec-label mb-2">Best Practices</div>
+        <h2 class="font-display font-700 text-white text-2xl mb-5">💡 Developer Tips</h2>
+        <div class="space-y-3">
+          <div class="flex items-start gap-4 info-chip p-4">
+            <span class="text-2xl flex-shrink-0">🗃️</span>
+            <div>
+              <div class="font-display font-600 text-white text-sm mb-1">Group Logically</div>
+              <p class="text-gem-400 text-xs leading-relaxed">Use separate sets for distinct concerns — don't throw
+                everything in one "global" set. <code class="il">company</code>, <code class="il">footer</code>, <code
+                  class="il">settings</code> each deserve their own set.</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-4 info-chip p-4">
+            <span class="text-2xl flex-shrink-0">🔭</span>
+            <div>
+              <div class="font-display font-600 text-white text-sm mb-1">Always Use Explicit Scope</div>
+              <p class="text-gem-400 text-xs leading-relaxed">Prefer <code class="il">{{ global:var_name }}</code> over
+                the unscoped <code class="il">{{ var_name }}</code> — it avoids collisions and makes templates
+                self-documenting.</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-4 info-chip p-4">
+            <span class="text-2xl flex-shrink-0">🧱</span>
+            <div>
+              <div class="font-display font-600 text-white text-sm mb-1">Use Blueprints for Rich Fields</div>
+              <p class="text-gem-400 text-xs leading-relaxed">Globals support blueprints too — use fieldtypes like <code
+                  class="il">assets</code>, <code class="il">toggle</code>, or <code class="il">bard</code> for logo
+                uploads, feature flags, or rich text content.</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-4 info-chip p-4">
+            <span class="text-2xl flex-shrink-0">🚫</span>
+            <div>
+              <div class="font-display font-600 text-white text-sm mb-1">Don't Overload Globals</div>
+              <p class="text-gem-400 text-xs leading-relaxed">Globals are for site-wide data — not for content that
+                varies by page. For page-specific content, use collections and entries instead.</p>
             </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <!-- ── FRONTEND TEMPLATING ── -->
-    <section id="templating" class="s-card p-7 md:p-9">
-      <div class="sec-label mb-2">Frontend</div>
-      <h2 class="font-display font-700 text-white text-2xl mb-4">🖥️ Frontend Templating</h2>
-      <p class="text-gem-300 leading-relaxed mb-6">
-        All variables inside a global set are accessed through a <strong class="text-white">scoped prefix</strong> matching the set handle — for example, <code class="il">footer:copyright</code>.
-      </p>
+      <!-- ── FINAL THOUGHT ── -->
+      <section class="cta-glow bg-ink-800/60 rounded-2xl p-10 border border-gem-800/30 text-center">
+        <div class="text-5xl mb-4">🌶️</div>
+        <h2 class="font-display font-800 text-3xl text-white mb-3">
+          The Global Advantage
+        </h2>
+        <div class="flex flex-wrap items-center justify-center gap-4 mb-6 text-lg">
+          <span class="acid-badge px-4 py-2 rounded-lg font-display font-600">🌍 Site-Wide</span>
+          <span class="text-gem-600 text-2xl font-display">+</span>
+          <span class="acid-badge px-4 py-2 rounded-lg font-display font-600">📦 Organised Sets</span>
+          <span class="text-gem-600 text-2xl font-display">+</span>
+          <span class="acid-badge px-4 py-2 rounded-lg font-display font-600">✏️ Editor Friendly</span>
+        </div>
+        <p class="text-gem-400 mb-8 leading-relaxed max-w-lg mx-auto">
+          Globals give editors a single source of truth for site-wide content — no code changes needed. Now make those
+          footers shine.
+        </p>
+        <div class="flex flex-wrap gap-3 justify-center">
+          <a href="https://statamic.dev/globals" target="_blank"
+            class="inline-flex items-center gap-2 bg-acid text-ink-950 font-display font-700 px-5 py-2.5 rounded text-sm hover:bg-white transition-colors">
+            Full Globals Docs ↗
+          </a>
+          <a href="statamic-collections.html"
+            class="inline-flex items-center gap-2 border border-gem-600/40 text-gem-200 font-display px-5 py-2.5 rounded text-sm hover:border-acid/40 hover:text-white transition-colors">
+            ← Back to Collections
+          </a>
+        </div>
+      </section>
 
-      <!-- Tab switcher -->
-      <div class="flex items-center gap-2 mb-4" x-data="{tab:'antlers'}">
-        <button class="tab-btn" :class="tab==='antlers' ? 'active' : ''" @click="tab='antlers'">Antlers</button>
-        <button class="tab-btn" :class="tab==='blade' ? 'active' : ''" @click="tab='blade'">Blade</button>
-
-        <!-- Antlers example -->
-        <div class="w-full" x-show="tab==='antlers'" id="antlers">
-        </div>
-        <div class="w-full" x-show="tab==='blade'" id="blade">
-        </div>
-      </div>
-
-      <!-- Antlers -->
-      <div id="antlers" class="space-y-5">
-        <div class="code-block rounded-lg" x-data="{copied:false}">
-          <div class="flex items-center justify-between px-4 py-2 border-b border-gem-800/30">
-            <div class="flex items-center gap-2">
-              <div class="t-r w-2.5 h-2.5 rounded-full"></div>
-              <div class="t-y w-2.5 h-2.5 rounded-full"></div>
-              <div class="t-g w-2.5 h-2.5 rounded-full"></div>
-              <span class="font-mono text-gem-500 text-xs ml-1">footer.antlers.html</span>
-            </div>
-            <button class="copy-btn text-gem-500 flex items-center gap-1.5"
-              @click="navigator.clipboard.writeText('<footer class=\'site-footer\'>\n  <p>{{ footer:copyright }}</p>\n  <p class=\'text-sm\'>{{ footer:flair }}</p>\n</footer>'); copied=true; setTimeout(()=>copied=false,2000)">
-              <template x-if="!copied"><span class="flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2"/></svg>Copy</span></template>
-              <template x-if="copied"><span class="flex items-center gap-1 text-acid"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Copied!</span></template>
-            </button>
-          </div>
-          <div class="p-5 text-sm leading-7">
-            <span class="text-gem-600">&lt;</span><span class="text-gem-400">footer</span> <span class="text-gem-300">class</span><span class="text-gem-600">="</span><span class="text-white">site-footer</span><span class="text-gem-600">"&gt;</span><br/>
-            <span class="text-gem-600">&nbsp;&nbsp;&lt;</span><span class="text-gem-400">p</span><span class="text-gem-600">&gt;</span><span class="text-acid">{{</span> <span class="text-white">footer:copyright</span> <span class="text-acid">}}</span><span class="text-gem-600">&lt;/</span><span class="text-gem-400">p</span><span class="text-gem-600">&gt;</span><br/>
-            <span class="text-gem-600">&nbsp;&nbsp;&lt;</span><span class="text-gem-400">p</span> <span class="text-gem-300">class</span><span class="text-gem-600">="</span><span class="text-white">text-sm</span><span class="text-gem-600">"&gt;</span><span class="text-acid">{{</span> <span class="text-white">footer:flair</span> <span class="text-acid">}}</span><span class="text-gem-600">&lt;/</span><span class="text-gem-400">p</span><span class="text-gem-600">&gt;</span><br/>
-            <span class="text-gem-600">&lt;/</span><span class="text-gem-400">footer</span><span class="text-gem-600">&gt;</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Scoping tip -->
-      <div class="mt-6 tip-box p-4 rounded">
-        <div class="flex items-start gap-3">
-          <span class="text-acid font-mono text-xs font-700 uppercase tracking-widest mt-0.5 flex-shrink-0">Tip</span>
-          <p class="text-gem-300 text-sm leading-relaxed">
-            In this example, all variables inside the <code class="il">footer</code> global set are accessed via <code class="il">footer:&lt;var_name&gt;</code>. The set handle becomes the scope prefix in your templates.
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <!-- ── SCOPE ── -->
-    <section id="scope" class="s-card p-7 md:p-9">
-      <div class="sec-label mb-2">Access Patterns</div>
-      <h2 class="font-display font-700 text-white text-2xl mb-4">🔭 Scoping &amp; Variable Access</h2>
-      <p class="text-gem-300 leading-relaxed mb-6">
-        If you only have one default global set (typically named <strong class="text-white">"Globals"</strong>), the scope prefix is <strong class="text-acid">optional</strong>. You can access variables two ways:
-      </p>
-
-      <div class="grid sm:grid-cols-2 gap-4 mb-6">
-        <div class="bg-ink-800/50 border border-gem-800/30 rounded-lg p-5">
-          <div class="sec-label mb-3">Without Scope</div>
-          <div class="code-block rounded-lg">
-            <div class="p-4 text-sm leading-7">
-              <span class="text-acid">{{</span> <span class="text-white">var_name</span> <span class="text-acid">}}</span>
-            </div>
-          </div>
-          <p class="text-gem-500 text-xs mt-3 font-mono">Works for the default "global" set only</p>
-        </div>
-        <div class="bg-ink-800/50 border border-gem-800/30 rounded-lg p-5">
-          <div class="sec-label mb-3">With Scope</div>
-          <div class="code-block rounded-lg">
-            <div class="p-4 text-sm leading-7">
-              <span class="text-acid">{{</span> <span class="text-gem-300">global:</span><span class="text-white">var_name</span> <span class="text-acid">}}</span>
-            </div>
-          </div>
-          <p class="text-gem-500 text-xs mt-3 font-mono">Explicit — always works, always clear</p>
-        </div>
-      </div>
-
-      <div class="space-y-3">
-        <div class="flex items-start gap-3">
-          <code class="il flex-shrink-0 mt-0.5">{{ footer:copyright }}</code>
-          <p class="text-gem-300 text-sm leading-relaxed">Scoped access — reaches into the <code class="il">footer</code> set for the <code class="il">copyright</code> field.</p>
-        </div>
-        <div class="flex items-start gap-3">
-          <code class="il flex-shrink-0 mt-0.5">{{ global:site_name }}</code>
-          <p class="text-gem-300 text-sm leading-relaxed">Explicit scope on the default set — equivalent to <code class="il">{{ site_name }}</code>.</p>
-        </div>
-        <div class="flex items-start gap-3">
-          <code class="il flex-shrink-0 mt-0.5">{{ site_name }}</code>
-          <p class="text-gem-300 text-sm leading-relaxed">Unscoped — works only for the default global set (named "global").</p>
-        </div>
-      </div>
-
-      <div class="mt-6 tip-box p-4 rounded">
-        <div class="flex items-start gap-3">
-          <span class="text-acid font-mono text-xs font-700 uppercase tracking-widest mt-0.5 flex-shrink-0">Best Practice</span>
-          <p class="text-gem-300 text-sm leading-relaxed">
-            Always use the explicit scope (<code class="il">global:var_name</code>) even for the default set — it avoids variable naming conflicts and makes templates easier to understand at a glance.
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <!-- ── QUICK RECAP TABLE ── -->
-    <section id="quick-recap" class="s-card p-7 md:p-9">
-      <div class="sec-label mb-2">Reference</div>
-      <h2 class="font-display font-700 text-white text-2xl mb-5">🧠 Quick Recap</h2>
-      <div class="overflow-x-auto rounded-lg border border-gem-800/25">
-        <table class="doc-table">
-          <thead>
-            <tr>
-              <th>Concept</th>
-              <th>Meaning</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td><code class="il">Global</code></td><td class="text-gem-300">Site-wide variable accessible in every view and template</td></tr>
-            <tr><td><code class="il">Global Set</code></td><td class="text-gem-300">A named group of related global fields (e.g. "footer", "settings")</td></tr>
-            <tr><td><code class="il">Handle</code></td><td class="text-gem-300">The machine-readable identifier for a set — used as the template scope prefix</td></tr>
-            <tr><td><code class="il">Scope</code></td><td class="text-gem-300">The set handle prefix used in templates (<code class="il">footer:copyright</code>)</td></tr>
-            <tr><td><code class="il">Metadata file</code></td><td class="text-gem-300"><code class="il">content/globals/{handle}.yaml</code> — stores title and blueprint info</td></tr>
-            <tr><td><code class="il">Data file</code></td><td class="text-gem-300"><code class="il">content/globals/{site}/{handle}.yaml</code> — stores actual field values</td></tr>
-            <tr><td><code class="il">Default set</code></td><td class="text-gem-300">The "global" set — its scope prefix is optional in templates</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- ── DEV TIPS ── -->
-    <section id="tips" class="s-card p-7 md:p-9">
-      <div class="sec-label mb-2">Best Practices</div>
-      <h2 class="font-display font-700 text-white text-2xl mb-5">💡 Developer Tips</h2>
-      <div class="space-y-3">
-        <div class="flex items-start gap-4 info-chip p-4">
-          <span class="text-2xl flex-shrink-0">🗃️</span>
-          <div>
-            <div class="font-display font-600 text-white text-sm mb-1">Group Logically</div>
-            <p class="text-gem-400 text-xs leading-relaxed">Use separate sets for distinct concerns — don't throw everything in one "global" set. <code class="il">company</code>, <code class="il">footer</code>, <code class="il">settings</code> each deserve their own set.</p>
-          </div>
-        </div>
-        <div class="flex items-start gap-4 info-chip p-4">
-          <span class="text-2xl flex-shrink-0">🔭</span>
-          <div>
-            <div class="font-display font-600 text-white text-sm mb-1">Always Use Explicit Scope</div>
-            <p class="text-gem-400 text-xs leading-relaxed">Prefer <code class="il">{{ global:var_name }}</code> over the unscoped <code class="il">{{ var_name }}</code> — it avoids collisions and makes templates self-documenting.</p>
-          </div>
-        </div>
-        <div class="flex items-start gap-4 info-chip p-4">
-          <span class="text-2xl flex-shrink-0">🧱</span>
-          <div>
-            <div class="font-display font-600 text-white text-sm mb-1">Use Blueprints for Rich Fields</div>
-            <p class="text-gem-400 text-xs leading-relaxed">Globals support blueprints too — use fieldtypes like <code class="il">assets</code>, <code class="il">toggle</code>, or <code class="il">bard</code> for logo uploads, feature flags, or rich text content.</p>
-          </div>
-        </div>
-        <div class="flex items-start gap-4 info-chip p-4">
-          <span class="text-2xl flex-shrink-0">🚫</span>
-          <div>
-            <div class="font-display font-600 text-white text-sm mb-1">Don't Overload Globals</div>
-            <p class="text-gem-400 text-xs leading-relaxed">Globals are for site-wide data — not for content that varies by page. For page-specific content, use collections and entries instead.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ── FINAL THOUGHT ── -->
-    <section class="cta-glow bg-ink-800/60 rounded-2xl p-10 border border-gem-800/30 text-center">
-      <div class="text-5xl mb-4">🌶️</div>
-      <h2 class="font-display font-800 text-3xl text-white mb-3">
-        The Global Advantage
-      </h2>
-      <div class="flex flex-wrap items-center justify-center gap-4 mb-6 text-lg">
-        <span class="acid-badge px-4 py-2 rounded-lg font-display font-600">🌍 Site-Wide</span>
-        <span class="text-gem-600 text-2xl font-display">+</span>
-        <span class="acid-badge px-4 py-2 rounded-lg font-display font-600">📦 Organised Sets</span>
-        <span class="text-gem-600 text-2xl font-display">+</span>
-        <span class="acid-badge px-4 py-2 rounded-lg font-display font-600">✏️ Editor Friendly</span>
-      </div>
-      <p class="text-gem-400 mb-8 leading-relaxed max-w-lg mx-auto">
-        Globals give editors a single source of truth for site-wide content — no code changes needed. Now make those footers shine.
-      </p>
       <div class="flex flex-wrap gap-3 justify-center">
-        <a href="https://statamic.dev/globals" target="_blank"
-           class="inline-flex items-center gap-2 bg-acid text-ink-950 font-display font-700 px-5 py-2.5 rounded text-sm hover:bg-white transition-colors">
-          Full Globals Docs ↗
-        </a>
-        <a href="statamic-collections.html"
-           class="inline-flex items-center gap-2 border border-gem-600/40 text-gem-200 font-display px-5 py-2.5 rounded text-sm hover:border-acid/40 hover:text-white transition-colors">
-          ← Back to Collections
+        <a href="/statamic-raw-dics/statamic-navigation.html"
+          class="inline-flex items-center gap-2 bg-acid text-ink-950 font-display font-700 px-5 py-2.5 rounded text-sm hover:bg-white transition-colors">
+          Content Modeling - Navigation
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M13 5l7 7-7 7" />
+          </svg>
+          </svg>
         </a>
       </div>
-    </section>
 
-  <div class="flex flex-wrap gap-3 justify-center">
-    <a href="/statamic-navigation.html"
-        class="inline-flex items-center gap-2 bg-acid text-ink-950 font-display font-700 px-5 py-2.5 rounded text-sm hover:bg-white transition-colors">
-      Content Modeling - Navigation
-      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M13 5l7 7-7 7"/>
-      </svg>
-      </svg>
-    </a>
+    </main>
   </div>
 
-  </main>
-</div>
-
-<!-- ─── FOOTER ─────────────────────────────────────────────── -->
-<footer class="cl border-t border-gem-900/50 py-8 px-6">
-  <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-    <div class="flex items-center gap-2">
-      <div class="w-5 h-5 rounded border border-gem-600/30 flex items-center justify-center bg-gem-800/20">
-        <svg viewBox="0 0 20 20" fill="none" class="w-3 h-3 text-gem-400" xmlns="http://www.w3.org/2000/svg">
-          <polygon points="10,2 18,7 18,13 10,18 2,13 2,7" stroke="currentColor" stroke-width="1.5" fill="none"/>
-        </svg>
+  <!-- ─── FOOTER ─────────────────────────────────────────────── -->
+  <footer class="cl border-t border-gem-900/50 py-8 px-6">
+    <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-2">
+        <div class="w-5 h-5 rounded border border-gem-600/30 flex items-center justify-center bg-gem-800/20">
+          <svg viewBox="0 0 20 20" fill="none" class="w-3 h-3 text-gem-400" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="10,2 18,7 18,13 10,18 2,13 2,7" stroke="currentColor" stroke-width="1.5" fill="none" />
+          </svg>
+        </div>
+        <span class="text-gem-500 text-xs font-mono">Statamic — Globals</span>
       </div>
-      <span class="text-gem-500 text-xs font-mono">Statamic — Globals</span>
+      <div class="flex items-center gap-4 text-xs font-mono text-gem-600">
+        <a href="#overview" class="hover:text-gem-400 transition-colors">↑ Back to top</a>
+        <span>·</span>
+        <span>v5.x docs</span>
+      </div>
     </div>
-    <div class="flex items-center gap-4 text-xs font-mono text-gem-600">
-      <a href="#overview" class="hover:text-gem-400 transition-colors">↑ Back to top</a>
-      <span>·</span>
-      <span>v5.x docs</span>
-    </div>
-  </div>
-</footer>
+  </footer>
 
 </body>
 </html>

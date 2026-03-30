@@ -127,6 +127,11 @@
       border-radius: 0 6px 6px 0;
     }
 
+    /* Actual image inside placeholder */
+    .img-placeholder{
+      overflow: hidden;
+    }
+
     .acid-underline { position: relative; display: inline-block; }
     .acid-underline::after {
       content: ''; position: absolute; bottom: -3px; left: 0; right: 0;
@@ -250,18 +255,7 @@
   </div>
 
   <!-- Field strip preview -->
-  <div class="max-w-lg mx-auto mt-12 animate-fade-up d3">
-    <div class="flex flex-wrap justify-center gap-2">
-      <span class="tag-pill">📝 text</span>
-      <span class="tag-pill">🖼️ assets</span>
-      <span class="tag-pill">📋 select</span>
-      <span class="tag-pill">🔀 toggle</span>
-      <span class="tag-pill">🔗 link</span>
-      <span class="tag-pill">📆 date</span>
-      <span class="tag-pill">🧩 replicator</span>
-    </div>
-    <p class="text-gem-600 text-xs font-mono mt-3">↑ These are field types inside a blueprint</p>
-  </div>
+
 </section>
 
 <!-- ─── MAIN LAYOUT ──────────────────────────────────────────── -->
@@ -308,6 +302,11 @@
           <span class="text-acid font-mono text-xs font-700 uppercase tracking-widest mt-0.5 flex-shrink-0">Simple idea</span>
           <p class="text-gem-200 text-sm font-display font-600">Blueprint = <span class="text-acid">what fields your content has</span>, and how they're arranged for editors</p>
         </div>
+      </div>
+      <div class="img-placeholder h-[350px] mt-5 rounded-lg mb-3">
+        <img src="/statamic-raw-dics/asserts/img/image.png"
+             alt="Statamic Control Panel — Navigation Builder"
+             onerror="this.style.display='none'"/>
       </div>
     </section>
 
@@ -554,7 +553,7 @@
     </section>
 
     <!-- ── IMPORT ── -->
-    <section id="import" class="s-card p-7 md:p-9">
+    <!-- <section id="import" class="s-card p-7 md:p-9">
       <div class="sec-label mb-2">Fieldset Import</div>
       <h2 class="font-display font-700 text-white text-2xl mb-4">📦 Importing Entire Fieldsets</h2>
       <p class="text-gem-300 leading-relaxed mb-5">Pull an <em>entire</em> fieldset into a blueprint with the <code class="il">import</code> key. Use a <code class="il">prefix</code> to namespace the fields — and to safely import the same fieldset more than once.</p>
@@ -604,10 +603,10 @@
           <p class="text-gem-300 text-sm">Skip the prefix and you can only import the fieldset once — handles would collide and overwrite each other.</p>
         </div>
       </div>
-    </section>
+    </section> -->
 
     <!-- ── CONDITIONAL ── -->
-    <section id="conditional" class="s-card p-7 md:p-9">
+    <!-- <section id="conditional" class="s-card p-7 md:p-9">
       <div class="sec-label mb-2">Smart Fields</div>
       <h2 class="font-display font-700 text-white text-2xl mb-4">👁️ Conditional Fields</h2>
       <p class="text-gem-300 leading-relaxed mb-5">Show or hide fields based on the value of other fields. Build smarter publish forms without overwhelming editors.</p>
@@ -635,10 +634,10 @@
           <p class="text-gem-300 text-sm">Conditional logic has its own dedicated documentation page at <code class="il">statamic.dev/conditional-fields</code> — the rule builder in the control panel makes it point-and-click.</p>
         </div>
       </div>
-    </section>
+    </section> -->
 
     <!-- ── VALIDATION ── -->
-    <section id="validation" class="s-card p-7 md:p-9">
+    <!-- <section id="validation" class="s-card p-7 md:p-9">
       <div class="sec-label mb-2">Data Integrity</div>
       <h2 class="font-display font-700 text-white text-2xl mb-4">✅ Validation</h2>
       <p class="text-gem-300 leading-relaxed mb-5">Fields can enforce rules before saving. Statamic uses <strong class="text-white">Laravel's built-in validation rules</strong> plus some Statamic-specific extras for Grids, Bards, and conditional logic.</p>
@@ -663,10 +662,10 @@
           <p class="text-gem-300 text-sm">In the control panel, switch to the <strong class="text-white">Validation tab</strong> while configuring a field to use the rule-picker UI instead of writing YAML by hand.</p>
         </div>
       </div>
-    </section>
+    </section> -->
 
     <!-- ── GRID ── -->
-    <section id="grid" class="s-card p-7 md:p-9">
+    <!-- <section id="grid" class="s-card p-7 md:p-9">
       <div class="sec-label mb-2">Repeatable Rows</div>
       <h2 class="font-display font-700 text-white text-2xl mb-4">🔢 Grid Fieldtype</h2>
       <p class="text-gem-300 leading-relaxed mb-5">The Grid field lets editors repeat a set of sub-fields as many times as they like — perfect for link lists, team members, pricing rows, and more.</p>
@@ -698,10 +697,10 @@
           <p class="text-gem-300 text-sm">Grid fields use the same blueprint field syntax — so you can reference fieldset fields and import fieldsets inside a grid too.</p>
         </div>
       </div>
-    </section>
+    </section> -->
 
     <!-- ── UNLISTED ── -->
-    <section id="listable" class="s-card p-7 md:p-9">
+    <!-- <section id="listable" class="s-card p-7 md:p-9">
       <div class="sec-label mb-2">Entry Listings</div>
       <h2 class="font-display font-700 text-white text-2xl mb-4">🙈 Unlisted Fields</h2>
       <p class="text-gem-300 leading-relaxed mb-5">Control whether a field appears as a column in the entry listing table — separate from conditional field visibility in the publish form.</p>
@@ -734,7 +733,7 @@
           <p class="text-gem-300 text-sm">Toggle fields and long text fields rarely make sense as listing columns — set them to <code class="il">listable: false</code> to keep the table clean.</p>
         </div>
       </div>
-    </section>
+    </section> -->
 
     <!-- ── PRO TIPS ── -->
     <section id="tips" class="s-card p-7 md:p-9">
@@ -873,9 +872,9 @@
     </section>
 
     <div class="flex flex-wrap gap-3 justify-center">
-      <a href="statamic-globals.html"
+      <a href="/statamic-raw-dics/statamic-fieldsets.html"
          class="inline-flex items-center gap-2 bg-acid text-ink-950 font-display font-700 px-5 py-2.5 rounded text-sm hover:bg-white transition-colors">
-        Content Modeling — Globals
+        Content Modeling — Fieldset
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M13 5l7 7-7 7"/>
         </svg>

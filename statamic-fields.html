@@ -282,23 +282,6 @@
       <a href="#recap"   class="inline-flex items-center gap-2 border border-gem-600/40 text-gem-200 font-display px-5 py-2.5 rounded text-sm hover:border-acid/40 hover:text-white transition-colors">Quick Recap</a>
     </div>
   </div>
-
-  <!-- fieldtype pill strip -->
-  <div class="max-w-2xl mx-auto mt-12 animate-fade-up d3">
-    <div class="flex flex-wrap justify-center gap-2">
-      <span class="tag-pill">📝 text</span>
-      <span class="tag-pill">📄 textarea</span>
-      <span class="tag-pill">✍️ markdown</span>
-      <span class="tag-pill">🧱 bard</span>
-      <span class="tag-pill">🖼️ assets</span>
-      <span class="tag-pill">🔀 toggle</span>
-      <span class="tag-pill">📋 select</span>
-      <span class="tag-pill">📆 date</span>
-      <span class="tag-pill">🔢 integer</span>
-      <span class="tag-pill">🔗 link</span>
-      <span class="tag-pill">🎨 color</span>
-    </div>
-    <p class="text-gem-600 text-xs font-mono mt-3">↑ A sample of the 40+ available fieldtypes</p>
   </div>
 </section>
 
@@ -313,7 +296,6 @@
         <a href="#what-is"     class="toc-link">What is a Field?</a>
         <a href="#config"      class="toc-link">Common Settings</a>
         <a href="#visibility"  class="toc-link">Field Visibility</a>
-        <a href="#dataflow"    class="toc-link">Field Data Flow</a>
         <a href="#blueprints"  class="toc-link">Blueprints &amp; Fieldsets</a>
         <a href="#fieldtypes"  class="toc-link">Fieldtypes</a>
         <a href="#tips"        class="toc-link">Pro Tips</a>
@@ -463,107 +445,6 @@
         <div class="flex items-start gap-2">
           <span class="text-yellow-400 font-mono text-xs font-700 uppercase tracking-widest mt-0.5 flex-shrink-0">Note</span>
           <p class="text-gem-300 text-sm">Hiding a field via <strong class="text-white">conditions</strong> (not static visibility) will generally prevent its value from being submitted on save. See <strong class="text-white">Field Data Flow</strong> below for the full picture.</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- ── DATA FLOW ── -->
-    <section id="dataflow" class="s-card p-7 md:p-9">
-      <div class="sec-label mb-2">Save Behaviour</div>
-      <h2 class="font-display font-700 text-white text-2xl mb-4">🌊 Field Data Flow</h2>
-      <p class="text-gem-300 leading-relaxed mb-5">
-        By default, <strong class="text-white">every field submits its value on save</strong>. There are only two situations where a field's value is <em>not</em> submitted:
-      </p>
-
-      <div class="grid sm:grid-cols-2 gap-3 mb-6">
-        <div class="cross-item bg-ink-800/40 border border-gem-800/20 rounded-lg p-4 text-gem-200 text-sm">
-          <span>Field visibility is set to <span class="vis-badge vis-computed" style="font-size:0.65rem;padding:2px 8px;">Computed</span></span>
-        </div>
-        <div class="cross-item bg-ink-800/40 border border-gem-800/20 rounded-lg p-4 text-gem-200 text-sm">
-          <span>Field is <strong class="text-white">dynamically hidden</strong> by a field condition</span>
-        </div>
-      </div>
-
-      <p class="text-gem-300 leading-relaxed mb-5">
-        Need to override the condition behaviour? Two options:
-      </p>
-
-      <div class="space-y-3 mb-5">
-        <div class="flex items-start gap-4 info-chip p-4">
-          <span class="text-2xl flex-shrink-0">🔓</span>
-          <div>
-            <div class="font-display font-600 text-white text-sm mb-1">Use a Revealer Field</div>
-            <p class="text-gem-400 text-xs leading-relaxed">A Revealer is a special fieldtype that toggles the visibility of surrounding fields while always allowing their values to be saved — no data loss.</p>
-          </div>
-        </div>
-        <div class="flex items-start gap-4 info-chip p-4">
-          <span class="text-2xl flex-shrink-0">💾</span>
-          <div>
-            <div class="font-display font-600 text-white text-sm mb-1">Set <code class="il">always_save: true</code></div>
-            <p class="text-gem-400 text-xs leading-relaxed">Forces the field's current value to be included in the save payload regardless of visibility — even if hidden by a condition.</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Flow diagram -->
-      <div class="sec-label mb-3">Save decision flow</div>
-      <div class="overflow-x-auto pb-2">
-        <div class="flex items-center gap-1 min-w-max">
-          <div class="flow-step bg-gem-800/30 border-gem-700/30 text-gem-200">Editor saves</div>
-          <div class="flow-arrow">→</div>
-          <div class="flow-step">Is field computed?</div>
-          <div class="flow-arrow text-red-400">→ yes →</div>
-          <div class="flow-step border-red-800/40 text-red-300 bg-red-900/10">Skip value</div>
-        </div>
-        <div class="flex items-center gap-1 min-w-max mt-2 ml-28">
-          <div class="flow-arrow">↓ no</div>
-        </div>
-        <div class="flex items-center gap-1 min-w-max mt-1 ml-16">
-          <div class="flow-step">Hidden by condition?</div>
-          <div class="flow-arrow text-yellow-400">→ yes →</div>
-          <div class="flow-step border-yellow-800/40 text-yellow-300 bg-yellow-900/10">Skip value</div>
-          <div class="text-gem-600 font-mono text-xs ml-2">(unless always_save: true)</div>
-        </div>
-        <div class="flex items-center gap-1 min-w-max mt-2 ml-28">
-          <div class="flow-arrow">↓ no</div>
-        </div>
-        <div class="flex items-center gap-1 min-w-max mt-1 ml-16">
-          <div class="flow-step border-gem-600/40 text-acid bg-gem-900/20">✓ Submit value</div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ── BLUEPRINTS & FIELDSETS ── -->
-    <section id="blueprints" class="s-card p-7 md:p-9">
-      <div class="sec-label mb-2">Where Fields Live</div>
-      <h2 class="font-display font-700 text-white text-2xl mb-4">🗂️ Blueprints &amp; Fieldsets</h2>
-      <p class="text-gem-300 leading-relaxed mb-5">Fields always live inside one of two containers. The choice depends on whether you need them in one place or many.</p>
-
-      <div class="grid sm:grid-cols-2 gap-4 mb-5">
-        <div class="bg-ink-800/50 border border-gem-800/30 rounded-xl p-5">
-          <div class="flex items-center gap-2 mb-3">
-            <span class="text-lg">📐</span>
-            <span class="font-display font-700 text-white">Blueprint</span>
-          </div>
-          <p class="text-gem-400 text-xs leading-relaxed mb-3">Attached to collections, taxonomies, globals, assets, forms, and users. Controls the publish form layout — field order, width, sections (tabs).</p>
-          <div class="check-item text-gem-300 text-xs"><span>Define inline for one-off fields</span></div>
-          <div class="check-item text-gem-300 text-xs mt-1"><span>Reference fieldset fields for reuse</span></div>
-        </div>
-        <div class="bg-ink-800/50 border border-gem-800/30 rounded-xl p-5">
-          <div class="flex items-center gap-2 mb-3">
-            <span class="text-lg">🧩</span>
-            <span class="font-display font-700 text-white">Fieldset</span>
-          </div>
-          <p class="text-gem-400 text-xs leading-relaxed mb-3">Not attached to anything — a library of pre-configured fields. Import individual fields or the whole fieldset into blueprints.</p>
-          <div class="check-item text-gem-300 text-xs"><span>DRY: update once, reflects everywhere</span></div>
-          <div class="check-item text-gem-300 text-xs mt-1"><span>Also works inside Grid, Replicator &amp; Bard</span></div>
-        </div>
-      </div>
-
-      <div class="tip-box p-4 rounded">
-        <div class="flex items-start gap-2">
-          <span class="text-acid font-mono text-xs font-700 uppercase tracking-widest mt-0.5 flex-shrink-0">Quick rule</span>
-          <p class="text-gem-300 text-sm">Used in one blueprint? Define it inline. Used in two or more? Move it to a fieldset. Future-you will be grateful.</p>
         </div>
       </div>
     </section>
@@ -748,17 +629,6 @@
         </a>
       </div>
     </section>
-
-    <div class="flex flex-wrap gap-3 justify-center">
-      <a href="statamic-globals.html"
-         class="inline-flex items-center gap-2 bg-acid text-ink-950 font-display font-700 px-5 py-2.5 rounded text-sm hover:bg-white transition-colors">
-        Content Modeling — Globals
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M13 5l7 7-7 7"/>
-        </svg>
-      </a>
-    </div>
-
   </main>
 </div>
 

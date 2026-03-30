@@ -2,12 +2,14 @@
 <html lang="en" x-data="{ activeStep: null, copied: null }" class="scroll-smooth">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Statamic — Fast-Track Installation Guide</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap"
+    rel="stylesheet">
 
   <script>
     tailwind.config = {
@@ -19,7 +21,7 @@
           },
           colors: {
             gem: {
-              50:  '#f0fdf9',
+              50: '#f0fdf9',
               100: '#ccfbef',
               200: '#99f3df',
               300: '#58e4c6',
@@ -46,16 +48,30 @@
           },
           keyframes: {
             fadeUp: {
-              '0%': { opacity: '0', transform: 'translateY(24px)' },
-              '100%': { opacity: '1', transform: 'translateY(0)' },
+              '0%': {
+                opacity: '0',
+                transform: 'translateY(24px)'
+              },
+              '100%': {
+                opacity: '1',
+                transform: 'translateY(0)'
+              },
             },
             glowPulse: {
-              '0%, 100%': { boxShadow: '0 0 20px rgba(57,255,132,0.15)' },
-              '50%': { boxShadow: '0 0 40px rgba(57,255,132,0.35)' },
+              '0%, 100%': {
+                boxShadow: '0 0 20px rgba(57,255,132,0.15)'
+              },
+              '50%': {
+                boxShadow: '0 0 40px rgba(57,255,132,0.35)'
+              },
             },
             scan: {
-              '0%': { backgroundPosition: '0 -100%' },
-              '100%': { backgroundPosition: '0 200%' },
+              '0%': {
+                backgroundPosition: '0 -100%'
+              },
+              '100%': {
+                backgroundPosition: '0 200%'
+              },
             }
           }
         }
@@ -81,8 +97,8 @@
       position: fixed;
       inset: 0;
       background-image:
-        linear-gradient(rgba(57,255,132,0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(57,255,132,0.03) 1px, transparent 1px);
+        linear-gradient(rgba(57, 255, 132, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(57, 255, 132, 0.03) 1px, transparent 1px);
       background-size: 40px 40px;
       pointer-events: none;
       z-index: 0;
@@ -99,12 +115,15 @@
       opacity: 0.4;
     }
 
-    .content-layer { position: relative; z-index: 1; }
+    .content-layer {
+      position: relative;
+      z-index: 1;
+    }
 
     /* Terminal code block */
     .code-block {
       background: #020c09;
-      border: 1px solid rgba(57,255,132,0.2);
+      border: 1px solid rgba(57, 255, 132, 0.2);
       border-left: 3px solid var(--acid);
       border-radius: 4px;
       font-family: 'Space Mono', monospace;
@@ -115,14 +134,14 @@
     .code-block::before {
       content: '';
       position: absolute;
-      top: 0; left: 0; right: 0;
+      top: 0;
+      left: 0;
+      right: 0;
       height: 100%;
-      background: linear-gradient(
-        180deg,
-        transparent 0%,
-        rgba(57,255,132,0.04) 50%,
-        transparent 100%
-      );
+      background: linear-gradient(180deg,
+          transparent 0%,
+          rgba(57, 255, 132, 0.04) 50%,
+          transparent 100%);
       background-size: 100% 8px;
       pointer-events: none;
       animation: scan 6s linear infinite;
@@ -131,30 +150,40 @@
     /* Step card hover */
     .step-card {
       transition: transform 0.3s ease, border-color 0.3s ease;
-      border: 1px solid rgba(57,255,132,0.1);
-      background: linear-gradient(135deg, rgba(13,42,32,0.7) 0%, rgba(4,16,13,0.9) 100%);
+      border: 1px solid rgba(57, 255, 132, 0.1);
+      background: linear-gradient(135deg, rgba(13, 42, 32, 0.7) 0%, rgba(4, 16, 13, 0.9) 100%);
       backdrop-filter: blur(8px);
     }
+
     .step-card:hover {
       transform: translateY(-3px);
-      border-color: rgba(57,255,132,0.35);
+      border-color: rgba(57, 255, 132, 0.35);
     }
 
     /* Glow badge */
     .acid-badge {
-      background: rgba(57,255,132,0.12);
-      border: 1px solid rgba(57,255,132,0.3);
+      background: rgba(57, 255, 132, 0.12);
+      border: 1px solid rgba(57, 255, 132, 0.3);
       color: var(--acid);
     }
 
     /* Scrollbar */
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: #04100d; }
-    ::-webkit-scrollbar-thumb { background: rgba(57,255,132,0.25); border-radius: 3px; }
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #04100d;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(57, 255, 132, 0.25);
+      border-radius: 3px;
+    }
 
     /* Hero text glow */
     .hero-glow {
-      text-shadow: 0 0 60px rgba(57,255,132,0.25);
+      text-shadow: 0 0 60px rgba(57, 255, 132, 0.25);
     }
 
     /* Animated underline */
@@ -162,10 +191,13 @@
       position: relative;
       display: inline-block;
     }
+
     .acid-underline::after {
       content: '';
       position: absolute;
-      bottom: -4px; left: 0; right: 0;
+      bottom: -4px;
+      left: 0;
+      right: 0;
       height: 2px;
       background: var(--acid);
       box-shadow: 0 0 12px var(--acid);
@@ -173,31 +205,47 @@
       transform-origin: left;
       transition: transform 0.4s ease;
     }
-    .acid-underline:hover::after { transform: scaleX(1); }
+
+    .acid-underline:hover::after {
+      transform: scaleX(1);
+    }
 
     /* Prereq chip */
     .prereq-chip {
-      background: rgba(10,178,142,0.1);
-      border: 1px solid rgba(10,178,142,0.25);
+      background: rgba(10, 178, 142, 0.1);
+      border: 1px solid rgba(10, 178, 142, 0.25);
       transition: all 0.25s;
     }
+
     .prereq-chip:hover {
-      background: rgba(10,178,142,0.2);
-      border-color: rgba(10,178,142,0.5);
+      background: rgba(10, 178, 142, 0.2);
+      border-color: rgba(10, 178, 142, 0.5);
     }
 
     /* Step number ring */
     .step-ring {
       border: 2px solid var(--acid);
-      box-shadow: 0 0 16px rgba(57,255,132,0.3), inset 0 0 10px rgba(57,255,132,0.05);
+      box-shadow: 0 0 16px rgba(57, 255, 132, 0.3), inset 0 0 10px rgba(57, 255, 132, 0.05);
     }
 
     /* Pulse dot */
     @keyframes pulseDot {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.5; transform: scale(0.7); }
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 0.5;
+        transform: scale(0.7);
+      }
     }
-    .pulse-dot { animation: pulseDot 2s ease-in-out infinite; }
+
+    .pulse-dot {
+      animation: pulseDot 2s ease-in-out infinite;
+    }
 
     /* Copy button */
     .copy-btn {
@@ -205,468 +253,540 @@
       font-size: 11px;
       transition: all 0.2s;
     }
-    .copy-btn:hover { color: var(--acid); }
+
+    .copy-btn:hover {
+      color: var(--acid);
+    }
 
     /* Connector line between steps */
     .step-connector {
-      background: linear-gradient(to bottom, rgba(57,255,132,0.3), rgba(57,255,132,0.05));
+      background: linear-gradient(to bottom, rgba(57, 255, 132, 0.3), rgba(57, 255, 132, 0.05));
     }
 
     /* Terminal dots */
-    .term-dot-r { background: #ff5f56; }
-    .term-dot-y { background: #ffbd2e; }
-    .term-dot-g { background: #27c93f; }
+    .term-dot-r {
+      background: #ff5f56;
+    }
+
+    .term-dot-y {
+      background: #ffbd2e;
+    }
+
+    .term-dot-g {
+      background: #27c93f;
+    }
 
     /* Tip box */
     .tip-box {
-      background: rgba(57,255,132,0.05);
+      background: rgba(57, 255, 132, 0.05);
       border-left: 3px solid var(--acid);
       border-radius: 0 4px 4px 0;
     }
 
     /* Final CTA glow */
     .cta-glow {
-      box-shadow: 0 0 0 1px rgba(57,255,132,0.2), 0 0 60px rgba(57,255,132,0.1);
+      box-shadow: 0 0 0 1px rgba(57, 255, 132, 0.2), 0 0 60px rgba(57, 255, 132, 0.1);
       animation: glowPulse 3s ease-in-out infinite;
     }
 
     @keyframes glowPulse {
-      0%,100% { box-shadow: 0 0 0 1px rgba(57,255,132,0.2), 0 0 40px rgba(57,255,132,0.08); }
-      50% { box-shadow: 0 0 0 1px rgba(57,255,132,0.4), 0 0 80px rgba(57,255,132,0.2); }
+
+      0%,
+      100% {
+        box-shadow: 0 0 0 1px rgba(57, 255, 132, 0.2), 0 0 40px rgba(57, 255, 132, 0.08);
+      }
+
+      50% {
+        box-shadow: 0 0 0 1px rgba(57, 255, 132, 0.4), 0 0 80px rgba(57, 255, 132, 0.2);
+      }
     }
 
     /* Stagger animation */
-    .stagger-1 { animation-delay: 0.1s; }
-    .stagger-2 { animation-delay: 0.2s; }
-    .stagger-3 { animation-delay: 0.3s; }
-    .stagger-4 { animation-delay: 0.4s; }
-    .stagger-5 { animation-delay: 0.5s; }
+    .stagger-1 {
+      animation-delay: 0.1s;
+    }
+
+    .stagger-2 {
+      animation-delay: 0.2s;
+    }
+
+    .stagger-3 {
+      animation-delay: 0.3s;
+    }
+
+    .stagger-4 {
+      animation-delay: 0.4s;
+    }
+
+    .stagger-5 {
+      animation-delay: 0.5s;
+    }
 
     .animate-fade-up {
       animation: fadeUp 0.65s ease both;
     }
 
     @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(28px); }
-      to { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(28px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
   </style>
 </head>
 <body>
 
-<!-- ─── TOP NAV ─────────────────────────────────────────── -->
-<nav class="content-layer sticky top-0 z-50 border-b border-gem-800/40 bg-ink-950/80 backdrop-blur-md">
-  <div class="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">
-    <div class="flex items-center gap-3">
-      <div class="w-7 h-7 rounded border border-gem-500/50 flex items-center justify-center bg-gem-800/30">
-        <svg viewBox="0 0 20 20" fill="none" class="w-4 h-4 text-acid" xmlns="http://www.w3.org/2000/svg">
-          <polygon points="10,2 18,7 18,13 10,18 2,13 2,7" stroke="currentColor" stroke-width="1.5" fill="none"/>
-          <polygon points="10,6 14,8.5 14,11.5 10,14 6,11.5 6,8.5" fill="currentColor" opacity="0.6"/>
-        </svg>
+  <!-- ─── TOP NAV ─────────────────────────────────────────── -->
+  <nav class="content-layer sticky top-0 z-50 border-b border-gem-800/40 bg-ink-950/80 backdrop-blur-md">
+    <div class="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-7 h-7 rounded border border-gem-500/50 flex items-center justify-center bg-gem-800/30">
+          <svg viewBox="0 0 20 20" fill="none" class="w-4 h-4 text-acid" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="10,2 18,7 18,13 10,18 2,13 2,7" stroke="currentColor" stroke-width="1.5" fill="none" />
+            <polygon points="10,6 14,8.5 14,11.5 10,14 6,11.5 6,8.5" fill="currentColor" opacity="0.6" />
+          </svg>
+        </div>
+        <span class="font-display font-700 text-white text-sm tracking-widest uppercase">Statamic</span>
+        <span class="acid-badge text-xs px-2 py-0.5 rounded font-mono">Docs</span>
       </div>
-      <span class="font-display font-700 text-white text-sm tracking-widest uppercase">Statamic</span>
-      <span class="acid-badge text-xs px-2 py-0.5 rounded font-mono">Docs</span>
-    </div>
-    <!-- <div class="hidden md:flex items-center gap-6 text-xs text-gem-400 font-mono">
+      <!-- <div class="hidden md:flex items-center gap-6 text-xs text-gem-400 font-mono">
       <a href="/statamic-collections.html" class="acid-underline hover:text-white transition-colors">Content Modeling</a>
       <a href="#step-1" class="acid-underline hover:text-white transition-colors">Install CLI</a>
       <a href="#step-2" class="acid-underline hover:text-white transition-colors">New Site</a>
       <a href="#step-3" class="acid-underline hover:text-white transition-colors">Launch</a>
     </div> -->
-    <div class="flex items-center gap-2">
-      <div class="pulse-dot w-2 h-2 rounded-full bg-acid"></div>
-      <span class="text-xs font-mono text-gem-400">v6.x</span>
-    </div>
-  </div>
-</nav>
-
-<!-- ─── HERO ────────────────────────────────────────────── -->
-<section class="content-layer pt-24 pb-16 px-6 text-center relative overflow-hidden">
-
-  <!-- Background radial glow -->
-  <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[400px] rounded-full opacity-20 pointer-events-none"
-       style="background: radial-gradient(ellipse, #39ff84 0%, transparent 70%); filter: blur(60px);"></div>
-
-  <div class="max-w-3xl mx-auto">
-    <div class="inline-flex items-center gap-2 acid-badge px-3 py-1 rounded-full text-xs font-mono mb-6 animate-fade-up">
-      <span class="text-acid">⚡</span>
-      Fast-Track Installation Guide
-    </div>
-
-    <h1 class="hero-glow font-display font-800 text-5xl md:text-7xl text-white leading-[1.05] mb-6 animate-fade-up stagger-1">
-      Level Up<br/>
-      <span style="color: var(--acid);">With Statamic</span>
-    </h1>
-
-    <p class="text-gem-300 text-lg md:text-xl leading-relaxed max-w-2xl mx-auto mb-8 animate-fade-up stagger-2">
-      Tired of bloated CMS setups? Statamic is clean, fast, and built for developers who actually enjoy writing code. Let's get you live before your coffee gets cold.
-    </p>
-
-    <a href="#prerequisites"
-       class="animate-fade-up stagger-3 inline-flex items-center gap-2 bg-acid text-ink-950 font-display font-700 px-6 py-3 rounded text-sm hover:bg-white transition-colors duration-200">
-      Start Building
-      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-      </svg>
-    </a>
-  </div>
-
-  <!-- Decorative terminal preview -->
-  <div class="max-w-lg mx-auto mt-14 animate-fade-up stagger-4">
-    <div class="code-block rounded-lg overflow-hidden">
-      <div class="flex items-center gap-2 px-4 py-3 border-b border-gem-800/40">
-        <div class="term-dot-r w-3 h-3 rounded-full"></div>
-        <div class="term-dot-y w-3 h-3 rounded-full"></div>
-        <div class="term-dot-g w-3 h-3 rounded-full"></div>
-        <span class="ml-2 text-xs text-gem-500 font-mono">terminal — bash</span>
-      </div>
-      <div class="p-4 text-left text-sm font-mono">
-        <span class="text-gem-500">$ </span><span class="text-acid">statamic new</span><span class="text-white"> my-awesome-site</span><br/>
-        <span class="text-gem-500 text-xs mt-1 block">✓ Installing dependencies...</span>
-        <span class="text-gem-500 text-xs block">✓ Generating application key...</span>
-        <span class="text-acid text-xs block mt-1">🚀 Your Statamic site is ready!</span>
+      <div class="flex items-center gap-2">
+        <div class="pulse-dot w-2 h-2 rounded-full bg-acid"></div>
+        <span class="text-xs font-mono text-gem-400">v6.x</span>
       </div>
     </div>
-  </div>
-</section>
+  </nav>
 
-<!-- ─── PREREQUISITES ────────────────────────────────────── -->
-<section id="prerequisites" class="content-layer py-16 px-6">
-  <div class="max-w-5xl mx-auto">
+  <!-- ─── HERO ────────────────────────────────────────────── -->
+  <section class="content-layer pt-24 pb-16 px-6 text-center relative overflow-hidden">
 
-    <div class="flex items-center gap-3 mb-2">
-      <span class="text-2xl">🛠</span>
-      <span class="font-mono text-gem-400 text-sm uppercase tracking-widest">Before You Begin</span>
-    </div>
-    <h2 class="font-display font-700 text-3xl md:text-4xl text-white mb-3">
-      Prerequisites: The Toolkit
-    </h2>
-    <p class="text-gem-400 mb-10 max-w-xl">
-      Lock and load your dev environment before we summon a new project.
-    </p>
+    <!-- Background radial glow -->
+    <div
+      class="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[400px] rounded-full opacity-20 pointer-events-none"
+      style="background: radial-gradient(ellipse, #39ff84 0%, transparent 70%); filter: blur(60px);"></div>
 
-    <div class="grid md:grid-cols-3 gap-4">
-
-      <!-- OS -->
-      <div class="prereq-chip rounded-lg p-5 group cursor-default">
-        <div class="text-3xl mb-3">💻</div>
-        <h3 class="font-display font-600 text-white text-lg mb-1">Modern OS</h3>
-        <p class="text-gem-400 text-sm leading-relaxed">macOS, Windows <span class="text-gem-200 font-mono text-xs">(WSL2 recommended)</span>, or Linux.</p>
+    <div class="max-w-3xl mx-auto">
+      <div
+        class="inline-flex items-center gap-2 acid-badge px-3 py-1 rounded-full text-xs font-mono mb-6 animate-fade-up">
+        <span class="text-acid">⚡</span>
+        Fast-Track Installation Guide
       </div>
 
-      <!-- PHP -->
-      <div class="prereq-chip rounded-lg p-5 group cursor-default">
-        <div class="text-3xl mb-3">🐘</div>
-        <h3 class="font-display font-600 text-white text-lg mb-1">PHP 8.2+</h3>
-        <p class="text-gem-400 text-sm leading-relaxed">Statamic loves the latest PHP features. Make sure you're running <span class="font-mono text-gem-200 text-xs">8.2</span> or newer.</p>
-      </div>
+      <h1
+        class="hero-glow font-display font-800 text-5xl md:text-7xl text-white leading-[1.05] mb-6 animate-fade-up stagger-1">
+        Level Up<br />
+        <span style="color: var(--acid);">With Statamic</span>
+      </h1>
 
-      <!-- Composer -->
-      <div class="prereq-chip rounded-lg p-5 group cursor-default">
-        <div class="text-3xl mb-3">🎼</div>
-        <h3 class="font-display font-600 text-white text-lg mb-1">Composer</h3>
-        <p class="text-gem-400 text-sm leading-relaxed">The heartbeat of your PHP dependency management. Must be globally installed.</p>
-      </div>
+      <p class="text-gem-300 text-lg md:text-xl leading-relaxed max-w-2xl mx-auto mb-8 animate-fade-up stagger-2">
+        Tired of bloated CMS setups? Statamic is clean, fast, and built for developers who actually enjoy writing code.
+        Let's get you live before your coffee gets cold.
+      </p>
 
-    </div>
-  </div>
-</section>
-
-<!-- ─── STEPS ────────────────────────────────────────────── -->
-<section class="content-layer py-8 px-6">
-  <div class="max-w-5xl mx-auto">
-
-    <div class="text-center mb-16">
-      <div class="font-mono text-gem-500 text-xs uppercase tracking-widest mb-2">The Process</div>
-      <h2 class="font-display font-700 text-3xl md:text-4xl text-white">Three Steps to Running</h2>
+      <a href="#prerequisites"
+        class="animate-fade-up stagger-3 inline-flex items-center gap-2 bg-acid text-ink-950 font-display font-700 px-6 py-3 rounded text-sm hover:bg-white transition-colors duration-200">
+        Start Building
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+      </a>
     </div>
 
-    <!-- Steps list -->
-    <div class="space-y-6" x-data="{ copied: null }">
+    <!-- Decorative terminal preview -->
+    <div class="max-w-lg mx-auto mt-14 animate-fade-up stagger-4">
+      <div class="code-block rounded-lg overflow-hidden">
+        <div class="flex items-center gap-2 px-4 py-3 border-b border-gem-800/40">
+          <div class="term-dot-r w-3 h-3 rounded-full"></div>
+          <div class="term-dot-y w-3 h-3 rounded-full"></div>
+          <div class="term-dot-g w-3 h-3 rounded-full"></div>
+          <span class="ml-2 text-xs text-gem-500 font-mono">terminal — bash</span>
+        </div>
+        <div class="p-4 text-left text-sm font-mono">
+          <span class="text-gem-500">$ </span><span class="text-acid">statamic new</span><span class="text-white">
+            my-awesome-site</span><br />
+          <span class="text-gem-500 text-xs mt-1 block">✓ Installing dependencies...</span>
+          <span class="text-gem-500 text-xs block">✓ Generating application key...</span>
+          <span class="text-acid text-xs block mt-1">🚀 Your Statamic site is ready!</span>
+        </div>
+      </div>
+    </div>
+  </section>
 
-      <!-- ── STEP 1 ── -->
-      <div id="step-1" class="step-card rounded-xl p-7 md:p-9">
-        <div class="flex items-start gap-6">
-          <div class="flex-shrink-0">
-            <div class="step-ring w-12 h-12 rounded-full flex items-center justify-center font-display font-800 text-acid text-xl">
-              1
+  <!-- ─── PREREQUISITES ────────────────────────────────────── -->
+  <section id="prerequisites" class="content-layer py-16 px-6">
+    <div class="max-w-5xl mx-auto">
+
+      <div class="flex items-center gap-3 mb-2">
+        <span class="text-2xl">🛠</span>
+        <span class="font-mono text-gem-400 text-sm uppercase tracking-widest">Before You Begin</span>
+      </div>
+      <h2 class="font-display font-700 text-3xl md:text-4xl text-white mb-3">
+        Prerequisites: The Toolkit
+      </h2>
+      <p class="text-gem-400 mb-10 max-w-xl">
+        Lock and load your dev environment before we summon a new project.
+      </p>
+
+      <div class="grid md:grid-cols-3 gap-4">
+
+        <!-- OS -->
+        <div class="prereq-chip rounded-lg p-5 group cursor-default">
+          <div class="text-3xl mb-3">💻</div>
+          <h3 class="font-display font-600 text-white text-lg mb-1">Modern OS</h3>
+          <p class="text-gem-400 text-sm leading-relaxed">macOS, Windows <span
+              class="text-gem-200 font-mono text-xs">(WSL2 recommended)</span>, or Linux.</p>
+        </div>
+
+        <!-- PHP -->
+        <div class="prereq-chip rounded-lg p-5 group cursor-default">
+          <div class="text-3xl mb-3">🐘</div>
+          <h3 class="font-display font-600 text-white text-lg mb-1">PHP 8.2+</h3>
+          <p class="text-gem-400 text-sm leading-relaxed">Statamic loves the latest PHP features. Make sure you're
+            running <span class="font-mono text-gem-200 text-xs">8.2</span> or newer.</p>
+        </div>
+
+        <!-- Composer -->
+        <div class="prereq-chip rounded-lg p-5 group cursor-default">
+          <div class="text-3xl mb-3">🎼</div>
+          <h3 class="font-display font-600 text-white text-lg mb-1">Composer</h3>
+          <p class="text-gem-400 text-sm leading-relaxed">The heartbeat of your PHP dependency management. Must be
+            globally installed.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── STEPS ────────────────────────────────────────────── -->
+  <section class="content-layer py-8 px-6">
+    <div class="max-w-5xl mx-auto">
+
+      <div class="text-center mb-16">
+        <div class="font-mono text-gem-500 text-xs uppercase tracking-widest mb-2">The Process</div>
+        <h2 class="font-display font-700 text-3xl md:text-4xl text-white">Three Steps to Running</h2>
+      </div>
+
+      <!-- Steps list -->
+      <div class="space-y-6" x-data="{ copied: null }">
+
+        <!-- ── STEP 1 ── -->
+        <div id="step-1" class="step-card rounded-xl p-7 md:p-9">
+          <div class="flex items-start gap-6">
+            <div class="flex-shrink-0">
+              <div
+                class="step-ring w-12 h-12 rounded-full flex items-center justify-center font-display font-800 text-acid text-xl">
+                1
+              </div>
             </div>
-          </div>
-          <div class="flex-1 min-w-0">
-            <div class="flex items-center gap-2 mb-1">
-              <span class="text-xl">🚀</span>
-              <span class="font-mono text-gem-400 text-xs uppercase tracking-widest">Step 1</span>
-            </div>
-            <h3 class="font-display font-700 text-white text-2xl mb-3">Arm Your Terminal</h3>
-            <p class="text-gem-300 mb-5 leading-relaxed">
-              Install the Statamic CLI — your magic wand for generating new sites in seconds. Run this in your terminal:
-            </p>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 mb-1">
+                <span class="text-xl">🚀</span>
+                <span class="font-mono text-gem-400 text-xs uppercase tracking-widest">Step 1</span>
+              </div>
+              <h3 class="font-display font-700 text-white text-2xl mb-3">Arm Your Terminal</h3>
+              <p class="text-gem-300 mb-5 leading-relaxed">
+                Install the Statamic CLI — your magic wand for generating new sites in seconds. Run this in your
+                terminal:
+              </p>
 
-            <!-- Code block -->
-            <div class="code-block rounded-lg mb-5 overflow-hidden">
-              <div class="flex items-center justify-between px-4 py-2 border-b border-gem-800/30">
-                <div class="flex items-center gap-2">
-                  <div class="term-dot-r w-2.5 h-2.5 rounded-full"></div>
-                  <div class="term-dot-y w-2.5 h-2.5 rounded-full"></div>
-                  <div class="term-dot-g w-2.5 h-2.5 rounded-full"></div>
-                  <span class="font-mono text-gem-500 text-xs ml-1">bash</span>
-                </div>
-                <button
-                  class="copy-btn text-gem-500 flex items-center gap-1.5"
-                  @click="
+              <!-- Code block -->
+              <div class="code-block rounded-lg mb-5 overflow-hidden">
+                <div class="flex items-center justify-between px-4 py-2 border-b border-gem-800/30">
+                  <div class="flex items-center gap-2">
+                    <div class="term-dot-r w-2.5 h-2.5 rounded-full"></div>
+                    <div class="term-dot-y w-2.5 h-2.5 rounded-full"></div>
+                    <div class="term-dot-g w-2.5 h-2.5 rounded-full"></div>
+                    <span class="font-mono text-gem-500 text-xs ml-1">bash</span>
+                  </div>
+                  <button class="copy-btn text-gem-500 flex items-center gap-1.5" @click="
                     navigator.clipboard.writeText('composer global require statamic/cli');
                     copied = 'step1';
                     setTimeout(() => copied = null, 2000);
                   ">
-                  <template x-if="copied !== 'step1'">
-                    <span class="flex items-center gap-1">
-                      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2"/></svg>
-                      Copy
-                    </span>
-                  </template>
-                  <template x-if="copied === 'step1'">
-                    <span class="flex items-center gap-1 text-acid">
-                      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                      Copied!
-                    </span>
-                  </template>
-                </button>
+                    <template x-if="copied !== 'step1'">
+                      <span class="flex items-center gap-1">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2" />
+                          <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2" />
+                        </svg>
+                        Copy
+                      </span>
+                    </template>
+                    <template x-if="copied === 'step1'">
+                      <span class="flex items-center gap-1 text-acid">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        Copied!
+                      </span>
+                    </template>
+                  </button>
+                </div>
+                <div class="p-4">
+                  <code class="text-sm text-acid">
+                    <span class="text-gem-500">$ </span>composer global require statamic/cli
+                  </code>
+                </div>
               </div>
-              <div class="p-4">
-                <code class="text-sm text-acid">
-                  <span class="text-gem-500">$ </span>composer global require statamic/cli
-                </code>
-              </div>
-            </div>
 
-            <!-- Pro Tip -->
-            <div class="tip-box p-4 rounded">
-              <div class="flex items-start gap-2">
-                <span class="text-acid font-mono text-xs font-700 uppercase tracking-widest mt-0.5 flex-shrink-0">Pro Tip</span>
-                <p class="text-gem-300 text-sm">
-                  Once it's done, type <code class="font-mono text-acid bg-acid/10 px-1.5 py-0.5 rounded text-xs">statamic list</code> to see all the superpowers now at your disposal.
-                </p>
+              <!-- Pro Tip -->
+              <div class="tip-box p-4 rounded">
+                <div class="flex items-start gap-2">
+                  <span class="text-acid font-mono text-xs font-700 uppercase tracking-widest mt-0.5 flex-shrink-0">Pro
+                    Tip</span>
+                  <p class="text-gem-300 text-sm">
+                    Once it's done, type <code
+                      class="font-mono text-acid bg-acid/10 px-1.5 py-0.5 rounded text-xs">statamic list</code> to see
+                    all the superpowers now at your disposal.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- ── STEP 2 ── -->
-      <div id="step-2" class="step-card rounded-xl p-7 md:p-9">
-        <div class="flex items-start gap-6">
-          <div class="flex-shrink-0">
-            <div class="step-ring w-12 h-12 rounded-full flex items-center justify-center font-display font-800 text-acid text-xl">
-              2
+        <!-- ── STEP 2 ── -->
+        <div id="step-2" class="step-card rounded-xl p-7 md:p-9">
+          <div class="flex items-start gap-6">
+            <div class="flex-shrink-0">
+              <div
+                class="step-ring w-12 h-12 rounded-full flex items-center justify-center font-display font-800 text-acid text-xl">
+                2
+              </div>
             </div>
-          </div>
-          <div class="flex-1 min-w-0">
-            <div class="flex items-center gap-2 mb-1">
-              <span class="text-xl">🏗</span>
-              <span class="font-mono text-gem-400 text-xs uppercase tracking-widest">Step 2</span>
-            </div>
-            <h3 class="font-display font-700 text-white text-2xl mb-3">Create Your Masterpiece</h3>
-            <p class="text-gem-300 mb-5 leading-relaxed">
-              Navigate to your projects folder and pull a brand-new Statamic instance out of thin air:
-            </p>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 mb-1">
+                <span class="text-xl">🏗</span>
+                <span class="font-mono text-gem-400 text-xs uppercase tracking-widest">Step 2</span>
+              </div>
+              <h3 class="font-display font-700 text-white text-2xl mb-3">Create Your Masterpiece</h3>
+              <p class="text-gem-300 mb-5 leading-relaxed">
+                Navigate to your projects folder and pull a brand-new Statamic instance out of thin air:
+              </p>
 
-            <!-- Directory hint -->
-            <div class="flex flex-wrap gap-2 mb-4">
-              <span class="font-mono text-xs bg-ink-800 border border-gem-800/40 text-gem-300 px-3 py-1.5 rounded">
-                <span class="text-gem-500">macOS/Linux: </span><span class="text-acid">cd ~/sites</span>
-              </span>
-              <span class="font-mono text-xs bg-ink-800 border border-gem-800/40 text-gem-300 px-3 py-1.5 rounded">
-                <span class="text-gem-500">Windows: </span><span class="text-acid">cd C:\dev</span>
-              </span>
-            </div>
+              <!-- Directory hint -->
+              <div class="flex flex-wrap gap-2 mb-4">
+                <span class="font-mono text-xs bg-ink-800 border border-gem-800/40 text-gem-300 px-3 py-1.5 rounded">
+                  <span class="text-gem-500">macOS/Linux: </span><span class="text-acid">cd ~/sites</span>
+                </span>
+                <span class="font-mono text-xs bg-ink-800 border border-gem-800/40 text-gem-300 px-3 py-1.5 rounded">
+                  <span class="text-gem-500">Windows: </span><span class="text-acid">cd C:\dev</span>
+                </span>
+              </div>
 
-            <!-- Code block -->
-            <div class="code-block rounded-lg mb-5 overflow-hidden">
-              <div class="flex items-center justify-between px-4 py-2 border-b border-gem-800/30">
-                <div class="flex items-center gap-2">
-                  <div class="term-dot-r w-2.5 h-2.5 rounded-full"></div>
-                  <div class="term-dot-y w-2.5 h-2.5 rounded-full"></div>
-                  <div class="term-dot-g w-2.5 h-2.5 rounded-full"></div>
-                  <span class="font-mono text-gem-500 text-xs ml-1">bash</span>
-                </div>
-                <button
-                  class="copy-btn text-gem-500 flex items-center gap-1.5"
-                  @click="
+              <!-- Code block -->
+              <div class="code-block rounded-lg mb-5 overflow-hidden">
+                <div class="flex items-center justify-between px-4 py-2 border-b border-gem-800/30">
+                  <div class="flex items-center gap-2">
+                    <div class="term-dot-r w-2.5 h-2.5 rounded-full"></div>
+                    <div class="term-dot-y w-2.5 h-2.5 rounded-full"></div>
+                    <div class="term-dot-g w-2.5 h-2.5 rounded-full"></div>
+                    <span class="font-mono text-gem-500 text-xs ml-1">bash</span>
+                  </div>
+                  <button class="copy-btn text-gem-500 flex items-center gap-1.5" @click="
                     navigator.clipboard.writeText('statamic new my-awesome-site');
                     copied = 'step2';
                     setTimeout(() => copied = null, 2000);
                   ">
-                  <template x-if="copied !== 'step2'">
-                    <span class="flex items-center gap-1">
-                      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2"/></svg>
-                      Copy
-                    </span>
-                  </template>
-                  <template x-if="copied === 'step2'">
-                    <span class="flex items-center gap-1 text-acid">
-                      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                      Copied!
-                    </span>
-                  </template>
-                </button>
+                    <template x-if="copied !== 'step2'">
+                      <span class="flex items-center gap-1">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2" />
+                          <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2" />
+                        </svg>
+                        Copy
+                      </span>
+                    </template>
+                    <template x-if="copied === 'step2'">
+                      <span class="flex items-center gap-1 text-acid">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        Copied!
+                      </span>
+                    </template>
+                  </button>
+                </div>
+                <div class="p-4">
+                  <code class="text-sm text-acid">
+                    <span class="text-gem-500">$ </span>statamic new my-awesome-site
+                  </code>
+                </div>
               </div>
-              <div class="p-4">
-                <code class="text-sm text-acid">
-                  <span class="text-gem-500">$ </span>statamic new my-awesome-site
-                </code>
-              </div>
-            </div>
 
-            <!-- Choice cards -->
-            <div class="grid sm:grid-cols-2 gap-3">
-              
-              <div class="bg-ink-800/50 border border-gem-800/30 rounded-lg p-4 hover:border-gem-600/50 transition-colors cursor-default">
-                <a href="https://statamic.com/starter-kits">
-                  <div class="flex items-center gap-2 mb-2">
+              <!-- Choice cards -->
+              <div class="grid sm:grid-cols-2 gap-3">
+
+                <div
+                  class="bg-ink-800/50 border border-gem-800/30 rounded-lg p-4 hover:border-gem-600/50 transition-colors cursor-default">
+                  <a href="https://statamic.com/starter-kits">
+                    <div class="flex items-center gap-2 mb-2">
                       <span class="text-lg">🎨</span>
                       <span class="font-display font-600 text-white text-sm">Starter Kit</span>
-                  </div>
-                  <p class="text-gem-400 text-xs leading-relaxed">Get a head start with pre-built templates, layouts, and components.</p>
-                </a>
-              </div>
-              <div class="bg-ink-800/50 border border-gem-800/30 rounded-lg p-4 hover:border-gem-600/50 transition-colors cursor-default">
-                <div class="flex items-center gap-2 mb-2">
-                  <span class="text-lg">⚡</span>
-                  <span class="font-display font-600 text-white text-sm">Blank Canvas</span>
+                    </div>
+                    <p class="text-gem-400 text-xs leading-relaxed">Get a head start with pre-built templates, layouts,
+                      and components.</p>
+                  </a>
                 </div>
-                <p class="text-gem-400 text-xs leading-relaxed">Total creative control from the ground up. Zero assumptions made.</p>
+                <div
+                  class="bg-ink-800/50 border border-gem-800/30 rounded-lg p-4 hover:border-gem-600/50 transition-colors cursor-default">
+                  <div class="flex items-center gap-2 mb-2">
+                    <span class="text-lg">⚡</span>
+                    <span class="font-display font-600 text-white text-sm">Blank Canvas</span>
+                  </div>
+                  <p class="text-gem-400 text-xs leading-relaxed">Total creative control from the ground up. Zero
+                    assumptions made.</p>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- ── STEP 3 ── -->
-      <div id="step-3" class="step-card rounded-xl p-7 md:p-9">
-        <div class="flex items-start gap-6">
-          <div class="flex-shrink-0">
-            <div class="step-ring w-12 h-12 rounded-full flex items-center justify-center font-display font-800 text-acid text-xl">
-              3
+        <!-- ── STEP 3 ── -->
+        <div id="step-3" class="step-card rounded-xl p-7 md:p-9">
+          <div class="flex items-start gap-6">
+            <div class="flex-shrink-0">
+              <div
+                class="step-ring w-12 h-12 rounded-full flex items-center justify-center font-display font-800 text-acid text-xl">
+                3
+              </div>
             </div>
-          </div>
-          <div class="flex-1 min-w-0">
-            <div class="flex items-center gap-2 mb-1">
-              <span class="text-xl">🌐</span>
-              <span class="font-mono text-gem-400 text-xs uppercase tracking-widest">Step 3</span>
-            </div>
-            <h3 class="font-display font-700 text-white text-2xl mb-3">Bring It to Life</h3>
-            <p class="text-gem-300 mb-5 leading-relaxed">
-              Statamic is built on Laravel — a built-in server is already waiting. Move into your new directory and fire it up:
-            </p>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 mb-1">
+                <span class="text-xl">🌐</span>
+                <span class="font-mono text-gem-400 text-xs uppercase tracking-widest">Step 3</span>
+              </div>
+              <h3 class="font-display font-700 text-white text-2xl mb-3">Bring It to Life</h3>
+              <p class="text-gem-300 mb-5 leading-relaxed">
+                Statamic is built on Laravel — a built-in server is already waiting. Move into your new directory and
+                fire it up:
+              </p>
 
-            <!-- Code block (two commands) -->
-            <div class="code-block rounded-lg mb-5 overflow-hidden">
-              <div class="flex items-center justify-between px-4 py-2 border-b border-gem-800/30">
-                <div class="flex items-center gap-2">
-                  <div class="term-dot-r w-2.5 h-2.5 rounded-full"></div>
-                  <div class="term-dot-y w-2.5 h-2.5 rounded-full"></div>
-                  <div class="term-dot-g w-2.5 h-2.5 rounded-full"></div>
-                  <span class="font-mono text-gem-500 text-xs ml-1">bash</span>
-                </div>
-                <button
-                  class="copy-btn text-gem-500 flex items-center gap-1.5"
-                  @click="
+              <!-- Code block (two commands) -->
+              <div class="code-block rounded-lg mb-5 overflow-hidden">
+                <div class="flex items-center justify-between px-4 py-2 border-b border-gem-800/30">
+                  <div class="flex items-center gap-2">
+                    <div class="term-dot-r w-2.5 h-2.5 rounded-full"></div>
+                    <div class="term-dot-y w-2.5 h-2.5 rounded-full"></div>
+                    <div class="term-dot-g w-2.5 h-2.5 rounded-full"></div>
+                    <span class="font-mono text-gem-500 text-xs ml-1">bash</span>
+                  </div>
+                  <button class="copy-btn text-gem-500 flex items-center gap-1.5" @click="
                     navigator.clipboard.writeText('cd my-awesome-site\nphp artisan serve');
                     copied = 'step3';
                     setTimeout(() => copied = null, 2000);
                   ">
-                  <template x-if="copied !== 'step3'">
-                    <span class="flex items-center gap-1">
-                      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2"/></svg>
-                      Copy
-                    </span>
-                  </template>
-                  <template x-if="copied === 'step3'">
-                    <span class="flex items-center gap-1 text-acid">
-                      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                      Copied!
-                    </span>
-                  </template>
-                </button>
+                    <template x-if="copied !== 'step3'">
+                      <span class="flex items-center gap-1">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2" />
+                          <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2" />
+                        </svg>
+                        Copy
+                      </span>
+                    </template>
+                    <template x-if="copied === 'step3'">
+                      <span class="flex items-center gap-1 text-acid">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        Copied!
+                      </span>
+                    </template>
+                  </button>
+                </div>
+                <div class="p-4 space-y-1">
+                  <div><code class="text-sm text-acid"><span class="text-gem-500">$ </span>cd my-awesome-site</code>
+                  </div>
+                  <div><code class="text-sm text-acid"><span class="text-gem-500">$ </span>php artisan serve</code>
+                  </div>
+                </div>
               </div>
-              <div class="p-4 space-y-1">
-                <div><code class="text-sm text-acid"><span class="text-gem-500">$ </span>cd my-awesome-site</code></div>
-                <div><code class="text-sm text-acid"><span class="text-gem-500">$ </span>php artisan serve</code></div>
-              </div>
-            </div>
 
-            <!-- URL result -->
-            <div class="flex items-center gap-3 bg-acid/5 border border-acid/20 rounded-lg p-4">
-              <div class="pulse-dot w-2.5 h-2.5 rounded-full bg-acid flex-shrink-0"></div>
-              <div>
-                <div class="font-mono text-acid text-sm">http://127.0.0.1:8000</div>
-                <div class="text-gem-400 text-xs mt-0.5">Your Statamic site is live. Open this in your browser.</div>
+              <!-- URL result -->
+              <div class="flex items-center gap-3 bg-acid/5 border border-acid/20 rounded-lg p-4">
+                <div class="pulse-dot w-2.5 h-2.5 rounded-full bg-acid flex-shrink-0"></div>
+                <div>
+                  <div class="font-mono text-acid text-sm">http://127.0.0.1:8000</div>
+                  <div class="text-gem-400 text-xs mt-0.5">Your Statamic site is live. Open this in your browser.</div>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-    </div>
-  </div>
-</section>
-
-<!-- ─── FINAL CTA ─────────────────────────────────────────── -->
-<section class="content-layer py-20 px-6">
-  <div class="max-w-2xl mx-auto text-center">
-    <div class="cta-glow bg-ink-800/60 rounded-2xl p-10 border border-gem-800/30">
-      <div class="text-5xl mb-4">🎉</div>
-      <h2 class="font-display font-800 text-3xl text-white mb-3">
-        You're officially a<br/>
-        <span style="color: var(--acid);">Statamic developer</span>
-      </h2>
-      <p class="text-gem-400 mb-8 leading-relaxed">
-        Your local environment is running. Time to explore the control panel, build your first collection, and see why developers love Statamic.
-      </p>
-      <div class="flex flex-wrap gap-3 justify-center">
-        <a href="https://statamic.dev/docs" target="_blank"
-           class="inline-flex items-center gap-2 bg-acid text-ink-950 font-display font-700 px-5 py-2.5 rounded text-sm hover:bg-white transition-colors">
-          Read Full Docs
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
-          </svg>
-        </a>
-        <a href="https://statamic.com/starter-kits" target="_blank"
-           class="inline-flex items-center gap-2 border border-gem-600/40 text-gem-200 font-display font-600 px-5 py-2.5 rounded text-sm hover:border-acid/40 hover:text-white transition-colors">
-          Browse Starter Kits
-        </a>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<div class="flex flex-wrap gap-3 justify-center">
-  <a href="/statamic-collections.html"
+  <!-- ─── FINAL CTA ─────────────────────────────────────────── -->
+  <section class="content-layer py-20 px-6">
+    <div class="max-w-2xl mx-auto text-center">
+      <div class="cta-glow bg-ink-800/60 rounded-2xl p-10 border border-gem-800/30">
+        <div class="text-5xl mb-4">🎉</div>
+        <h2 class="font-display font-800 text-3xl text-white mb-3">
+          You're officially a<br />
+          <span style="color: var(--acid);">Statamic developer</span>
+        </h2>
+        <p class="text-gem-400 mb-8 leading-relaxed">
+          Your local environment is running. Time to explore the control panel, build your first collection, and see why
+          developers love Statamic.
+        </p>
+        <div class="flex flex-wrap gap-3 justify-center">
+          <a href="https://statamic.dev/docs" target="_blank"
+            class="inline-flex items-center gap-2 bg-acid text-ink-950 font-display font-700 px-5 py-2.5 rounded text-sm hover:bg-white transition-colors">
+            Read Full Docs
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+            </svg>
+          </a>
+          <a href="https://statamic.com/starter-kits" target="_blank"
+            class="inline-flex items-center gap-2 border border-gem-600/40 text-gem-200 font-display font-600 px-5 py-2.5 rounded text-sm hover:border-acid/40 hover:text-white transition-colors">
+            Browse Starter Kits
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="flex flex-wrap gap-3 justify-center">
+    <a href="/statamic-raw-dics/statamic-collections.html"
       class="inline-flex items-center gap-2 bg-acid text-ink-950 font-display font-700 px-5 py-2.5 rounded text-sm hover:bg-white transition-colors">
-    Content Modeling - Collection
-    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M13 5l7 7-7 7"/>
-    </svg>
-    </svg>
-  </a>
-</div>
-
-<!-- ─── FOOTER ─────────────────────────────────────────────── -->
-<footer class="content-layer border-t border-gem-900/50 py-8 px-6">
-  <div class="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-    <div class="flex items-center gap-2">
-      <div class="w-5 h-5 rounded border border-gem-600/30 flex items-center justify-center bg-gem-800/20">
-        <svg viewBox="0 0 20 20" fill="none" class="w-3 h-3 text-gem-400" xmlns="http://www.w3.org/2000/svg">
-          <polygon points="10,2 18,7 18,13 10,18 2,13 2,7" stroke="currentColor" stroke-width="1.5" fill="none"/>
-        </svg>
-      </div>
-      <span class="text-gem-500 text-xs font-mono">Statamic Fast-Track Guide</span>
-    </div>
-    <p class="text-gem-600 text-xs font-mono text-center">
-      Built for developers who actually enjoy writing code.
-    </p>
+      Content Modeling - Collection
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M13 5l7 7-7 7" />
+      </svg>
+      </svg>
+    </a>
   </div>
-</footer>
+
+  <!-- ─── FOOTER ─────────────────────────────────────────────── -->
+  <footer class="content-layer border-t border-gem-900/50 py-8 px-6">
+    <div class="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-2">
+        <div class="w-5 h-5 rounded border border-gem-600/30 flex items-center justify-center bg-gem-800/20">
+          <svg viewBox="0 0 20 20" fill="none" class="w-3 h-3 text-gem-400" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="10,2 18,7 18,13 10,18 2,13 2,7" stroke="currentColor" stroke-width="1.5" fill="none" />
+          </svg>
+        </div>
+        <span class="text-gem-500 text-xs font-mono">Statamic Fast-Track Guide</span>
+      </div>
+      <p class="text-gem-600 text-xs font-mono text-center">
+        Built for developers who actually enjoy writing code.
+      </p>
+    </div>
+  </footer>
 
 </body>
 </html>

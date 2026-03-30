@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="en" x-data="{}" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Statamic — Taxonomies</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['Syne', 'sans-serif'],
+            mono:    ['Space Mono', 'monospace'],
+          },
+          colors: {
+            gem: {
+              50:  '#f0fdf9', 100: '#ccfbef', 200: '#99f3df',
+              300: '#58e4c6', 400: '#22cda8', 500: '#0ab28e',
+              600: '#048f73', 700: '#07725d', 800: '#095a4b', 900: '#0a4a3e',
+            },
+            ink: {
+              950: '#04100d', 900: '#081a14', 800: '#0d2a20',
+              700: '#133d2f', 600: '#1c5440',
+            },
+            acid: '#39ff84',
+          },
+        }
+      }
+    }
+  </script>
+
+  <style>
+    :root { --acid: #39ff84; --ink-dark: #04100d; }
+    * { box-sizing: border-box; }
+
+    body {
+      background-color: #04100d;
+      color: #c8ddd6;
+      font-family: 'Syne', sans-serif;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image:
+        linear-gradient(rgba(57,255,132,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(57,255,132,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none; z-index: 0;
+    }
+
+    body::after {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 0; opacity: 0.4;
+    }
+
+    .cl { position: relative; z-index: 1; }
+
+    .code-block {
+      background: #020c09;
+      border: 1px solid rgba(57,255,132,0.18);
+      border-left: 3px solid var(--acid);
+      border-radius: 6px;
+      font-family: 'Space Mono', monospace;
+      position: relative; overflow: hidden;
+    }
+    .code-block::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 100%;
+      background: linear-gradient(180deg, transparent 0%, rgba(57,255,132,0.03) 50%, transparent 100%);
+      background-size: 100% 8px;
+      pointer-events: none;
+      animation: scan 6s linear infinite;
+    }
+    @keyframes scan { 0%{background-position:0 -100%} 100%{background-position:0 200%} }
+
+    .s-card {
+      border: 1px solid rgba(57,255,132,0.1);
+      background: linear-gradient(135deg, rgba(13,42,32,0.65) 0%, rgba(4,16,13,0.9) 100%);
+      backdrop-filter: blur(8px);
+      border-radius: 12px;
+      transition: border-color 0.3s;
+    }
+    .s-card:hover { border-color: rgba(57,255,132,0.28); }
+
+    code.il {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.78em;
+      background: rgba(57,255,132,0.08);
+      border: 1px solid rgba(57,255,132,0.18);
+      color: var(--acid);
+      padding: 2px 7px;
+      border-radius: 4px;
+    }
+
+    .acid-badge {
+      background: rgba(57,255,132,0.1);
+      border: 1px solid rgba(57,255,132,0.28);
+      color: var(--acid);
+    }
+
+    .info-chip {
+      background: rgba(10,178,142,0.08);
+      border: 1px solid rgba(10,178,142,0.22);
+      border-radius: 8px;
+      transition: all 0.22s;
+    }
+    .info-chip:hover { background: rgba(10,178,142,0.16); border-color: rgba(10,178,142,0.45); }
+
+    .tip-box {
+      background: rgba(57,255,132,0.04);
+      border-left: 3px solid var(--acid);
+      border-radius: 0 6px 6px 0;
+    }
+
+    .warn-box {
+      background: rgba(251,191,36,0.04);
+      border-left: 3px solid #fbbf24;
+      border-radius: 0 6px 6px 0;
+    }
+
+    .acid-underline { position: relative; display: inline-block; }
+    .acid-underline::after {
+      content: ''; position: absolute; bottom: -3px; left: 0; right: 0;
+      height: 2px; background: var(--acid);
+      box-shadow: 0 0 10px var(--acid);
+      transform: scaleX(0); transform-origin: left; transition: transform 0.35s ease;
+    }
+    .acid-underline:hover::after { transform: scaleX(1); }
+
+    @keyframes pulseDot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.7)} }
+    .pulse-dot { animation: pulseDot 2s ease-in-out infinite; }
+
+    .copy-btn { font-family: 'Space Mono', monospace; font-size: 11px; transition: all 0.2s; }
+    .copy-btn:hover { color: var(--acid); }
+
+    .t-r{background:#ff5f56} .t-y{background:#ffbd2e} .t-g{background:#27c93f}
+
+    .sec-label { font-family: 'Space Mono', monospace; font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: #0ab28e; }
+
+    .doc-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+    .doc-table th { font-family: 'Space Mono', monospace; font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: #0ab28e; padding: 10px 14px; border-bottom: 1px solid rgba(57,255,132,0.15); text-align: left; }
+    .doc-table td { padding: 11px 14px; border-bottom: 1px solid rgba(57,255,132,0.06); color: #c8ddd6; vertical-align: top; }
+    .doc-table tr:last-child td { border-bottom: none; }
+    .doc-table tr:hover td { background: rgba(57,255,132,0.03); }
+
+    .img-placeholder {
+      background: linear-gradient(135deg, #081a14 0%, #0d2a20 100%);
+      border: 1px dashed rgba(57,255,132,0.25);
+      border-radius: 8px;
+      position: relative; overflow: hidden;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+    }
+    .img-placeholder::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: repeating-linear-gradient(45deg, transparent, transparent 8px, rgba(57,255,132,0.025) 8px, rgba(57,255,132,0.025) 9px);
+    }
+    .img-placeholder img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.55; border-radius: 8px; }
+    .img-placeholder .img-label { position: relative; z-index: 2; text-align: center; }
+
+    .toc-link { font-family: 'Space Mono', monospace; font-size: 0.72rem; color: #0ab28e; display: block; padding: 5px 0 5px 12px; border-left: 2px solid transparent; transition: all 0.2s; }
+    .toc-link:hover { color: var(--acid); border-left-color: var(--acid); }
+
+    /* Tag pill */
+    .tag-pill {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.72rem;
+      padding: 4px 12px;
+      border-radius: 20px;
+      border: 1px solid rgba(57,255,132,0.25);
+      background: rgba(57,255,132,0.07);
+      color: var(--acid);
+      transition: all 0.2s;
+      display: inline-block;
+    }
+    .tag-pill:hover { background: rgba(57,255,132,0.18); border-color: rgba(57,255,132,0.5); }
+
+    /* URL table */
+    .url-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; font-family: 'Space Mono', monospace; }
+    .url-table th { color: #0ab28e; font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; padding: 8px 14px; border-bottom: 1px solid rgba(57,255,132,0.15); text-align: left; }
+    .url-table td { padding: 9px 14px; border-bottom: 1px solid rgba(57,255,132,0.06); vertical-align: top; }
+    .url-table tr:last-child td { border-bottom: none; }
+    .url-table tr:hover td { background: rgba(57,255,132,0.03); }
+
+    /* Transform arrow */
+    .transform-arrow { color: rgba(57,255,132,0.5); font-size: 1.2rem; }
+
+    /* Check item */
+    .check-item { display: flex; align-items: flex-start; gap: 10px; }
+    .check-item::before { content: '✓'; color: var(--acid); font-family: 'Space Mono', monospace; font-size: 0.8rem; margin-top: 2px; flex-shrink: 0; }
+
+    /* Cross item */
+    .cross-item { display: flex; align-items: flex-start; gap: 10px; }
+    .cross-item::before { content: '✗'; color: #f87171; font-family: 'Space Mono', monospace; font-size: 0.8rem; margin-top: 2px; flex-shrink: 0; }
+
+    @keyframes fadeUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
+    .animate-fade-up { animation: fadeUp 0.65s ease both; }
+    .d1{animation-delay:0.1s} .d2{animation-delay:0.2s} .d3{animation-delay:0.3s}
+
+    @keyframes glowPulse {
+      0%,100%{box-shadow:0 0 0 1px rgba(57,255,132,0.2),0 0 40px rgba(57,255,132,0.08)}
+      50%{box-shadow:0 0 0 1px rgba(57,255,132,0.4),0 0 80px rgba(57,255,132,0.2)}
+    }
+    .cta-glow { animation: glowPulse 3s ease-in-out infinite; }
+    .hero-glow { text-shadow: 0 0 60px rgba(57,255,132,0.2); }
+
+    ::-webkit-scrollbar{width:6px} ::-webkit-scrollbar-track{background:#04100d} ::-webkit-scrollbar-thumb{background:rgba(57,255,132,0.22);border-radius:3px}
+
+    /* Normalize grid */
+    .normalize-row {
+      display: flex; align-items: center; gap: 8px;
+      font-family: 'Space Mono', monospace; font-size: 0.78rem;
+      padding: 6px 0; border-bottom: 1px solid rgba(57,255,132,0.05);
+    }
+    .normalize-row:last-child { border-bottom: none; }
+    .normalize-val { color: var(--acid); background: rgba(57,255,132,0.07); border: 1px solid rgba(57,255,132,0.18); padding: 2px 10px; border-radius: 20px; }
+    .normalize-eq { color: rgba(57,255,132,0.35); }
+  </style>
+</head>
+<body>
+
+<!-- ─── NAV ─────────────────────────────────────────────────── -->
+<nav class="cl sticky top-0 z-50 border-b border-gem-800/40 bg-ink-950/85 backdrop-blur-md">
+  <div class="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <a href="statamic-docs.html" class="flex items-center gap-2 group">
+        <div class="w-7 h-7 rounded border border-gem-500/50 flex items-center justify-center bg-gem-800/30 group-hover:border-acid/60 transition-colors">
+          <svg viewBox="0 0 20 20" fill="none" class="w-4 h-4 text-acid" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="10,2 18,7 18,13 10,18 2,13 2,7" stroke="currentColor" stroke-width="1.5" fill="none"/>
+            <polygon points="10,6 14,8.5 14,11.5 10,14 6,11.5 6,8.5" fill="currentColor" opacity="0.6"/>
+          </svg>
+        </div>
+        <span class="font-display font-700 text-white text-sm tracking-widest uppercase">Statamic</span>
+      </a>
+      <span class="text-gem-700">/</span>
+      <a href="statamic-collections.html" class="text-gem-500 text-xs font-mono hover:text-gem-300 transition-colors">Collections</a>
+      <span class="text-gem-700">/</span>
+      <span class="acid-badge text-xs px-2 py-0.5 rounded font-mono">Taxonomies</span>
+    </div>
+    <div class="hidden md:flex items-center gap-5 text-xs text-gem-400 font-mono">
+      <a href="#what-is"    class="acid-underline hover:text-white transition-colors">What is it</a>
+      <a href="#connecting" class="acid-underline hover:text-white transition-colors">Connecting</a>
+      <a href="#routing"    class="acid-underline hover:text-white transition-colors">Routing</a>
+      <a href="#templating" class="acid-underline hover:text-white transition-colors">Templating</a>
+      <a href="#recap"      class="acid-underline hover:text-white transition-colors">Recap</a>
+    </div>
+    <div class="flex items-center gap-2">
+      <div class="pulse-dot w-2 h-2 rounded-full bg-acid"></div>
+      <span class="text-xs font-mono text-gem-400">v5.x</span>
+    </div>
+  </div>
+</nav>
+
+<!-- ─── HERO ─────────────────────────────────────────────────── -->
+<section class="cl pt-20 pb-14 px-6 text-center relative overflow-hidden">
+  <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[380px] rounded-full opacity-15 pointer-events-none"
+       style="background:radial-gradient(ellipse,#39ff84 0%,transparent 70%);filter:blur(60px)"></div>
+  <div class="max-w-3xl mx-auto">
+    <div class="inline-flex items-center gap-2 acid-badge px-3 py-1 rounded-full text-xs font-mono mb-5 animate-fade-up">
+      <span>🏷️</span> Taxonomy Guide
+    </div>
+    <h1 class="hero-glow font-display font-800 text-5xl md:text-6xl text-white leading-[1.06] mb-5 animate-fade-up d1">
+      Taxonomies &amp;<br/>
+      <span style="color:var(--acid)">Content Organising</span>
+    </h1>
+    <p class="text-gem-300 text-lg leading-relaxed max-w-2xl mx-auto mb-8 animate-fade-up d2">
+      If Collections are your content containers, Taxonomies are your content organisers. Labels, tags, categories — the system that makes your content navigable.
+    </p>
+    <div class="flex flex-wrap justify-center gap-3 animate-fade-up d3">
+      <a href="#what-is" class="inline-flex items-center gap-2 bg-acid text-ink-950 font-display font-700 px-5 py-2.5 rounded text-sm hover:bg-white transition-colors">Start Reading ↓</a>
+      <a href="#recap"   class="inline-flex items-center gap-2 border border-gem-600/40 text-gem-200 font-display px-5 py-2.5 rounded text-sm hover:border-acid/40 hover:text-white transition-colors">Quick Recap</a>
+    </div>
+  </div>
+
+  <!-- Live tag preview strip -->
+  <div class="max-w-lg mx-auto mt-12 animate-fade-up d3">
+    <div class="flex flex-wrap justify-center gap-2">
+      <span class="tag-pill">🏷️ JavaScript</span>
+      <span class="tag-pill">🏷️ React</span>
+      <span class="tag-pill">🏷️ CSS</span>
+      <span class="tag-pill">📂 Frontend</span>
+      <span class="tag-pill">📂 Backend</span>
+      <span class="tag-pill">🎬 Sci-Fi</span>
+      <span class="tag-pill">🎬 Drama</span>
+    </div>
+    <p class="text-gem-600 text-xs font-mono mt-3">↑ These are taxonomy terms</p>
+  </div>
+</section>
+
+<!-- ─── MAIN LAYOUT ──────────────────────────────────────────── -->
+<div class="cl max-w-6xl mx-auto px-4 pb-24 flex gap-8">
+
+  <!-- TOC Sidebar -->
+  <aside class="hidden lg:block w-52 flex-shrink-0 pt-2">
+    <div class="sticky top-20">
+      <div class="sec-label mb-4">On This Page</div>
+      <nav class="space-y-0.5">
+        <a href="#what-is"      class="toc-link">What is a Taxonomy?</a>
+        <a href="#example"      class="toc-link">Real-Life Example</a>
+        <a href="#concepts"     class="toc-link">Key Concepts</a>
+        <a href="#structure"    class="toc-link">Example Structure</a>
+        <a href="#connecting"   class="toc-link">Connecting to Collections</a>
+        <a href="#adding"       class="toc-link">Adding to a Collection</a>
+        <a href="#global"       class="toc-link">Global Nature of Terms</a>
+        <a href="#blueprints"   class="toc-link">Blueprints</a>
+        <a href="#routing"      class="toc-link">Routing (URLs)</a>
+        <a href="#slugs"        class="toc-link">Term Value vs Slug</a>
+        <a href="#normalize"    class="toc-link">Normalisation</a>
+        <a href="#templating"   class="toc-link">Templating</a>
+        <a href="#gotcha"       class="toc-link">Gotcha</a>
+        <a href="#tips"         class="toc-link">Pro Tips</a>
+        <a href="#recap"        class="toc-link">Quick Recap</a>
+      </nav>
+    </div>
+  </aside>
+
+  <!-- Content -->
+  <main class="flex-1 min-w-0 space-y-8 pt-2">
+
+    <!-- ── WHAT IS ── -->
+    <section id="what-is" class="s-card p-7 md:p-9">
+      <div class="sec-label mb-2">Introduction</div>
+      <h2 class="font-display font-700 text-white text-2xl md:text-3xl mb-4">🤔 What is a Taxonomy?</h2>
+      <p class="text-gem-300 leading-relaxed mb-6">
+        A taxonomy is a way to <strong class="text-white">group and classify content</strong> based on shared attributes. They give your content context and make it filterable and navigable.
+      </p>
+      <div class="grid sm:grid-cols-3 gap-3 mb-6">
+        <div class="info-chip p-4 text-center">
+          <div class="text-3xl mb-2">🏷️</div>
+          <div class="font-display font-600 text-white text-sm mb-1">Tags</div>
+          <p class="text-gem-400 text-xs leading-relaxed">On blog posts, articles, or any content.</p>
+        </div>
+        <div class="info-chip p-4 text-center">
+          <div class="text-3xl mb-2">📂</div>
+          <div class="font-display font-600 text-white text-sm mb-1">Categories</div>
+          <p class="text-gem-400 text-xs leading-relaxed">Group products, posts, or resources.</p>
+        </div>
+        <div class="info-chip p-4 text-center">
+          <div class="text-3xl mb-2">🎬</div>
+          <div class="font-display font-600 text-white text-sm mb-1">Genres</div>
+          <p class="text-gem-400 text-xs leading-relaxed">Classify movies, music, or media types.</p>
+        </div>
+      </div>
+      <div class="tip-box p-4 rounded">
+        <div class="flex items-start gap-2">
+          <span class="text-acid font-mono text-xs font-700 uppercase tracking-widest mt-0.5 flex-shrink-0">Simple idea</span>
+          <p class="text-gem-200 text-sm font-display font-600">Taxonomy = a system to <span class="text-acid">organize content by labels</span></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── REAL LIFE EXAMPLE ── -->
+    <section id="example" class="s-card p-7 md:p-9">
+      <div class="sec-label mb-2">In Practice</div>
+      <h2 class="font-display font-700 text-white text-2xl mb-4">🧠 Real-Life Example</h2>
+      <p class="text-gem-300 leading-relaxed mb-6">Let's say you have a collection of blog posts. You might group them using two different taxonomies:</p>
+
+      <div class="grid sm:grid-cols-2 gap-4 mb-6">
+        <!-- Tags -->
+        <div class="bg-ink-800/50 border border-gem-800/30 rounded-xl p-5">
+          <div class="flex items-center gap-2 mb-4">
+            <span class="text-lg">🏷️</span>
+            <span class="font-display font-700 text-white">Tags</span>
+            <span class="text-gem-500 font-mono text-xs ml-auto">taxonomy</span>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <span class="tag-pill">JavaScript</span>
+            <span class="tag-pill">React</span>
+            <span class="tag-pill">CSS</span>
+          </div>
+        </div>
+        <!-- Categories -->
+        <div class="bg-ink-800/50 border border-gem-800/30 rounded-xl p-5">
+          <div class="flex items-center gap-2 mb-4">
+            <span class="text-lg">📂</span>
+            <span class="font-display font-700 text-white">Categories</span>
+            <span class="text-gem-500 font-mono text-xs ml-auto">taxonomy</span>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <span class="tag-pill">Frontend</span>
+            <span class="tag-pill">Backend</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid sm:grid-cols-2 gap-3">
+        <div class="check-item text-gem-300 text-sm py-1">
+          <span>Show all posts with tag <code class="il">React</code></span>
+        </div>
+        <div class="check-item text-gem-300 text-sm py-1">
+          <span>Filter posts by <code class="il">Frontend</code> category</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── KEY CONCEPTS ── -->
+    <section id="concepts" class="s-card p-7 md:p-9">
+      <div class="sec-label mb-2">Vocabulary</div>
+      <h2 class="font-display font-700 text-white text-2xl mb-5">📦 Key Concepts</h2>
+
+      <div class="overflow-x-auto rounded-lg border border-gem-800/25 mb-5">
+        <table class="doc-table">
+          <thead>
+            <tr>
+              <th>Term</th>
+              <th>Meaning</th>
+              <th>Example</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code class="il">Taxonomy</code></td>
+              <td class="text-gem-300">The grouping system itself</td>
+              <td class="text-gem-500 font-mono text-xs">tags, categories, genres</td>
+            </tr>
+            <tr>
+              <td><code class="il">Term</code></td>
+              <td class="text-gem-300">A single item inside a taxonomy</td>
+              <td class="text-gem-500 font-mono text-xs">"React", "Frontend"</td>
+            </tr>
+            <tr>
+              <td><code class="il">Entry</code></td>
+              <td class="text-gem-300">Your content that uses terms</td>
+              <td class="text-gem-500 font-mono text-xs">blog post, product</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ── STRUCTURE ── -->
+    <section id="structure" class="s-card p-7 md:p-9">
+      <div class="sec-label mb-2">File Layout</div>
+      <h2 class="font-display font-700 text-white text-2xl mb-4">🧩 Example Structure</h2>
+      <p class="text-gem-300 leading-relaxed mb-5">A taxonomy lives in <code class="il">content/taxonomies/</code>. Each item inside it is called a <strong class="text-white">term</strong>.</p>
+
+      <div class="code-block rounded-lg mb-5">
+        <div class="flex items-center gap-2 px-4 py-2 border-b border-gem-800/30">
+          <div class="t-r w-2.5 h-2.5 rounded-full"></div>
+          <div class="t-y w-2.5 h-2.5 rounded-full"></div>
+          <div class="t-g w-2.5 h-2.5 rounded-full"></div>
+          <span class="font-mono text-gem-500 text-xs ml-1">taxonomy structure</span>
+        </div>
+        <div class="p-5 text-sm leading-8 font-mono">
+          <span class="text-gem-400">Taxonomy: </span><span class="text-acid font-700">tags</span><br/>
+          <span class="text-gem-500">&nbsp;├── </span><span class="text-white">React</span><span class="text-gem-600 text-xs ml-2">← term</span><br/>
+          <span class="text-gem-500">&nbsp;├── </span><span class="text-white">JavaScript</span><span class="text-gem-600 text-xs ml-2">← term</span><br/>
+          <span class="text-gem-500">&nbsp;└── </span><span class="text-white">CSS</span><span class="text-gem-600 text-xs ml-2">← term</span>
+        </div>
+      </div>
+
+      <div class="tip-box p-4 rounded">
+        <div class="flex items-start gap-2">
+          <span class="text-acid font-mono text-xs font-700 uppercase tracking-widest mt-0.5 flex-shrink-0">Remember</span>
+          <p class="text-gem-300 text-sm">Each item — <code class="il">React</code>, <code class="il">CSS</code>, <code class="il">JavaScript</code> — is called a <strong class="text-white">term</strong>.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── CONNECTING ── -->
+    <section id="connecting" class="s-card p-7 md:p-9">
+      <div class="sec-label mb-2">Relationships</div>
+      <h2 class="font-display font-700 text-white text-2xl mb-4">🔗 How Taxonomies Connect</h2>
+      <p class="text-gem-300 leading-relaxed mb-5">Taxonomies don't work alone — they connect to collections. Once attached, they power filtering and listing across your site.</p>
+
+      <div class="code-block rounded-lg mb-5">
+        <div class="flex items-center gap-2 px-4 py-2 border-b border-gem-800/30">
+          <div class="t-r w-2.5 h-2.5 rounded-full"></div>
+          <div class="t-y w-2.5 h-2.5 rounded-full"></div>
+          <div class="t-g w-2.5 h-2.5 rounded-full"></div>
+          <span class="font-mono text-gem-500 text-xs ml-1">relationship</span>
+        </div>
+        <div class="p-5 text-sm leading-8 font-mono">
+          <span class="text-gem-400">Collection </span><span class="text-acid">(Blog)</span><br/>
+          <span class="text-gem-500">&nbsp;├── </span><span class="text-white">Post 1</span><span class="text-gem-600"> → </span><span class="text-gem-400">tags: </span><span class="text-acid">React</span><br/>
+          <span class="text-gem-500">&nbsp;└── </span><span class="text-white">Post 2</span><span class="text-gem-600"> → </span><span class="text-gem-400">tags: </span><span class="text-acid">CSS</span>
+        </div>
+      </div>
+
+      <div class="grid sm:grid-cols-2 gap-3">
+        <div class="check-item bg-ink-800/40 border border-gem-800/20 rounded-lg p-4 text-gem-200 text-sm">
+          <span>Filter posts by their tags</span>
+        </div>
+        <div class="check-item bg-ink-800/40 border border-gem-800/20 rounded-lg p-4 text-gem-200 text-sm">
+          <span>List all posts under a specific tag</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── ADDING TO COLLECTION ── -->
+    <section id="adding" class="s-card p-7 md:p-9">
+      <div class="sec-label mb-2">Configuration</div>
+      <h2 class="font-display font-700 text-white text-2xl mb-4">⚙️ Adding Taxonomies to a Collection</h2>
+      <p class="text-gem-300 leading-relaxed mb-5">Add them to your collection's YAML config file — that's all it takes:</p>
+
+      <div class="code-block rounded-lg mb-6" x-data="{copied:false}">
+        <div class="flex items-center justify-between px-4 py-2 border-b border-gem-800/30">
+          <div class="flex items-center gap-2">
+            <div class="t-r w-2.5 h-2.5 rounded-full"></div>
+            <div class="t-y w-2.5 h-2.5 rounded-full"></div>
+            <div class="t-g w-2.5 h-2.5 rounded-full"></div>
+            <span class="font-mono text-gem-500 text-xs ml-1">blog.yaml</span>
+          </div>
+          <button class="copy-btn text-gem-500 flex items-center gap-1.5"
+            @click="navigator.clipboard.writeText('taxonomies:\n  - categories\n  - tags'); copied=true; setTimeout(()=>copied=false,2000)">
+            <template x-if="!copied"><span class="flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2"/></svg>Copy</span></template>
+            <template x-if="copied"><span class="flex items-center gap-1 text-acid"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Copied!</span></template>
+          </button>
+        </div>
+        <div class="p-4 text-sm leading-7">
+          <span class="text-gem-400">taxonomies</span><span class="text-gem-600">:</span><br/>
+          <span class="text-gem-600">&nbsp;&nbsp;- </span><span class="text-acid">categories</span><br/>
+          <span class="text-gem-600">&nbsp;&nbsp;- </span><span class="text-acid">tags</span>
+        </div>
+      </div>
+
+      <div class="grid sm:grid-cols-2 gap-3">
+        <div class="check-item bg-ink-800/40 border border-gem-800/20 rounded-lg p-4 text-gem-200 text-sm">
+          <span>Fields appear automatically in all entries</span>
+        </div>
+        <div class="check-item bg-ink-800/40 border border-gem-800/20 rounded-lg p-4 text-gem-200 text-sm">
+          <span>Routing &amp; template variables ready to use</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── GLOBAL NATURE ── -->
+    <section id="global" class="s-card p-7 md:p-9">
+      <div class="sec-label mb-2">Important Concept</div>
+      <h2 class="font-display font-700 text-white text-2xl mb-4">🌍 Global Nature of Terms</h2>
+      <p class="text-gem-300 leading-relaxed mb-5">This is a key concept that trips up newcomers:</p>
+
+      <div class="bg-acid/5 border border-acid/20 rounded-xl p-6 mb-5 text-center">
+        <div class="font-display font-800 text-acid text-2xl mb-2">Terms are Global</div>
+        <p class="text-gem-300 text-sm">The <code class="il">React</code> tag is the same <code class="il">React</code> everywhere — it doesn't matter which collection uses it.</p>
+      </div>
+
+      <div class="tip-box p-4 rounded">
+        <div class="flex items-start gap-2">
+          <span class="text-acid font-mono text-xs font-700 uppercase tracking-widest mt-0.5 flex-shrink-0">Need Separation?</span>
+          <p class="text-gem-300 text-sm">Create a new taxonomy like <code class="il">product_tags</code> if you need context-specific terms that shouldn't overlap with <code class="il">tags</code>.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── BLUEPRINTS ── -->
+    <section id="blueprints" class="s-card p-7 md:p-9">
+      <div class="sec-label mb-2">Field Definitions</div>
+      <h2 class="font-display font-700 text-white text-2xl mb-4">🧩 Blueprints for Taxonomies</h2>
+      <p class="text-gem-300 leading-relaxed mb-5">Just like collections, taxonomies also use blueprints to define what data a term can hold.</p>
+
+      <div class="grid sm:grid-cols-2 gap-4 mb-5">
+        <div>
+          <div class="sec-label mb-3">Default Fields</div>
+          <div class="flex flex-col gap-2">
+            <span class="acid-badge font-mono text-xs px-3 py-1.5 rounded w-fit">title</span>
+            <span class="acid-badge font-mono text-xs px-3 py-1.5 rounded w-fit">slug</span>
+            <span class="acid-badge font-mono text-xs px-3 py-1.5 rounded w-fit">content</span>
+          </div>
+        </div>
+        <div>
+          <div class="sec-label mb-3">You Can Add</div>
+          <div class="flex flex-col gap-2">
+            <span class="info-chip font-mono text-xs px-3 py-1.5 rounded w-fit text-gem-300">images</span>
+            <span class="info-chip font-mono text-xs px-3 py-1.5 rounded w-fit text-gem-300">descriptions</span>
+            <span class="info-chip font-mono text-xs px-3 py-1.5 rounded w-fit text-gem-300">custom fields</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-ink-800/50 border border-gem-800/30 rounded-xl p-5">
+        <div class="sec-label mb-3">Example: "Category" Term Blueprint</div>
+        <div class="flex flex-wrap gap-3">
+          <div class="check-item text-gem-300 text-sm"><span>Name</span></div>
+          <div class="check-item text-gem-300 text-sm"><span>Icon</span></div>
+          <div class="check-item text-gem-300 text-sm"><span>Description</span></div>
+        </div>
+      </div>
+
+      <!-- Image placeholder -->
+
+    </section>
+
+    <!-- ── ROUTING ── -->
+    <section id="routing" class="s-card p-7 md:p-9">
+      <div class="sec-label mb-2">Automatic URLs</div>
+      <h2 class="font-display font-700 text-white text-2xl mb-4">🌐 Routing (Automatic URLs)</h2>
+      <p class="text-gem-300 leading-relaxed mb-6">Statamic automatically creates URLs for your taxonomies — no manual route configuration needed.</p>
+
+      <!-- Global URLs -->
+      <div class="mb-6">
+        <div class="flex items-center gap-2 mb-3">
+          <div class="w-2 h-2 rounded-full bg-acid"></div>
+          <span class="font-display font-600 text-white text-sm">Global Taxonomy URLs</span>
+        </div>
+        <div class="overflow-x-auto rounded-lg border border-gem-800/25 mb-4">
+          <table class="url-table">
+            <thead>
+              <tr><th>Page</th><th>URL</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="text-gem-300">All tags</td>
+                <td><code class="il">/tags</code></td>
+              </tr>
+              <tr>
+                <td class="text-gem-300">Single tag</td>
+                <td><code class="il">/tags/react</code></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="code-block rounded-lg" x-data="{copied:false}">
+          <div class="flex items-center justify-between px-4 py-2 border-b border-gem-800/30">
+            <span class="font-mono text-gem-500 text-xs">Views used</span>
+            <button class="copy-btn text-gem-500 flex items-center gap-1.5"
+              @click="navigator.clipboard.writeText('resources/views/tags/index.antlers.html\nresources/views/tags/show.antlers.html'); copied=true; setTimeout(()=>copied=false,2000)">
+              <template x-if="!copied"><span class="flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2"/></svg>Copy</span></template>
+              <template x-if="copied"><span class="flex items-center gap-1 text-acid"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Copied!</span></template>
+            </button>
+          </div>
+          <div class="p-4 text-sm leading-7">
+            <span class="text-gem-500">resources/views/tags/</span><span class="text-acid">index</span><span class="text-gem-400">.antlers.html</span><br/>
+            <span class="text-gem-500">resources/views/tags/</span><span class="text-acid">show</span><span class="text-gem-400">.antlers.html</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Collection-specific URLs -->
+      <div>
+        <div class="flex items-center gap-2 mb-3">
+          <div class="w-2 h-2 rounded-full bg-gem-400"></div>
+          <span class="font-display font-600 text-white text-sm">Collection-Specific URLs</span>
+        </div>
+        <div class="overflow-x-auto rounded-lg border border-gem-800/25 mb-3">
+          <table class="url-table">
+            <thead>
+              <tr><th>Page</th><th>URL</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="text-gem-300">Blog tags index</td>
+                <td><code class="il">/blog/tags</code></td>
+              </tr>
+              <tr>
+                <td class="text-gem-300">Blog tag "React"</td>
+                <td><code class="il">/blog/tags/react</code></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="tip-box p-4 rounded">
+          <div class="flex items-start gap-2">
+            <span class="text-acid font-mono text-xs font-700 uppercase tracking-widest mt-0.5 flex-shrink-0">Note</span>
+            <p class="text-gem-300 text-sm">Collection-specific URLs only show entries from <em>that</em> collection — not globally.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── TERM VALUE VS SLUG ── -->
+    <section id="slugs" class="s-card p-7 md:p-9">
+      <div class="sec-label mb-2">URL Identifiers</div>
+      <h2 class="font-display font-700 text-white text-2xl mb-4">🧠 Term Value vs Slug</h2>
+      <p class="text-gem-300 leading-relaxed mb-5">This part confuses many developers — here's the simple version:</p>
+
+      <div class="flex flex-col sm:flex-row items-center gap-4 mb-6">
+        <div class="flex-1 w-full bg-ink-800/60 border border-gem-800/30 rounded-xl p-5 text-center">
+          <div class="sec-label mb-2">Term Value</div>
+          <div class="font-display font-700 text-white text-xl">"Star Wars"</div>
+          <div class="text-gem-500 text-xs mt-2 font-mono">Human-readable label</div>
+        </div>
+        <div class="text-acid text-3xl font-display hidden sm:block">→</div>
+        <div class="text-acid text-3xl font-display sm:hidden">↓</div>
+        <div class="flex-1 w-full bg-acid/5 border border-acid/25 rounded-xl p-5 text-center">
+          <div class="sec-label mb-2">Slug</div>
+          <div class="font-mono font-700 text-acid text-xl">"star-wars"</div>
+          <div class="text-gem-500 text-xs mt-2 font-mono">URL-safe version</div>
+        </div>
+      </div>
+
+      <div class="tip-box p-4 rounded">
+        <div class="flex items-start gap-2">
+          <span class="text-acid font-mono text-xs font-700 uppercase tracking-widest mt-0.5 flex-shrink-0">Rule</span>
+          <p class="text-gem-300 text-sm">Slug = the URL-friendly version of the term value. Statamic generates this automatically.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── NORMALISATION ── -->
+    <section id="normalize" class="s-card p-7 md:p-9">
+      <div class="sec-label mb-2">Auto Conversion</div>
+      <h2 class="font-display font-700 text-white text-2xl mb-4">🔄 Normalisation</h2>
+      <p class="text-gem-300 leading-relaxed mb-5">Statamic automatically converts term values to slugs when saving entries.</p>
+
+      <div class="grid sm:grid-cols-2 gap-4 mb-5">
+        <!-- Before -->
+        <div class="code-block rounded-lg" x-data="{copied:false}">
+          <div class="flex items-center justify-between px-4 py-2 border-b border-gem-800/30">
+            <span class="font-mono text-gem-500 text-xs">In your entry</span>
+          </div>
+          <div class="p-4 text-sm leading-7">
+            <span class="text-gem-400">tags</span><span class="text-gem-600">:</span><br/>
+            <span class="text-gem-600">&nbsp;&nbsp;- </span><span class="text-white">Star Wars</span><br/>
+            <span class="text-gem-600">&nbsp;&nbsp;- </span><span class="text-white">Tatooine</span><br/>
+            <span class="text-gem-600">&nbsp;&nbsp;- </span><span class="text-white">Droids We're Not Looking For</span>
+          </div>
+        </div>
+        <!-- After -->
+        <div class="code-block rounded-lg">
+          <div class="flex items-center gap-2 px-4 py-2 border-b border-gem-800/30">
+            <span class="font-mono text-gem-500 text-xs">Becomes slugs</span>
+          </div>
+          <div class="p-4 text-sm leading-7">
+            <span class="text-acid">star-wars</span><br/>
+            <span class="text-acid">tatooine</span><br/>
+            <span class="text-acid">droids-were-not-looking-for</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Normalisation table -->
+      <div class="bg-ink-800/40 border border-gem-800/25 rounded-xl p-5 mb-4">
+        <div class="sec-label mb-4">⚠️ Important Rule — All treated as the same term</div>
+        <div class="space-y-2">
+          <div class="normalize-row"><span class="normalize-val">Star Wars</span><span class="normalize-eq">≡</span><span class="normalize-val">star wars</span><span class="normalize-eq">≡</span><span class="normalize-val">StAr WaRs</span><span class="normalize-eq">≡</span><span class="normalize-val">star-wars</span></div>
+        </div>
+      </div>
+
+      <div class="warn-box p-4 rounded">
+        <div class="flex items-start gap-2">
+          <span class="text-yellow-400 font-mono text-xs font-700 uppercase tracking-widest mt-0.5 flex-shrink-0">Tip</span>
+          <p class="text-gem-300 text-sm">Be consistent when naming terms. Even though Statamic normalizes them, human consistency avoids confusion in your content team.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── TEMPLATING ── -->
+    <section id="templating" class="s-card p-7 md:p-9">
+      <div class="sec-label mb-2">Antlers Templates</div>
+      <h2 class="font-display font-700 text-white text-2xl mb-6">🎨 Templating (Using Taxonomies)</h2>
+
+      <!-- Output terms -->
+      <div class="mb-7">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="text-lg">🏷️</span>
+          <span class="font-display font-600 text-white">Output Terms on a Page</span>
+        </div>
+        <div class="code-block rounded-lg mb-3" x-data="{copied:false}">
+          <div class="flex items-center justify-between px-4 py-2 border-b border-gem-800/30">
+            <span class="font-mono text-gem-500 text-xs">template.antlers.html</span>
+            <button class="copy-btn text-gem-500 flex items-center gap-1.5"
+              @click="navigator.clipboard.writeText(`{{ tags }}\n  {{ title }} - {{ url }}\n{{ /tags }}`); copied=true; setTimeout(()=>copied=false,2000)">
+              <template x-if="!copied"><span class="flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2"/></svg>Copy</span></template>
+              <template x-if="copied"><span class="flex items-center gap-1 text-acid"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Copied!</span></template>
+            </button>
+          </div>
+          <div class="p-4 text-sm leading-7">
+            <span class="text-gem-400">{{ </span><span class="text-acid">tags</span><span class="text-gem-400"> }}</span><br/>
+            <span class="text-gem-600">&nbsp;&nbsp;</span><span class="text-gem-400">{{ </span><span class="text-white">title</span><span class="text-gem-400"> }}</span><span class="text-gem-500"> - </span><span class="text-gem-400">{{ </span><span class="text-white">url</span><span class="text-gem-400"> }}</span><br/>
+            <span class="text-gem-400">{{ /</span><span class="text-acid">tags</span><span class="text-gem-400"> }}</span>
+          </div>
+        </div>
+        <div class="code-block rounded-lg">
+          <div class="flex items-center gap-2 px-4 py-2 border-b border-gem-800/30">
+            <span class="font-mono text-gem-500 text-xs">Output</span>
+          </div>
+          <div class="p-4 text-sm leading-7">
+            <span class="text-gem-200">React - </span><span class="text-acid">/tags/react</span><br/>
+            <span class="text-gem-200">CSS - </span><span class="text-acid">/tags/css</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- List all terms -->
+      <div class="mb-7">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="text-lg">🔁</span>
+          <span class="font-display font-600 text-white">Listing All Terms</span>
+        </div>
+        <div class="code-block rounded-lg mb-3" x-data="{copied:false}">
+          <div class="flex items-center justify-between px-4 py-2 border-b border-gem-800/30">
+            <span class="font-mono text-gem-500 text-xs">tags/index.antlers.html</span>
+            <button class="copy-btn text-gem-500 flex items-center gap-1.5"
+              @click="navigator.clipboard.writeText('<ul>\n  {{ terms }}\n    <li><a href=\"{{ url }}\">{{ title }}</a></li>\n  {{ /terms }}\n</ul>'); copied=true; setTimeout(()=>copied=false,2000)">
+              <template x-if="!copied"><span class="flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2"/></svg>Copy</span></template>
+              <template x-if="copied"><span class="flex items-center gap-1 text-acid"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Copied!</span></template>
+            </button>
+          </div>
+          <div class="p-4 text-sm leading-7">
+            <span class="text-gem-300">&lt;</span><span class="text-white">ul</span><span class="text-gem-300">&gt;</span><br/>
+            <span class="text-gem-600">&nbsp;&nbsp;</span><span class="text-gem-400">{{ </span><span class="text-acid">terms</span><span class="text-gem-400"> }}</span><br/>
+            <span class="text-gem-600">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="text-gem-300">&lt;</span><span class="text-white">li</span><span class="text-gem-300">&gt;&lt;</span><span class="text-white">a</span> <span class="text-gem-400">href</span><span class="text-gem-300">="</span><span class="text-acid">{{ url }}</span><span class="text-gem-300">"&gt;</span><span class="text-gem-400">{{ </span><span class="text-white">title</span><span class="text-gem-400"> }}</span><span class="text-gem-300">&lt;/</span><span class="text-white">a</span><span class="text-gem-300">&gt;&lt;/</span><span class="text-white">li</span><span class="text-gem-300">&gt;</span><br/>
+            <span class="text-gem-600">&nbsp;&nbsp;</span><span class="text-gem-400">{{ /</span><span class="text-acid">terms</span><span class="text-gem-400"> }}</span><br/>
+            <span class="text-gem-300">&lt;/</span><span class="text-white">ul</span><span class="text-gem-300">&gt;</span>
+          </div>
+        </div>
+        <div class="tip-box p-4 rounded">
+          <p class="text-gem-300 text-sm">This renders a list of all available terms — great for a tag cloud or category navigation.</p>
+        </div>
+      </div>
+
+      <!-- Entries inside a term -->
+      <div>
+        <div class="flex items-center gap-2 mb-3">
+          <span class="text-lg">📄</span>
+          <span class="font-display font-600 text-white">Listing Entries Inside a Term</span>
+        </div>
+        <div class="code-block rounded-lg mb-3" x-data="{copied:false}">
+          <div class="flex items-center justify-between px-4 py-2 border-b border-gem-800/30">
+            <span class="font-mono text-gem-500 text-xs">tags/show.antlers.html</span>
+            <button class="copy-btn text-gem-500 flex items-center gap-1.5"
+              @click="navigator.clipboard.writeText('{{ entries }}\n  <li>{{ title }}</li>\n{{ /entries }}'); copied=true; setTimeout(()=>copied=false,2000)">
+              <template x-if="!copied"><span class="flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2"/></svg>Copy</span></template>
+              <template x-if="copied"><span class="flex items-center gap-1 text-acid"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Copied!</span></template>
+            </button>
+          </div>
+          <div class="p-4 text-sm leading-7">
+            <span class="text-gem-400">{{ </span><span class="text-acid">entries</span><span class="text-gem-400"> }}</span><br/>
+            <span class="text-gem-600">&nbsp;&nbsp;</span><span class="text-gem-300">&lt;</span><span class="text-white">li</span><span class="text-gem-300">&gt;</span><span class="text-gem-400">{{ </span><span class="text-white">title</span><span class="text-gem-400"> }}</span><span class="text-gem-300">&lt;/</span><span class="text-white">li</span><span class="text-gem-300">&gt;</span><br/>
+            <span class="text-gem-400">{{ /</span><span class="text-acid">entries</span><span class="text-gem-400"> }}</span>
+          </div>
+        </div>
+        <div class="flex items-start gap-3 bg-ink-800/40 border border-gem-800/20 rounded-lg p-4">
+          <span class="text-acid text-lg mt-0.5">→</span>
+          <div class="text-gem-300 text-sm">Navigate to <code class="il">/tags/react</code> and this will automatically list all posts tagged with React.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── GOTCHA ── -->
+    <section id="gotcha" class="s-card p-7 md:p-9">
+      <div class="sec-label mb-2">Watch Out</div>
+      <h2 class="font-display font-700 text-white text-2xl mb-4">⚠️ Small Gotcha</h2>
+      <p class="text-gem-300 leading-relaxed mb-5">The <code class="il">{{ terms }}</code> tag needs context to work correctly.</p>
+
+      <div class="grid sm:grid-cols-2 gap-4">
+        <!-- Won't work -->
+        <div>
+          <div class="flex items-center gap-2 mb-3">
+            <span class="text-red-400 font-mono text-sm font-700">✗</span>
+            <span class="font-display font-600 text-red-400 text-sm">Won't work</span>
+          </div>
+          <div class="code-block rounded-lg border-red-500/30" style="border-left-color:#f87171">
+            <div class="px-4 py-2 border-b border-gem-800/30">
+              <span class="font-mono text-gem-500 text-xs">Without context</span>
+            </div>
+            <div class="p-4 text-sm">
+              <span class="text-red-400/70">{{ terms }}</span>
+            </div>
+          </div>
+        </div>
+        <!-- Works -->
+        <div>
+          <div class="flex items-center gap-2 mb-3">
+            <span class="text-acid font-mono text-sm font-700">✓</span>
+            <span class="font-display font-600 text-acid text-sm">Works correctly</span>
+          </div>
+          <div class="bg-ink-800/40 border border-gem-800/25 rounded-lg p-4">
+            <div class="space-y-2">
+              <div class="check-item text-gem-200 text-sm">Inside a taxonomy page</div>
+              <div class="check-item text-gem-200 text-sm">Or with a specified collection</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── PRO TIPS ── -->
+    <section id="tips" class="s-card p-7 md:p-9">
+      <div class="sec-label mb-2">Best Practices</div>
+      <h2 class="font-display font-700 text-white text-2xl mb-5">💡 Pro Tips</h2>
+      <div class="space-y-3">
+        <div class="flex items-start gap-4 info-chip p-4">
+          <span class="text-2xl flex-shrink-0">🔍</span>
+          <div>
+            <div class="font-display font-600 text-white text-sm mb-1">Use Taxonomies for Filtering &amp; Navigation</div>
+            <p class="text-gem-400 text-xs leading-relaxed">They're built for it — tag archives, category pages, and faceted filtering all become trivial.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-4 info-chip p-4">
+          <span class="text-2xl flex-shrink-0">✏️</span>
+          <div>
+            <div class="font-display font-600 text-white text-sm mb-1">Keep Naming Consistent</div>
+            <p class="text-gem-400 text-xs leading-relaxed">This is critical. Inconsistent naming (React vs react vs ReactJS) creates duplicate terms and messy archives.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-4 info-chip p-4">
+          <span class="text-2xl flex-shrink-0">🧹</span>
+          <div>
+            <div class="font-display font-600 text-white text-sm mb-1">Don't Overload with Taxonomies</div>
+            <p class="text-gem-400 text-xs leading-relaxed">Start with 1–2 taxonomies per collection. Add more only when genuinely needed — too many gets unwieldy fast.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-4 info-chip p-4">
+          <span class="text-2xl flex-shrink-0">🔀</span>
+          <div>
+            <div class="font-display font-600 text-white text-sm mb-1">Separate Taxonomies for Different Contexts</div>
+            <p class="text-gem-400 text-xs leading-relaxed">If product tags and blog tags shouldn't mix, create <code class="il">product_tags</code> and <code class="il">blog_tags</code> as separate taxonomies.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── QUICK RECAP ── -->
+    <section id="recap" class="s-card p-7 md:p-9">
+      <div class="sec-label mb-2">Summary</div>
+      <h2 class="font-display font-700 text-white text-2xl mb-5">🧠 Quick Recap</h2>
+      <div class="space-y-2 mb-6">
+        <div class="check-item bg-ink-800/40 border border-gem-800/20 rounded-lg p-4 text-gem-200 text-sm">
+          <span><strong class="text-white">Taxonomy</strong> = the grouping system (tags, categories, genres)</span>
+        </div>
+        <div class="check-item bg-ink-800/40 border border-gem-800/20 rounded-lg p-4 text-gem-200 text-sm">
+          <span><strong class="text-white">Term</strong> = a single label inside a taxonomy (React, Frontend)</span>
+        </div>
+        <div class="check-item bg-ink-800/40 border border-gem-800/20 rounded-lg p-4 text-gem-200 text-sm">
+          <span>Connected to collections via the <code class="il">taxonomies</code> config key</span>
+        </div>
+        <div class="check-item bg-ink-800/40 border border-gem-800/20 rounded-lg p-4 text-gem-200 text-sm">
+          <span>Automatically gets <strong class="text-white">URLs</strong> and <strong class="text-white">templates</strong> — no manual routing needed</span>
+        </div>
+        <div class="check-item bg-ink-800/40 border border-gem-800/20 rounded-lg p-4 text-gem-200 text-sm">
+          <span>Super powerful for <strong class="text-white">filtering</strong> and <strong class="text-white">grouping</strong> content at scale</span>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto rounded-lg border border-gem-800/25">
+        <table class="doc-table">
+          <thead>
+            <tr><th>Concept</th><th>Meaning</th><th>Example</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code class="il">Taxonomy</code></td>
+              <td class="text-gem-300">Grouping system</td>
+              <td class="text-gem-500 font-mono text-xs">tags, categories</td>
+            </tr>
+            <tr>
+              <td><code class="il">Term</code></td>
+              <td class="text-gem-300">Single label item</td>
+              <td class="text-gem-500 font-mono text-xs">React, Frontend</td>
+            </tr>
+            <tr>
+              <td><code class="il">Term Value</code></td>
+              <td class="text-gem-300">Human-readable name</td>
+              <td class="text-gem-500 font-mono text-xs">"Star Wars"</td>
+            </tr>
+            <tr>
+              <td><code class="il">Slug</code></td>
+              <td class="text-gem-300">URL-safe version</td>
+              <td class="text-gem-500 font-mono text-xs">star-wars</td>
+            </tr>
+            <tr>
+              <td><code class="il">Global Term</code></td>
+              <td class="text-gem-300">Same term across all collections</td>
+              <td class="text-gem-500 font-mono text-xs">React is always React</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ── FINAL CTA ── -->
+    <section class="cta-glow bg-ink-800/60 rounded-2xl p-10 border border-gem-800/30 text-center">
+      <div class="text-5xl mb-5">🎉</div>
+      <h2 class="font-display font-800 text-3xl text-white mb-4">
+        The Statamic Content Model
+      </h2>
+      <div class="flex flex-wrap items-center justify-center gap-4 mb-6 text-base">
+        <div class="acid-badge px-5 py-3 rounded-xl font-display font-600 text-center">
+          <div class="text-2xl mb-1">📦</div>
+          Collections<br/>
+          <span class="text-gem-400 font-mono text-xs font-400">store content</span>
+        </div>
+        <div class="text-acid text-3xl font-display">+</div>
+        <div class="acid-badge px-5 py-3 rounded-xl font-display font-600 text-center">
+          <div class="text-2xl mb-1">🏷️</div>
+          Taxonomies<br/>
+          <span class="text-gem-400 font-mono text-xs font-400">organize it</span>
+        </div>
+        <div class="text-acid text-3xl font-display">=</div>
+        <div class="bg-acid/15 border border-acid/40 px-5 py-3 rounded-xl font-display font-700 text-acid text-center">
+          <div class="text-2xl mb-1">🚀</div>
+          Powerful CMS<br/>
+          <span class="text-gem-300 font-mono text-xs font-400">developer-first</span>
+        </div>
+      </div>
+      <p class="text-gem-400 mb-8 leading-relaxed max-w-lg mx-auto">
+        You now understand the full content modelling system in Statamic. Collections store the content, Taxonomies organise it — together they're unstoppable.
+      </p>
+      <div class="flex flex-wrap gap-3 justify-center">
+        <a href="https://statamic.dev/taxonomies" target="_blank"
+           class="inline-flex items-center gap-2 bg-acid text-ink-950 font-display font-700 px-5 py-2.5 rounded text-sm hover:bg-white transition-colors">
+          Full Taxonomy Docs ↗
+        </a>
+        <a href="statamic-collections.html"
+           class="inline-flex items-center gap-2 border border-gem-600/40 text-gem-200 font-display px-5 py-2.5 rounded text-sm hover:border-acid/40 hover:text-white transition-colors">
+          ← Collections
+        </a>
+        <a href="/statamic-installation.html"
+           class="inline-flex items-center gap-2 border border-gem-600/40 text-gem-200 font-display px-5 py-2.5 rounded text-sm hover:border-acid/40 hover:text-white transition-colors">
+          ← Installation
+        </a>
+      </div>
+    </section>
+
+  <div class="flex flex-wrap gap-3 justify-center">
+    <a href="/statamic-globals.html"
+        class="inline-flex items-center gap-2 bg-acid text-ink-950 font-display font-700 px-5 py-2.5 rounded text-sm hover:bg-white transition-colors">
+      Content Modeling - Globals
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M13 5l7 7-7 7"/>
+      </svg>
+      </svg>
+    </a>
+  </div>
+
+  </main>
+</div>
+
+<!-- ─── FOOTER ─────────────────────────────────────────────── -->
+<footer class="cl border-t border-gem-900/50 py-8 px-6">
+  <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+    <div class="flex items-center gap-2">
+      <div class="w-5 h-5 rounded border border-gem-600/30 flex items-center justify-center bg-gem-800/20">
+        <svg viewBox="0 0 20 20" fill="none" class="w-3 h-3 text-gem-400" xmlns="http://www.w3.org/2000/svg">
+          <polygon points="10,2 18,7 18,13 10,18 2,13 2,7" stroke="currentColor" stroke-width="1.5" fill="none"/>
+        </svg>
+      </div>
+      <span class="text-gem-500 text-xs font-mono">Statamic — Taxonomies Guide</span>
+    </div>
+    <div class="flex items-center gap-4 text-xs font-mono text-gem-600">
+      <a href="#what-is" class="hover:text-gem-400 transition-colors">↑ Back to top</a>
+      <span>·</span>
+      <span>v5.x docs</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

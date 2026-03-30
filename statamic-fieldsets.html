@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en" x-data="{}" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Statamic — Fieldsets</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['Syne', 'sans-serif'],
+            mono:    ['Space Mono', 'monospace'],
+          },
+          colors: {
+            gem: {
+              50:  '#f0fdf9', 100: '#ccfbef', 200: '#99f3df',
+              300: '#58e4c6', 400: '#22cda8', 500: '#0ab28e',
+              600: '#048f73', 700: '#07725d', 800: '#095a4b', 900: '#0a4a3e',
+            },
+            ink: {
+              950: '#04100d', 900: '#081a14', 800: '#0d2a20',
+              700: '#133d2f', 600: '#1c5440',
+            },
+            acid: '#39ff84',
+          },
+        }
+      }
+    }
+  </script>
+
+  <style>
+    :root { --acid: #39ff84; --ink-dark: #04100d; }
+    * { box-sizing: border-box; }
+
+    body {
+      background-color: #04100d;
+      color: #c8ddd6;
+      font-family: 'Syne', sans-serif;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image:
+        linear-gradient(rgba(57,255,132,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(57,255,132,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none; z-index: 0;
+    }
+
+    body::after {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 0; opacity: 0.4;
+    }
+
+    .cl { position: relative; z-index: 1; }
+
+    .code-block {
+      background: #020c09;
+      border: 1px solid rgba(57,255,132,0.18);
+      border-left: 3px solid var(--acid);
+      border-radius: 6px;
+      font-family: 'Space Mono', monospace;
+      position: relative; overflow: hidden;
+    }
+    .code-block::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 100%;
+      background: linear-gradient(180deg, transparent 0%, rgba(57,255,132,0.03) 50%, transparent 100%);
+      background-size: 100% 8px;
+      pointer-events: none;
+      animation: scan 6s linear infinite;
+    }
+    @keyframes scan { 0%{background-position:0 -100%} 100%{background-position:0 200%} }
+
+    .s-card {
+      border: 1px solid rgba(57,255,132,0.1);
+      background: linear-gradient(135deg, rgba(13,42,32,0.65) 0%, rgba(4,16,13,0.9) 100%);
+      backdrop-filter: blur(8px);
+      border-radius: 12px;
+      transition: border-color 0.3s;
+    }
+    .s-card:hover { border-color: rgba(57,255,132,0.28); }
+
+    code.il {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.78em;
+      background: rgba(57,255,132,0.08);
+      border: 1px solid rgba(57,255,132,0.18);
+      color: var(--acid);
+      padding: 2px 7px;
+      border-radius: 4px;
+    }
+
+    .acid-badge {
+      background: rgba(57,255,132,0.1);
+      border: 1px solid rgba(57,255,132,0.28);
+      color: var(--acid);
+    }
+
+    .info-chip {
+      background: rgba(10,178,142,0.08);
+      border: 1px solid rgba(10,178,142,0.22);
+      border-radius: 8px;
+      transition: all 0.22s;
+    }
+    .info-chip:hover { background: rgba(10,178,142,0.16); border-color: rgba(10,178,142,0.45); }
+
+    .tip-box {
+      background: rgba(57,255,132,0.04);
+      border-left: 3px solid var(--acid);
+      border-radius: 0 6px 6px 0;
+    }
+
+    .warn-box {
+      background: rgba(251,191,36,0.04);
+      border-left: 3px solid #fbbf24;
+      border-radius: 0 6px 6px 0;
+    }
+
+    .acid-underline { position: relative; display: inline-block; }
+    .acid-underline::after {
+      content: ''; position: absolute; bottom: -3px; left: 0; right: 0;
+      height: 2px; background: var(--acid);
+      box-shadow: 0 0 10px var(--acid);
+      transform: scaleX(0); transform-origin: left; transition: transform 0.35s ease;
+    }
+    .acid-underline:hover::after { transform: scaleX(1); }
+
+    @keyframes pulseDot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.7)} }
+    .pulse-dot { animation: pulseDot 2s ease-in-out infinite; }
+
+    .t-r{background:#ff5f56} .t-y{background:#ffbd2e} .t-g{background:#27c93f}
+
+    .sec-label { font-family: 'Space Mono', monospace; font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: #0ab28e; }
+
+    .doc-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+    .doc-table th { font-family: 'Space Mono', monospace; font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: #0ab28e; padding: 10px 14px; border-bottom: 1px solid rgba(57,255,132,0.15); text-align: left; }
+    .doc-table td { padding: 11px 14px; border-bottom: 1px solid rgba(57,255,132,0.06); color: #c8ddd6; vertical-align: top; }
+    .doc-table tr:last-child td { border-bottom: none; }
+    .doc-table tr:hover td { background: rgba(57,255,132,0.03); }
+
+    .toc-link { font-family: 'Space Mono', monospace; font-size: 0.72rem; color: #0ab28e; display: block; padding: 5px 0 5px 12px; border-left: 2px solid transparent; transition: all 0.2s; }
+    .toc-link:hover { color: var(--acid); border-left-color: var(--acid); }
+
+    .tag-pill {
+      border-radius: 20px;
+      border: 1px solid rgba(57,255,132,0.25);
+      background: rgba(57,255,132,0.07);
+      color: var(--acid);
+      font-family: 'Space Mono', monospace;
+      font-size: 0.72rem;
+      padding: 4px 12px;
+      transition: all 0.2s;
+      display: inline-block;
+    }
+    .tag-pill:hover { background: rgba(57,255,132,0.18); border-color: rgba(57,255,132,0.5); }
+
+    .check-item { display: flex; align-items: flex-start; gap: 10px; }
+    .check-item::before { content: '✓'; color: var(--acid); font-family: 'Space Mono', monospace; font-size: 0.8rem; margin-top: 2px; flex-shrink: 0; }
+
+    .cross-item { display: flex; align-items: flex-start; gap: 10px; }
+    .cross-item::before { content: '✗'; color: #f87171; font-family: 'Space Mono', monospace; font-size: 0.8rem; margin-top: 2px; flex-shrink: 0; }
+
+    @keyframes fadeUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
+    .animate-fade-up { animation: fadeUp 0.65s ease both; }
+    .d1{animation-delay:0.1s} .d2{animation-delay:0.2s} .d3{animation-delay:0.3s}
+
+    @keyframes glowPulse {
+      0%,100%{box-shadow:0 0 0 1px rgba(57,255,132,0.2),0 0 40px rgba(57,255,132,0.08)}
+      50%{box-shadow:0 0 0 1px rgba(57,255,132,0.4),0 0 80px rgba(57,255,132,0.2)}
+    }
+    .cta-glow { animation: glowPulse 3s ease-in-out infinite; }
+    .hero-glow { text-shadow: 0 0 60px rgba(57,255,132,0.2); }
+
+    ::-webkit-scrollbar{width:6px} ::-webkit-scrollbar-track{background:#04100d} ::-webkit-scrollbar-thumb{background:rgba(57,255,132,0.22);border-radius:3px}
+
+    .yaml-key     { color: #22cda8; }
+    .yaml-val     { color: #c8ddd6; }
+    .yaml-str     { color: #39ff84; }
+    .yaml-comment { color: rgba(57,255,132,0.35); }
+    .yaml-num     { color: #fbbf24; }
+
+    /* diff-style lines */
+    .line-add { background: rgba(57,255,132,0.06); border-left: 2px solid var(--acid); padding-left: 10px; display: block; margin-left: -12px; }
+
+    /* vs divider */
+    .vs-divider {
+      display: flex; align-items: center; gap: 12px;
+      color: rgba(57,255,132,0.3); font-family: 'Space Mono', monospace; font-size: 0.72rem;
+    }
+    .vs-divider::before, .vs-divider::after {
+      content: ''; flex: 1; height: 1px; background: rgba(57,255,132,0.1);
+    }
+  </style>
+</head>
+<body>
+
+<!-- ─── NAV ─────────────────────────────────────────────────── -->
+<nav class="cl sticky top-0 z-50 border-b border-gem-800/40 bg-ink-950/85 backdrop-blur-md">
+  <div class="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <a href="statamic-docs.html" class="flex items-center gap-2 group">
+        <div class="w-7 h-7 rounded border border-gem-500/50 flex items-center justify-center bg-gem-800/30 group-hover:border-acid/60 transition-colors">
+          <svg viewBox="0 0 20 20" fill="none" class="w-4 h-4 text-acid" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="10,2 18,7 18,13 10,18 2,13 2,7" stroke="currentColor" stroke-width="1.5" fill="none"/>
+            <polygon points="10,6 14,8.5 14,11.5 10,14 6,11.5 6,8.5" fill="currentColor" opacity="0.6"/>
+          </svg>
+        </div>
+        <span class="font-display font-700 text-white text-sm tracking-widest uppercase">Statamic</span>
+      </a>
+      <span class="text-gem-700">/</span>
+      <a href="statamic-blueprints.html" class="text-gem-500 text-xs font-mono hover:text-gem-300 transition-colors">Blueprints</a>
+      <span class="text-gem-700">/</span>
+      <span class="acid-badge text-xs px-2 py-0.5 rounded font-mono">Fieldsets</span>
+    </div>
+    <div class="hidden md:flex items-center gap-5 text-xs text-gem-400 font-mono">
+      <a href="#what-is"    class="acid-underline hover:text-white transition-colors">What is it</a>
+      <a href="#vs"         class="acid-underline hover:text-white transition-colors">vs Blueprints</a>
+      <a href="#create"     class="acid-underline hover:text-white transition-colors">Creating</a>
+      <a href="#using"      class="acid-underline hover:text-white transition-colors">Using</a>
+      <a href="#recap"      class="acid-underline hover:text-white transition-colors">Recap</a>
+    </div>
+    <div class="flex items-center gap-2">
+      <div class="pulse-dot w-2 h-2 rounded-full bg-acid"></div>
+      <span class="text-xs font-mono text-gem-400">v5.x</span>
+    </div>
+  </div>
+</nav>
+
+<!-- ─── HERO ─────────────────────────────────────────────────── -->
+<section class="cl pt-20 pb-14 px-6 text-center relative overflow-hidden">
+  <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[380px] rounded-full opacity-15 pointer-events-none"
+       style="background:radial-gradient(ellipse,#39ff84 0%,transparent 70%);filter:blur(60px)"></div>
+  <div class="max-w-3xl mx-auto">
+    <div class="inline-flex items-center gap-2 acid-badge px-3 py-1 rounded-full text-xs font-mono mb-5 animate-fade-up">
+      <span>🧩</span> Reusable Fields
+    </div>
+    <h1 class="hero-glow font-display font-800 text-5xl md:text-6xl text-white leading-[1.06] mb-5 animate-fade-up d1">
+      Fieldsets &amp;<br/>
+      <span style="color:var(--acid)">Field Libraries</span>
+    </h1>
+    <p class="text-gem-300 text-lg leading-relaxed max-w-2xl mx-auto mb-8 animate-fade-up d2">
+      Blueprints define your content structure. Fieldsets are where you park the fields you want to <em>reuse</em> across multiple blueprints — your field library.
+    </p>
+    <div class="flex flex-wrap justify-center gap-3 animate-fade-up d3">
+      <a href="#what-is" class="inline-flex items-center gap-2 bg-acid text-ink-950 font-display font-700 px-5 py-2.5 rounded text-sm hover:bg-white transition-colors">Start Reading ↓</a>
+      <a href="#recap"   class="inline-flex items-center gap-2 border border-gem-600/40 text-gem-200 font-display px-5 py-2.5 rounded text-sm hover:border-acid/40 hover:text-white transition-colors">Quick Recap</a>
+    </div>
+  </div>
+
+  <!-- fieldset file strip -->
+  <div class="max-w-lg mx-auto mt-12 animate-fade-up d3">
+    <div class="flex flex-wrap justify-center gap-2">
+      <span class="tag-pill">📄 common.yaml</span>
+      <span class="tag-pill">📄 seo.yaml</span>
+      <span class="tag-pill">📄 bard-image.yaml</span>
+      <span class="tag-pill">📄 bard-quote.yaml</span>
+      <span class="tag-pill">📄 social.yaml</span>
+    </div>
+    <p class="text-gem-600 text-xs font-mono mt-3">↑ These are fieldsets — each one a reusable field library</p>
+  </div>
+</section>
+
+<!-- ─── MAIN LAYOUT ──────────────────────────────────────────── -->
+<div class="cl max-w-6xl mx-auto px-4 pb-24 flex gap-8">
+
+  <!-- TOC Sidebar -->
+  <aside class="hidden lg:block w-52 flex-shrink-0 pt-2">
+    <div class="sticky top-20">
+      <div class="sec-label mb-4">On This Page</div>
+      <nav class="space-y-0.5">
+        <a href="#what-is"    class="toc-link">What is a Fieldset?</a>
+        <a href="#vs"         class="toc-link">vs Blueprints</a>
+        <a href="#where"      class="toc-link">Where They're Used</a>
+        <a href="#create"     class="toc-link">Creating Fieldsets</a>
+        <a href="#structure"  class="toc-link">Directory Structure</a>
+        <a href="#yaml"       class="toc-link">YAML Structure</a>
+        <a href="#using"      class="toc-link">Using in Blueprints</a>
+        <a href="#fieldtypes" class="toc-link">Inside Fieldtypes</a>
+        <a href="#tips"       class="toc-link">Pro Tips</a>
+        <a href="#recap"      class="toc-link">Quick Recap</a>
+      </nav>
+    </div>
+  </aside>
+
+  <!-- Content -->
+  <main class="flex-1 min-w-0 space-y-8 pt-2">
+
+    <!-- ── WHAT IS ── -->
+    <section id="what-is" class="s-card p-7 md:p-9">
+      <div class="sec-label mb-2">The Concept</div>
+      <h2 class="font-display font-700 text-white text-2xl mb-4">🧩 What is a Fieldset?</h2>
+      <p class="text-gem-300 leading-relaxed mb-4">
+        A Fieldset is a <strong class="text-white">named collection of pre-configured fields</strong> that lives on its own — not attached to any content area. Think of it as your field library.
+      </p>
+      <p class="text-gem-300 leading-relaxed mb-5">
+        You build a fieldset once, then pull its fields into as many blueprints as you like. Update the fieldset → every blueprint that references it gets the change instantly.
+      </p>
+      <div class="tip-box p-4 rounded">
+        <div class="flex items-start gap-2">
+          <span class="text-acid font-mono text-xs font-700 uppercase tracking-widest mt-0.5 flex-shrink-0">Simple idea</span>
+          <p class="text-gem-200 text-sm font-display font-600">Fieldset = <span class="text-acid">a reusable field library</span> that blueprints borrow from</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── VS BLUEPRINTS ── -->
+    <section id="vs" class="s-card p-7 md:p-9">
+      <div class="sec-label mb-2">Know the Difference</div>
+      <h2 class="font-display font-700 text-white text-2xl mb-5">⚖️ Fieldsets vs Blueprints</h2>
+      <p class="text-gem-300 leading-relaxed mb-5">They look similar in YAML but serve very different roles.</p>
+
+      <div class="grid sm:grid-cols-2 gap-4 mb-5">
+        <!-- Blueprint -->
+        <div class="bg-ink-800/50 border border-gem-800/30 rounded-xl p-5">
+          <div class="flex items-center gap-2 mb-4">
+            <span class="text-lg">📐</span>
+            <span class="font-display font-700 text-white">Blueprint</span>
+          </div>
+          <div class="space-y-2 text-xs text-gem-300 font-mono leading-relaxed">
+            <div class="check-item"><span>Attached to collections, forms, etc.</span></div>
+            <div class="check-item"><span>Has <strong class="text-white">sections</strong> (= tabs in publish form)</span></div>
+            <div class="check-item"><span>Renders the control panel publish UI</span></div>
+            <div class="check-item"><span>Defines your front-end data schema</span></div>
+          </div>
+        </div>
+        <!-- Fieldset -->
+        <div class="bg-ink-800/50 border border-gem-800/30 rounded-xl p-5">
+          <div class="flex items-center gap-2 mb-4">
+            <span class="text-lg">🧩</span>
+            <span class="font-display font-700 text-white">Fieldset</span>
+          </div>
+          <div class="space-y-2 text-xs text-gem-300 font-mono leading-relaxed">
+            <div class="check-item"><span>Not attached to anything directly</span></div>
+            <div class="cross-item"><span>No sections — <strong class="text-white">fields only</strong></span></div>
+            <div class="check-item"><span>Imported into blueprints (or fieldtypes)</span></div>
+            <div class="check-item"><span>Single source of truth for shared fields</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tip-box p-4 rounded">
+        <div class="flex items-start gap-2">
+          <span class="text-acid font-mono text-xs font-700 uppercase tracking-widest mt-0.5 flex-shrink-0">Rule of thumb</span>
+          <p class="text-gem-300 text-sm">If a field appears in 2+ blueprints → it belongs in a fieldset. If it's unique to one blueprint → define it inline.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── WHERE USED ── -->
+    <section id="where" class="s-card p-7 md:p-9">
+      <div class="sec-label mb-2">Usage Scope</div>
+      <h2 class="font-display font-700 text-white text-2xl mb-5">🗺️ Where Can You Use Fieldsets?</h2>
+      <p class="text-gem-300 leading-relaxed mb-5">Fieldsets aren't limited to blueprints — they plug into complex fieldtypes too, making them doubly useful.</p>
+
+      <div class="space-y-3">
+        <div class="flex items-start gap-4 info-chip p-4">
+          <span class="text-2xl flex-shrink-0">📐</span>
+          <div>
+            <div class="font-display font-600 text-white text-sm mb-1">Inside Blueprints</div>
+            <p class="text-gem-400 text-xs leading-relaxed">Reference individual fields or import the whole fieldset with a prefix. The most common use case.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-4 info-chip p-4">
+          <span class="text-2xl flex-shrink-0">🔢</span>
+          <div>
+            <div class="font-display font-600 text-white text-sm mb-1">Inside Grid fields</div>
+            <p class="text-gem-400 text-xs leading-relaxed">Define a row's sub-fields using a fieldset — keeps your Grid definition clean and reusable across multiple Grids.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-4 info-chip p-4">
+          <span class="text-2xl flex-shrink-0">🧱</span>
+          <div>
+            <div class="font-display font-600 text-white text-sm mb-1">Inside Replicator &amp; Bard</div>
+            <p class="text-gem-400 text-xs leading-relaxed">Each Replicator set or Bard block can pull its fields from a fieldset — e.g. <code class="il">bard-image.yaml</code>, <code class="il">bard-quote.yaml</code>.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── CREATE ── -->
+    <section id="create" class="s-card p-7 md:p-9">
+      <div class="sec-label mb-2">Getting Started</div>
+      <h2 class="font-display font-700 text-white text-2xl mb-5">🛠️ Creating a Fieldset</h2>
+      <p class="text-gem-300 leading-relaxed mb-5">Two ways — pick your style:</p>
+
+      <div class="space-y-3">
+        <div class="flex items-start gap-4 info-chip p-4">
+          <span class="text-2xl flex-shrink-0">🖱️</span>
+          <div>
+            <div class="font-display font-600 text-white text-sm mb-1">Control Panel → Fieldsets</div>
+            <p class="text-gem-400 text-xs leading-relaxed">Navigate to the Fieldsets area, click New Fieldset, drag and drop fields in the builder. YAML gets written for you.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-4 info-chip p-4">
+          <span class="text-2xl flex-shrink-0">✍️</span>
+          <div>
+            <div class="font-display font-600 text-white text-sm mb-1">Drop a YAML file in <code class="il">resources/fieldsets/</code></div>
+            <p class="text-gem-400 text-xs leading-relaxed">The developer way. Write YAML, save, done. Statamic picks it up immediately — no restart required.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── DIRECTORY ── -->
+    <section id="structure" class="s-card p-7 md:p-9">
+      <div class="sec-label mb-2">File Layout</div>
+      <h2 class="font-display font-700 text-white text-2xl mb-4">📁 Directory Structure</h2>
+      <p class="text-gem-300 leading-relaxed mb-5">All fieldsets live as YAML files under <code class="il">resources/fieldsets/</code>. You can nest them in subdirectories — just use <code class="il">.</code> in the handle to reference them.</p>
+
+      <div class="code-block rounded-lg mb-5">
+        <div class="flex items-center gap-2 px-4 py-2 border-b border-gem-800/30">
+          <div class="t-r w-2.5 h-2.5 rounded-full"></div>
+          <div class="t-y w-2.5 h-2.5 rounded-full"></div>
+          <div class="t-g w-2.5 h-2.5 rounded-full"></div>
+          <span class="font-mono text-gem-500 text-xs ml-1">resources/fieldsets/</span>
+        </div>
+        <div class="p-5 text-sm leading-8 font-mono">
+          <span class="text-acid">resources/</span><br/>
+          <span class="text-gem-500">&nbsp;└── </span><span class="text-acid">fieldsets/</span><br/>
+          <span class="text-gem-500">&nbsp;&nbsp;&nbsp;&nbsp;├── </span><span class="text-white">common.yaml</span><span class="text-gem-600 text-xs ml-2">← handle: common</span><br/>
+          <span class="text-gem-500">&nbsp;&nbsp;&nbsp;&nbsp;├── </span><span class="text-white">seo.yaml</span><span class="text-gem-600 text-xs ml-2">← handle: seo</span><br/>
+          <span class="text-gem-500">&nbsp;&nbsp;&nbsp;&nbsp;├── </span><span class="text-white">bard-image.yaml</span><span class="text-gem-600 text-xs ml-2">← handle: bard-image</span><br/>
+          <span class="text-gem-500">&nbsp;&nbsp;&nbsp;&nbsp;├── </span><span class="text-white">bard-quote.yaml</span><br/>
+          <span class="text-gem-500">&nbsp;&nbsp;&nbsp;&nbsp;└── </span><span class="text-gem-300">blocks/</span><span class="text-gem-600 text-xs ml-2">← subdirectory</span><br/>
+          <span class="text-gem-500">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── </span><span class="text-white">hero.yaml</span><span class="text-gem-600 text-xs ml-2">← handle: blocks.hero</span>
+        </div>
+      </div>
+
+      <div class="tip-box p-4 rounded">
+        <div class="flex items-start gap-2">
+          <span class="text-acid font-mono text-xs font-700 uppercase tracking-widest mt-0.5 flex-shrink-0">Subdirs</span>
+          <p class="text-gem-300 text-sm">A fieldset at <code class="il">fieldsets/blocks/hero.yaml</code> is referenced as <code class="il">blocks.hero</code> — dots map to directory separators.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── YAML ── -->
+    <section id="yaml" class="s-card p-7 md:p-9">
+      <div class="sec-label mb-2">The Schema</div>
+      <h2 class="font-display font-700 text-white text-2xl mb-4">🧬 YAML Structure</h2>
+      <p class="text-gem-300 leading-relaxed mb-5">Dead simple — just a flat list of fields. No sections, no nesting. That's the whole file.</p>
+
+      <div class="code-block rounded-lg mb-5">
+        <div class="flex items-center justify-between px-4 py-2 border-b border-gem-800/30">
+          <div class="flex items-center gap-2">
+            <div class="t-r w-2.5 h-2.5 rounded-full"></div>
+            <div class="t-y w-2.5 h-2.5 rounded-full"></div>
+            <div class="t-g w-2.5 h-2.5 rounded-full"></div>
+          </div>
+          <span class="font-mono text-gem-500 text-xs">common.yaml</span>
+        </div>
+        <pre class="p-5 text-sm leading-7 overflow-x-auto"><span class="yaml-key">fields</span><span class="yaml-val">:</span>
+  <span class="yaml-val">-</span>
+    <span class="yaml-key">handle</span><span class="yaml-val">: </span><span class="yaml-str">content</span>
+    <span class="yaml-key">field</span><span class="yaml-val">:</span>
+      <span class="yaml-key">type</span><span class="yaml-val">: </span><span class="yaml-str">markdown</span>
+      <span class="yaml-key">display</span><span class="yaml-val">: </span><span class="yaml-str">Content</span>
+  <span class="yaml-val">-</span>
+    <span class="yaml-key">handle</span><span class="yaml-val">: </span><span class="yaml-str">featured</span>
+    <span class="yaml-key">field</span><span class="yaml-val">:</span>
+      <span class="yaml-key">type</span><span class="yaml-val">: </span><span class="yaml-str">toggle</span>
+      <span class="yaml-key">display</span><span class="yaml-val">: </span><span class="yaml-str">Featured?</span>
+      <span class="yaml-key">default</span><span class="yaml-val">: </span><span class="yaml-num">false</span></pre>
+      </div>
+
+      <div class="grid sm:grid-cols-2 gap-3">
+        <div class="check-item bg-ink-800/40 border border-gem-800/20 rounded-lg p-4 text-gem-200 text-sm">
+          <span>Fields are fully configured here — type, display name, validation, instructions, everything</span>
+        </div>
+        <div class="cross-item bg-ink-800/40 border border-gem-800/20 rounded-lg p-4 text-gem-200 text-sm">
+          <span>No <code class="il">sections:</code> key — fieldsets are flat by design</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── USING ── -->
+    <section id="using" class="s-card p-7 md:p-9">
+      <div class="sec-label mb-2">Putting It to Work</div>
+      <h2 class="font-display font-700 text-white text-2xl mb-4">🔗 Using Fieldsets in Blueprints</h2>
+      <p class="text-gem-300 leading-relaxed mb-5">Fieldsets don't do anything on their own — they come alive when referenced from a blueprint. Two approaches:</p>
+
+      <!-- Approach 1: single field ref -->
+      <div class="mb-6">
+        <div class="sec-label mb-3">① Reference a single field</div>
+        <div class="code-block rounded-lg">
+          <div class="flex items-center justify-between px-4 py-2 border-b border-gem-800/30">
+            <div class="flex items-center gap-2">
+              <div class="t-r w-2.5 h-2.5 rounded-full"></div><div class="t-y w-2.5 h-2.5 rounded-full"></div><div class="t-g w-2.5 h-2.5 rounded-full"></div>
+            </div>
+            <span class="font-mono text-gem-500 text-xs">blueprint.yaml — single field ref</span>
+          </div>
+          <pre class="p-5 text-sm leading-7 overflow-x-auto"><span class="yaml-key">fields</span><span class="yaml-val">:</span>
+  <span class="yaml-val">-</span>
+    <span class="yaml-key">handle</span><span class="yaml-val">: </span><span class="yaml-str">body</span>
+    <span class="yaml-key">field</span><span class="yaml-val">: </span><span class="yaml-str">common.content</span>   <span class="yaml-comment"># fieldset_handle.field_handle</span>
+  <span class="yaml-val">-</span>
+    <span class="yaml-key">handle</span><span class="yaml-val">: </span><span class="yaml-str">is_featured</span>
+    <span class="yaml-key">field</span><span class="yaml-val">: </span><span class="yaml-str">common.featured</span>   <span class="yaml-comment"># same fieldset, different field</span>
+    <span class="yaml-key">config</span><span class="yaml-val">:</span>
+      <span class="yaml-key">display</span><span class="yaml-val">: </span><span class="yaml-str">Mark as Featured</span>  <span class="yaml-comment"># override just the label</span></pre>
+        </div>
+      </div>
+
+      <div class="vs-divider mb-6">OR</div>
+
+      <!-- Approach 2: import whole fieldset -->
+      <div class="mb-6">
+        <div class="sec-label mb-3">② Import the whole fieldset</div>
+        <div class="code-block rounded-lg">
+          <div class="flex items-center justify-between px-4 py-2 border-b border-gem-800/30">
+            <div class="flex items-center gap-2">
+              <div class="t-r w-2.5 h-2.5 rounded-full"></div><div class="t-y w-2.5 h-2.5 rounded-full"></div><div class="t-g w-2.5 h-2.5 rounded-full"></div>
+            </div>
+            <span class="font-mono text-gem-500 text-xs">blueprint.yaml — full import with prefix</span>
+          </div>
+          <pre class="p-5 text-sm leading-7 overflow-x-auto"><span class="yaml-key">fields</span><span class="yaml-val">:</span>
+  <span class="yaml-val">-</span>
+    <span class="yaml-key">import</span><span class="yaml-val">: </span><span class="yaml-str">seo</span>              <span class="yaml-comment"># pulls in all fields from seo.yaml</span>
+    <span class="yaml-key">prefix</span><span class="yaml-val">: </span><span class="yaml-str">seo_</span>            <span class="yaml-comment"># prefixes every field handle</span>
+  <span class="yaml-val">-</span>
+    <span class="yaml-key">import</span><span class="yaml-val">: </span><span class="yaml-str">seo</span>              <span class="yaml-comment"># import again for another context</span>
+    <span class="yaml-key">prefix</span><span class="yaml-val">: </span><span class="yaml-str">og_</span>             <span class="yaml-comment"># different prefix = no handle collision</span></pre>
+        </div>
+      </div>
+
+      <div class="warn-box p-4 rounded">
+        <div class="flex items-start gap-2">
+          <span class="text-yellow-400 font-mono text-xs font-700 uppercase tracking-widest mt-0.5 flex-shrink-0">Watch out</span>
+          <p class="text-gem-300 text-sm">Always use a <code class="il">prefix</code> when importing a fieldset more than once in the same blueprint — without it, field handles collide and overwrite each other.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── INSIDE FIELDTYPES ── -->
+    <section id="fieldtypes" class="s-card p-7 md:p-9">
+      <div class="sec-label mb-2">Advanced Usage</div>
+      <h2 class="font-display font-700 text-white text-2xl mb-4">🧱 Inside Grid, Replicator &amp; Bard</h2>
+      <p class="text-gem-300 leading-relaxed mb-5">Fieldsets really shine when you need consistent sub-fields inside complex fieldtypes. Define once, use everywhere.</p>
+
+      <div class="code-block rounded-lg mb-5">
+        <div class="flex items-center justify-between px-4 py-2 border-b border-gem-800/30">
+          <div class="flex items-center gap-2">
+            <div class="t-r w-2.5 h-2.5 rounded-full"></div><div class="t-y w-2.5 h-2.5 rounded-full"></div><div class="t-g w-2.5 h-2.5 rounded-full"></div>
+          </div>
+          <span class="font-mono text-gem-500 text-xs">Bard set using a fieldset</span>
+        </div>
+        <pre class="p-5 text-sm leading-7 overflow-x-auto"><span class="yaml-comment"># In your blueprint's bard field config:</span>
+<span class="yaml-key">content</span><span class="yaml-val">:</span>
+  <span class="yaml-key">type</span><span class="yaml-val">: </span><span class="yaml-str">bard</span>
+  <span class="yaml-key">sets</span><span class="yaml-val">:</span>
+    <span class="yaml-key">image_block</span><span class="yaml-val">:</span>
+      <span class="yaml-key">display</span><span class="yaml-val">: </span><span class="yaml-str">Image</span>
+      <span class="yaml-key">fields</span><span class="yaml-val">:</span>
+        <span class="yaml-val">-</span>
+          <span class="yaml-key">import</span><span class="yaml-val">: </span><span class="yaml-str">bard-image</span>    <span class="yaml-comment"># pulls fields from bard-image.yaml</span>
+    <span class="yaml-key">quote_block</span><span class="yaml-val">:</span>
+      <span class="yaml-key">display</span><span class="yaml-val">: </span><span class="yaml-str">Quote</span>
+      <span class="yaml-key">fields</span><span class="yaml-val">:</span>
+        <span class="yaml-val">-</span>
+          <span class="yaml-key">import</span><span class="yaml-val">: </span><span class="yaml-str">bard-quote</span>    <span class="yaml-comment"># each block type = its own fieldset</span></pre>
+      </div>
+
+      <div class="grid sm:grid-cols-3 gap-3">
+        <div class="flex items-start gap-4 info-chip p-4">
+          <span class="text-xl flex-shrink-0">🔢</span>
+          <div>
+            <div class="font-display font-600 text-white text-xs mb-1">Grid</div>
+            <p class="text-gem-400 text-xs">Define row sub-fields in a fieldset</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-4 info-chip p-4">
+          <span class="text-xl flex-shrink-0">🔁</span>
+          <div>
+            <div class="font-display font-600 text-white text-xs mb-1">Replicator</div>
+            <p class="text-gem-400 text-xs">Each set's fields from a fieldset</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-4 info-chip p-4">
+          <span class="text-xl flex-shrink-0">🧱</span>
+          <div>
+            <div class="font-display font-600 text-white text-xs mb-1">Bard</div>
+            <p class="text-gem-400 text-xs">Each block type from a fieldset</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── PRO TIPS ── -->
+    <section id="tips" class="s-card p-7 md:p-9">
+      <div class="sec-label mb-2">Best Practices</div>
+      <h2 class="font-display font-700 text-white text-2xl mb-5">💡 Pro Tips</h2>
+      <div class="space-y-3">
+        <div class="flex items-start gap-4 info-chip p-4">
+          <span class="text-2xl flex-shrink-0">📄</span>
+          <div>
+            <div class="font-display font-600 text-white text-sm mb-1">Create a <code class="il">common.yaml</code> first</div>
+            <p class="text-gem-400 text-xs leading-relaxed">Most projects have 3–5 fields that appear everywhere — title variants, SEO fields, featured toggles. Get them into a fieldset on day one.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-4 info-chip p-4">
+          <span class="text-2xl flex-shrink-0">🗂️</span>
+          <div>
+            <div class="font-display font-600 text-white text-sm mb-1">Organise by context, not by field type</div>
+            <p class="text-gem-400 text-xs leading-relaxed"><code class="il">seo.yaml</code>, <code class="il">social.yaml</code>, <code class="il">hero.yaml</code> — group by where they're used, not by whether they're text or toggle fields.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-4 info-chip p-4">
+          <span class="text-2xl flex-shrink-0">🧱</span>
+          <div>
+            <div class="font-display font-600 text-white text-sm mb-1">One fieldset per Bard/Replicator set type</div>
+            <p class="text-gem-400 text-xs leading-relaxed">Give each block its own file: <code class="il">bard-image.yaml</code>, <code class="il">bard-video.yaml</code>. Easier to find, easier to edit, and they compose cleanly.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-4 info-chip p-4">
+          <span class="text-2xl flex-shrink-0">🏷️</span>
+          <div>
+            <div class="font-display font-600 text-white text-sm mb-1">Always use <code class="il">prefix</code> on import</div>
+            <p class="text-gem-400 text-xs leading-relaxed">Even if you only import once — adding a prefix makes your data keys self-documenting: <code class="il">seo_title</code> is clearer than just <code class="il">title</code>.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── RECAP ── -->
+    <section id="recap" class="s-card p-7 md:p-9">
+      <div class="sec-label mb-2">Summary</div>
+      <h2 class="font-display font-700 text-white text-2xl mb-5">🧠 Quick Recap</h2>
+      <div class="space-y-2 mb-6">
+        <div class="check-item bg-ink-800/40 border border-gem-800/20 rounded-lg p-4 text-gem-200 text-sm">
+          <span><strong class="text-white">Fieldset</strong> = a named, reusable collection of pre-configured fields</span>
+        </div>
+        <div class="check-item bg-ink-800/40 border border-gem-800/20 rounded-lg p-4 text-gem-200 text-sm">
+          <span>Not attached to anything — blueprints <strong class="text-white">pull from</strong> fieldsets</span>
+        </div>
+        <div class="check-item bg-ink-800/40 border border-gem-800/20 rounded-lg p-4 text-gem-200 text-sm">
+          <span>Flat structure — <strong class="text-white">fields only</strong>, no sections</span>
+        </div>
+        <div class="check-item bg-ink-800/40 border border-gem-800/20 rounded-lg p-4 text-gem-200 text-sm">
+          <span>Lives in <code class="il">resources/fieldsets/</code> — supports subdirectories via dot notation</span>
+        </div>
+        <div class="check-item bg-ink-800/40 border border-gem-800/20 rounded-lg p-4 text-gem-200 text-sm">
+          <span>Works inside <strong class="text-white">Grid</strong>, <strong class="text-white">Replicator</strong>, and <strong class="text-white">Bard</strong> too — not just blueprints</span>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto rounded-lg border border-gem-800/25">
+        <table class="doc-table">
+          <thead>
+            <tr><th>Concept</th><th>Meaning</th><th>Example</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code class="il">Fieldset</code></td>
+              <td class="text-gem-300">Reusable field library</td>
+              <td class="text-gem-500 font-mono text-xs">common.yaml, seo.yaml</td>
+            </tr>
+            <tr>
+              <td><code class="il">field: x.y</code></td>
+              <td class="text-gem-300">Reference a single field from fieldset x</td>
+              <td class="text-gem-500 font-mono text-xs">common.content</td>
+            </tr>
+            <tr>
+              <td><code class="il">import: x</code></td>
+              <td class="text-gem-300">Pull all fields from a fieldset</td>
+              <td class="text-gem-500 font-mono text-xs">import: seo</td>
+            </tr>
+            <tr>
+              <td><code class="il">prefix: x_</code></td>
+              <td class="text-gem-300">Namespace handles on import</td>
+              <td class="text-gem-500 font-mono text-xs">seo_title, seo_description</td>
+            </tr>
+            <tr>
+              <td><code class="il">blocks.hero</code></td>
+              <td class="text-gem-300">Dot notation for subdirectory fieldsets</td>
+              <td class="text-gem-500 font-mono text-xs">fieldsets/blocks/hero.yaml</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ── FINAL CTA ── -->
+    <section class="cta-glow bg-ink-800/60 rounded-2xl p-10 border border-gem-800/30 text-center">
+      <div class="text-5xl mb-5">🧩</div>
+      <h2 class="font-display font-800 text-3xl text-white mb-4">The Reuse Stack</h2>
+      <div class="flex flex-wrap items-center justify-center gap-4 mb-6 text-base">
+        <div class="acid-badge px-5 py-3 rounded-xl font-display font-600 text-center">
+          <div class="text-2xl mb-1">🧩</div>
+          Fieldsets<br/>
+          <span class="text-gem-400 font-mono text-xs font-400">define once</span>
+        </div>
+        <div class="text-acid text-3xl font-display">→</div>
+        <div class="acid-badge px-5 py-3 rounded-xl font-display font-600 text-center">
+          <div class="text-2xl mb-1">📐</div>
+          Blueprints<br/>
+          <span class="text-gem-400 font-mono text-xs font-400">import &amp; use</span>
+        </div>
+        <div class="text-acid text-3xl font-display">→</div>
+        <div class="bg-acid/15 border border-acid/40 px-5 py-3 rounded-xl font-display font-700 text-acid text-center">
+          <div class="text-2xl mb-1">🚀</div>
+          Content<br/>
+          <span class="text-gem-300 font-mono text-xs font-400">stays consistent</span>
+        </div>
+      </div>
+      <p class="text-gem-400 mb-8 leading-relaxed max-w-lg mx-auto">
+        Fieldsets are what separates a tidy, maintainable project from a sprawling mess of duplicated fields. Define your field library early and everything else clicks into place.
+      </p>
+      <div class="flex flex-wrap gap-3 justify-center">
+        <a href="https://statamic.dev/fieldsets" target="_blank"
+           class="inline-flex items-center gap-2 bg-acid text-ink-950 font-display font-700 px-5 py-2.5 rounded text-sm hover:bg-white transition-colors">
+          Full Fieldsets Docs ↗
+        </a>
+        <a href="statamic-blueprints.html"
+           class="inline-flex items-center gap-2 border border-gem-600/40 text-gem-200 font-display px-5 py-2.5 rounded text-sm hover:border-acid/40 hover:text-white transition-colors">
+          ← Blueprints
+        </a>
+        <a href="statamic-taxonomies.html"
+           class="inline-flex items-center gap-2 border border-gem-600/40 text-gem-200 font-display px-5 py-2.5 rounded text-sm hover:border-acid/40 hover:text-white transition-colors">
+          ← Taxonomies
+        </a>
+      </div>
+    </section>
+
+    <div class="flex flex-wrap gap-3 justify-center">
+      <a href="statamic-globals.html"
+         class="inline-flex items-center gap-2 bg-acid text-ink-950 font-display font-700 px-5 py-2.5 rounded text-sm hover:bg-white transition-colors">
+        Content Modeling — Globals
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M13 5l7 7-7 7"/>
+        </svg>
+      </a>
+    </div>
+
+  </main>
+</div>
+
+<!-- ─── FOOTER ─────────────────────────────────────────────── -->
+<footer class="cl border-t border-gem-900/50 py-8 px-6">
+  <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+    <div class="flex items-center gap-2">
+      <div class="w-5 h-5 rounded border border-gem-600/30 flex items-center justify-center bg-gem-800/20">
+        <svg viewBox="0 0 20 20" fill="none" class="w-3 h-3 text-gem-400" xmlns="http://www.w3.org/2000/svg">
+          <polygon points="10,2 18,7 18,13 10,18 2,13 2,7" stroke="currentColor" stroke-width="1.5" fill="none"/>
+        </svg>
+      </div>
+      <span class="text-gem-500 text-xs font-mono">Statamic — Fieldsets Guide</span>
+    </div>
+    <div class="flex items-center gap-4 text-xs font-mono text-gem-600">
+      <a href="#what-is" class="hover:text-gem-400 transition-colors">↑ Back to top</a>
+      <span>·</span>
+      <span>v5.x docs</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

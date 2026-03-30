@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en" x-data="{}" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Statamic — Navigation</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['Syne', 'sans-serif'],
+            mono:    ['Space Mono', 'monospace'],
+          },
+          colors: {
+            gem: {
+              50:  '#f0fdf9', 100: '#ccfbef', 200: '#99f3df',
+              300: '#58e4c6', 400: '#22cda8', 500: '#0ab28e',
+              600: '#048f73', 700: '#07725d', 800: '#095a4b', 900: '#0a4a3e',
+            },
+            ink: {
+              950: '#04100d', 900: '#081a14', 800: '#0d2a20',
+              700: '#133d2f', 600: '#1c5440',
+            },
+            acid: '#39ff84',
+          },
+        }
+      }
+    }
+  </script>
+
+  <style>
+    :root { --acid: #39ff84; --ink-dark: #04100d; }
+    * { box-sizing: border-box; }
+    body {
+      background-color: #04100d;
+      color: #c8ddd6;
+      font-family: 'Syne', sans-serif;
+      overflow-x: hidden;
+    }
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image:
+        linear-gradient(rgba(57,255,132,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(57,255,132,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none; z-index: 0;
+    }
+    body::after {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 0; opacity: 0.4;
+    }
+    .cl { position: relative; z-index: 1; }
+    .code-block {
+      background: #020c09;
+      border: 1px solid rgba(57,255,132,0.18);
+      border-left: 3px solid var(--acid);
+      border-radius: 6px;
+      font-family: 'Space Mono', monospace;
+      position: relative; overflow: hidden;
+    }
+    .code-block::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 100%;
+      background: linear-gradient(180deg, transparent 0%, rgba(57,255,132,0.03) 50%, transparent 100%);
+      background-size: 100% 8px;
+      pointer-events: none;
+      animation: scan 6s linear infinite;
+    }
+    @keyframes scan { 0%{background-position:0 -100%} 100%{background-position:0 200%} }
+    .s-card {
+      border: 1px solid rgba(57,255,132,0.1);
+      background: linear-gradient(135deg, rgba(13,42,32,0.65) 0%, rgba(4,16,13,0.9) 100%);
+      backdrop-filter: blur(8px);
+      border-radius: 12px;
+      transition: border-color 0.3s;
+    }
+    .s-card:hover { border-color: rgba(57,255,132,0.28); }
+    code.il {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.78em;
+      background: rgba(57,255,132,0.08);
+      border: 1px solid rgba(57,255,132,0.18);
+      color: var(--acid);
+      padding: 2px 7px;
+      border-radius: 4px;
+    }
+    .acid-badge {
+      background: rgba(57,255,132,0.1);
+      border: 1px solid rgba(57,255,132,0.28);
+      color: var(--acid);
+    }
+    .info-chip {
+      background: rgba(10,178,142,0.08);
+      border: 1px solid rgba(10,178,142,0.22);
+      border-radius: 8px;
+      transition: all 0.22s;
+    }
+    .info-chip:hover { background: rgba(10,178,142,0.16); border-color: rgba(10,178,142,0.45); }
+    .tip-box {
+      background: rgba(57,255,132,0.04);
+      border-left: 3px solid var(--acid);
+      border-radius: 0 6px 6px 0;
+    }
+    .warn-box {
+      background: rgba(251,191,36,0.04);
+      border-left: 3px solid #fbbf24;
+      border-radius: 0 6px 6px 0;
+    }
+    .acid-underline { position: relative; display: inline-block; }
+    .acid-underline::after {
+      content: ''; position: absolute; bottom: -3px; left: 0; right: 0;
+      height: 2px; background: var(--acid);
+      box-shadow: 0 0 10px var(--acid);
+      transform: scaleX(0); transform-origin: left; transition: transform 0.35s ease;
+    }
+    .acid-underline:hover::after { transform: scaleX(1); }
+    @keyframes pulseDot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.7)} }
+    .pulse-dot { animation: pulseDot 2s ease-in-out infinite; }
+    .copy-btn { font-family: 'Space Mono', monospace; font-size: 11px; transition: all 0.2s; }
+    .copy-btn:hover { color: var(--acid); }
+    .t-r{background:#ff5f56} .t-y{background:#ffbd2e} .t-g{background:#27c93f}
+    .sec-label { font-family: 'Space Mono', monospace; font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: #0ab28e; }
+    .doc-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+    .doc-table th { font-family: 'Space Mono', monospace; font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: #0ab28e; padding: 10px 14px; border-bottom: 1px solid rgba(57,255,132,0.15); text-align: left; }
+    .doc-table td { padding: 11px 14px; border-bottom: 1px solid rgba(57,255,132,0.06); color: #c8ddd6; vertical-align: top; }
+    .doc-table tr:last-child td { border-bottom: none; }
+    .doc-table tr:hover td { background: rgba(57,255,132,0.03); }
+
+    /* Screenshot / image placeholder */
+    .img-placeholder {
+      background: linear-gradient(135deg, #081a14 0%, #0d2a20 100%);
+      border: 1px dashed rgba(57,255,132,0.25);
+      border-radius: 8px;
+      position: relative; overflow: hidden;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 10px;
+    }
+    .img-placeholder::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: repeating-linear-gradient(
+        45deg, transparent, transparent 8px,
+        rgba(57,255,132,0.025) 8px, rgba(57,255,132,0.025) 9px
+      );
+    }
+    .img-placeholder img {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+    .img-placeholder .img-label { position: relative; z-index: 2; text-align: center; }
+
+    @keyframes fadeUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
+    .animate-fade-up { animation: fadeUp 0.65s ease both; }
+    .d1{animation-delay:0.1s} .d2{animation-delay:0.2s} .d3{animation-delay:0.3s} .d4{animation-delay:0.4s}
+
+    @keyframes glowPulse {
+      0%,100%{box-shadow:0 0 0 1px rgba(57,255,132,0.2),0 0 40px rgba(57,255,132,0.08)}
+      50%{box-shadow:0 0 0 1px rgba(57,255,132,0.4),0 0 80px rgba(57,255,132,0.2)}
+    }
+    .cta-glow { animation: glowPulse 3s ease-in-out infinite; }
+    .hero-glow { text-shadow: 0 0 60px rgba(57,255,132,0.2); }
+    ::-webkit-scrollbar{width:6px} ::-webkit-scrollbar-track{background:#04100d} ::-webkit-scrollbar-thumb{background:rgba(57,255,132,0.22);border-radius:3px}
+    .sec-divider { border: none; border-top: 1px solid rgba(57,255,132,0.07); margin: 0; }
+    .toc-link { font-family: 'Space Mono', monospace; font-size: 0.72rem; color: #0ab28e; display: block; padding: 5px 0; border-left: 2px solid transparent; padding-left: 12px; transition: all 0.2s; }
+    .toc-link:hover { color: var(--acid); border-left-color: var(--acid); }
+    .cascade-step { border: 1px solid rgba(57,255,132,0.12); background: rgba(13,42,32,0.5); border-radius: 8px; }
+    .cascade-arrow { color: rgba(57,255,132,0.5); }
+
+    /* Nav tree mock UI */
+    .nav-tree-item {
+      border: 1px solid rgba(57,255,132,0.1);
+      background: rgba(13,42,32,0.5);
+      border-radius: 6px;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .nav-tree-item:hover { border-color: rgba(57,255,132,0.25); background: rgba(13,42,32,0.75); }
+    .nav-tree-children { border-left: 1px solid rgba(57,255,132,0.15); margin-left: 20px; padding-left: 16px; margin-top: 6px; }
+
+    /* Field badge */
+    .field-badge {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.68rem;
+      background: rgba(57,255,132,0.06);
+      border: 1px solid rgba(57,255,132,0.18);
+      color: #58e4c6;
+      padding: 3px 9px;
+      border-radius: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ─── NAV ─────────────────────────────────────────────────── -->
+<nav class="cl sticky top-0 z-50 border-b border-gem-800/40 bg-ink-950/85 backdrop-blur-md">
+  <div class="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <a href="statamic-docs.html" class="flex items-center gap-2 group">
+        <div class="w-7 h-7 rounded border border-gem-500/50 flex items-center justify-center bg-gem-800/30 group-hover:border-acid/60 transition-colors">
+          <svg viewBox="0 0 20 20" fill="none" class="w-4 h-4 text-acid" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="10,2 18,7 18,13 10,18 2,13 2,7" stroke="currentColor" stroke-width="1.5" fill="none"/>
+            <polygon points="10,6 14,8.5 14,11.5 10,14 6,11.5 6,8.5" fill="currentColor" opacity="0.6"/>
+          </svg>
+        </div>
+        <span class="font-display font-700 text-white text-sm tracking-widest uppercase">Statamic</span>
+      </a>
+      <span class="text-gem-700">/</span>
+      <span class="acid-badge text-xs px-2 py-0.5 rounded font-mono">Navigation</span>
+    </div>
+    <div class="hidden md:flex items-center gap-5 text-xs text-gem-400 font-mono">
+      <a href="#overview"    class="acid-underline hover:text-white transition-colors">Overview</a>
+      <a href="#storage"     class="acid-underline hover:text-white transition-colors">Storage</a>
+      <a href="#templating"  class="acid-underline hover:text-white transition-colors">Templating</a>
+      <a href="#blueprints"  class="acid-underline hover:text-white transition-colors">Blueprints</a>
+      <a href="#overriding"  class="acid-underline hover:text-white transition-colors">Overrides</a>
+    </div>
+    <div class="flex items-center gap-2">
+      <div class="pulse-dot w-2 h-2 rounded-full bg-acid"></div>
+      <span class="text-xs font-mono text-gem-400">v5.x</span>
+    </div>
+  </div>
+</nav>
+
+<!-- ─── HERO ─────────────────────────────────────────────────── -->
+<section class="cl pt-20 pb-14 px-6 text-center relative overflow-hidden">
+  <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[380px] rounded-full opacity-15 pointer-events-none"
+       style="background:radial-gradient(ellipse,#39ff84 0%,transparent 70%);filter:blur(60px)"></div>
+  <div class="max-w-3xl mx-auto">
+    <div class="inline-flex items-center gap-2 acid-badge px-3 py-1 rounded-full text-xs font-mono mb-5 animate-fade-up">
+      <span>🧭</span> Menus &amp; Navigation Guide
+    </div>
+    <h1 class="hero-glow font-display font-800 text-5xl md:text-6xl text-white leading-[1.06] mb-5 animate-fade-up d1">
+      Navigation &amp;<br/>
+      <span style="color:var(--acid)">Nav Structures</span>
+    </h1>
+    <p class="text-gem-300 text-lg leading-relaxed max-w-2xl mx-auto mb-8 animate-fade-up d2">
+      Flexible, drag-and-drop menu building for headers, footers, dropdowns, and sidebars. Yes — that menu you're looking at right now? That's a nav. 👀
+    </p>
+    <div class="flex flex-wrap justify-center gap-3 animate-fade-up d3">
+      <a href="#overview"    class="inline-flex items-center gap-2 bg-acid text-ink-950 font-display font-700 px-5 py-2.5 rounded text-sm hover:bg-white transition-colors">Start Reading ↓</a>
+      <a href="#quick-recap" class="inline-flex items-center gap-2 border border-gem-600/40 text-gem-200 font-display px-5 py-2.5 rounded text-sm hover:border-acid/40 hover:text-white transition-colors">Quick Recap</a>
+    </div>
+  </div>
+</section>
+
+<!-- ─── MAIN LAYOUT ──────────────────────────────────────────── -->
+<div class="cl max-w-6xl mx-auto px-4 pb-24 flex gap-8">
+
+  <!-- TOC Sidebar -->
+  <aside class="hidden lg:block w-52 flex-shrink-0 pt-2">
+    <div class="sticky top-20">
+      <div class="sec-label mb-4">On This Page</div>
+      <nav class="space-y-0.5">
+        <a href="#overview"      class="toc-link">Overview</a>
+        <a href="#what-you-can"  class="toc-link">What You Can Do</a>
+        <a href="#storage"       class="toc-link">Storage</a>
+        <a href="#nav-config"    class="toc-link">Nav Configuration</a>
+        <a href="#nav-tree"      class="toc-link">Navigation Tree</a>
+        <a href="#templating"    class="toc-link">Templating</a>
+        <a href="#loop-vars"     class="toc-link">Loop Variables</a>
+        <a href="#collections"   class="toc-link">Collections</a>
+        <a href="#blueprints"    class="toc-link">Blueprints</a>
+        <a href="#data-storage"  class="toc-link">Data Storage</a>
+        <a href="#quick-recap"   class="toc-link">Quick Recap</a>
+        <a href="#tips"          class="toc-link">Dev Tips</a>
+      </nav>
+    </div>
+  </aside>
+
+  <!-- Content -->
+  <main class="flex-1 min-w-0 space-y-10 pt-2">
+
+    <!-- ── OVERVIEW ── -->
+    <section id="overview" class="s-card p-7 md:p-9">
+      <div class="sec-label mb-2">Introduction</div>
+      <h2 class="font-display font-700 text-white text-2xl md:text-3xl mb-4">🧭 What is Navigation?</h2>
+      <p class="text-gem-300 leading-relaxed mb-6">
+        A <strong class="text-white">Nav</strong> in Statamic is how you build menus for your website — a structured hierarchy of links, entries, and text items that power your site's menus, like headers, footers, dropdowns, and sidebars. Each Nav is powered by a <strong class="text-acid">Structure</strong>, giving you a flexible, drag-and-drop interface to organise your menu items.
+      </p>
+      <div class="grid sm:grid-cols-3 gap-3 mb-6">
+        <div class="info-chip p-4">
+          <div class="text-2xl mb-2">🏗️</div>
+          <div class="font-display font-600 text-white text-sm mb-1">Structure-Powered</div>
+          <p class="text-gem-400 text-xs leading-relaxed">Built on Statamic's Structure system — drag, drop, and nest items visually in the CP.</p>
+        </div>
+        <div class="info-chip p-4">
+          <div class="text-2xl mb-2">🔗</div>
+          <div class="font-display font-600 text-white text-sm mb-1">Flexible Links</div>
+          <p class="text-gem-400 text-xs leading-relaxed">Mix entries, custom URLs, and text-only items freely in a single nav.</p>
+        </div>
+        <div class="info-chip p-4">
+          <div class="text-2xl mb-2">📁</div>
+          <div class="font-display font-600 text-white text-sm mb-1">File-Based</div>
+          <p class="text-gem-400 text-xs leading-relaxed">Config and tree stored as YAML files — fully version-controllable, no database needed.</p>
+        </div>
+      </div>
+      <div class="tip-box p-4 rounded">
+        <div class="flex items-start gap-3">
+          <span class="text-acid font-mono text-xs font-700 uppercase tracking-widest mt-0.5 flex-shrink-0">In simple terms</span>
+          <p class="text-gem-200 text-sm font-display font-600">
+            Nav = <span class="text-acid">Structure</span> + <span class="text-acid">Links &amp; Entries</span> + <span class="text-acid">Frontend Tag</span>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── WHAT YOU CAN DO ── -->
+    <section id="what-you-can" class="s-card p-7 md:p-9">
+      <div class="sec-label mb-2">Capabilities</div>
+      <h2 class="font-display font-700 text-white text-2xl mb-4">⚡ What You Can Do</h2>
+      <p class="text-gem-300 leading-relaxed mb-6">Navigation is more flexible than a simple list of links. Here's what a single Nav can handle:</p>
+
+      <div class="space-y-3 mb-6">
+        <div class="flex items-start gap-4 bg-ink-800/50 border border-gem-800/30 rounded-lg p-4">
+          <span class="text-2xl">🔗</span>
+          <div>
+            <div class="font-display font-600 text-white mb-1">Link to Entries</div>
+            <p class="text-gem-400 text-sm">Pick entries directly from any of your collections. Their URLs always follow the collection's routing rules — no matter where they appear in the nav.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-4 bg-ink-800/50 border border-gem-800/30 rounded-lg p-4">
+          <span class="text-2xl">🌐</span>
+          <div>
+            <div class="font-display font-600 text-white mb-1">Add Custom URLs</div>
+            <p class="text-gem-400 text-sm">Add internal paths or full external URLs — ideal for third-party links, marketing pages, or legacy URLs.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-4 bg-ink-800/50 border border-gem-800/30 rounded-lg p-4">
+          <span class="text-2xl">🏷️</span>
+          <div>
+            <div class="font-display font-600 text-white mb-1">Text-Only Items</div>
+            <p class="text-gem-400 text-sm">Label-only items with no URL — great for dropdown section headings or non-clickable parent nodes.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-4 bg-ink-800/50 border border-gem-800/30 rounded-lg p-4">
+          <span class="text-2xl">🔁</span>
+          <div>
+            <div class="font-display font-600 text-white mb-1">Reuse the Same Entry</div>
+            <p class="text-gem-400 text-sm">Reference the same entry multiple times across a single nav with no limits — useful for featured links or cross-section shortcuts.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Screenshot: CP nav builder -->
+      <div class="img-placeholder h-[350px] rounded-lg mb-3">
+        <img src="/asserts/img/image.png"
+             alt="Statamic Control Panel — Navigation Builder"
+             onerror="this.style.display='none'"/>
+      </div>
+      <p class="text-gem-500 text-xs font-mono text-center mb-2">👉 The CP gives you a drag-and-drop tree to build and nest your nav items visually.</p>
+
+      <div class="warn-box p-4 rounded mt-2">
+        <div class="flex items-start gap-3">
+          <span class="text-yellow-400 font-mono text-xs font-700 uppercase tracking-widest mt-0.5 flex-shrink-0">⚡ Important</span>
+          <p class="text-gem-300 text-sm leading-relaxed">Entry URLs <strong class="text-white">always follow their collection's routing rules</strong> — no matter where they appear in the nav. The nav never overrides URL generation.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── STORAGE ── -->
+    <section id="storage" class="s-card p-7 md:p-9">
+      <div class="sec-label mb-2">On Disk</div>
+      <h2 class="font-display font-700 text-white text-2xl mb-4">💾 Storage</h2>
+      <p class="text-gem-300 leading-relaxed mb-5">
+        Navigation data is split into <strong class="text-white">two separate parts</strong>: the nav configuration and the navigation tree (structure). Each lives in its own directory.
+      </p>
+
+      <!-- Part 1 -->
+      <section id="nav-config" class="mb-8">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="acid-badge text-xs px-2 py-0.5 rounded font-mono">Part 1</span>
+          <span class="font-display font-600 text-white">Nav Configuration</span>
+        </div>
+        <p class="text-gem-400 text-sm leading-relaxed mb-4">Defines settings like title, max depth, and which collections are selectable. One file per nav.</p>
+
+        <div class="code-block rounded-lg mb-4" x-data="{copied:false}">
+          <div class="flex items-center justify-between px-4 py-2 border-b border-gem-800/30">
+            <div class="flex items-center gap-2">
+              <div class="t-r w-2.5 h-2.5 rounded-full"></div>
+              <div class="t-y w-2.5 h-2.5 rounded-full"></div>
+              <div class="t-g w-2.5 h-2.5 rounded-full"></div>
+              <span class="font-mono text-gem-500 text-xs ml-1">project structure</span>
+            </div>
+            <button class="copy-btn text-gem-500 flex items-center gap-1.5"
+              @click="navigator.clipboard.writeText('content/navigation/\n  header.yaml\n  footer.yaml'); copied=true; setTimeout(()=>copied=false,2000)">
+              <template x-if="!copied"><span class="flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2"/></svg>Copy</span></template>
+              <template x-if="copied"><span class="flex items-center gap-1 text-acid"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Copied!</span></template>
+            </button>
+          </div>
+          <div class="p-5 text-sm leading-7">
+            <span class="text-gem-400">content/navigation/</span><br/>
+            <span class="text-gem-500">&nbsp;&nbsp;├── </span><span class="text-white">header.yaml</span><br/>
+            <span class="text-gem-500">&nbsp;&nbsp;└── </span><span class="text-white">footer.yaml</span>
+          </div>
+        </div>
+
+        <div class="code-block rounded-lg" x-data="{copied:false}">
+          <div class="flex items-center justify-between px-4 py-2 border-b border-gem-800/30">
+            <div class="flex items-center gap-2">
+              <div class="t-r w-2.5 h-2.5 rounded-full"></div>
+              <div class="t-y w-2.5 h-2.5 rounded-full"></div>
+              <div class="t-g w-2.5 h-2.5 rounded-full"></div>
+              <span class="font-mono text-gem-500 text-xs ml-1">content/navigation/footer.yaml</span>
+            </div>
+            <button class="copy-btn text-gem-500 flex items-center gap-1.5"
+              @click="navigator.clipboard.writeText('title: Footer\nmax_depth: 3\ncollections:\n  - pages\n  - posts\n  - documents'); copied=true; setTimeout(()=>copied=false,2000)">
+              <template x-if="!copied"><span class="flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2"/></svg>Copy</span></template>
+              <template x-if="copied"><span class="flex items-center gap-1 text-acid"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Copied!</span></template>
+            </button>
+          </div>
+          <div class="p-5 text-sm leading-7">
+            <span class="text-gem-500"># content/navigation/footer.yaml</span><br/><br/>
+            <span class="text-gem-400">title</span><span class="text-gem-600">: </span><span class="text-white">Footer</span><br/>
+            <span class="text-gem-400">max_depth</span><span class="text-gem-600">: </span><span class="text-acid">3</span><br/>
+            <span class="text-gem-400">collections</span><span class="text-gem-600">:</span><br/>
+            <span class="text-gem-600">&nbsp;&nbsp;- </span><span class="text-acid">pages</span><br/>
+            <span class="text-gem-600">&nbsp;&nbsp;- </span><span class="text-acid">posts</span><br/>
+            <span class="text-gem-600">&nbsp;&nbsp;- </span><span class="text-acid">documents</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Part 2 -->
+      <section id="nav-tree">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="acid-badge text-xs px-2 py-0.5 rounded font-mono">Part 2</span>
+          <span class="font-display font-600 text-white">Navigation Tree (Structure)</span>
+        </div>
+        <p class="text-gem-400 text-sm leading-relaxed mb-4">Stores the actual hierarchy — the ordered "tree" of items. Edited visually in the CP; saved to YAML.</p>
+
+        <div class="code-block rounded-lg mb-4" x-data="{copied:false}">
+          <div class="flex items-center justify-between px-4 py-2 border-b border-gem-800/30">
+            <div class="flex items-center gap-2">
+              <div class="t-r w-2.5 h-2.5 rounded-full"></div>
+              <div class="t-y w-2.5 h-2.5 rounded-full"></div>
+              <div class="t-g w-2.5 h-2.5 rounded-full"></div>
+              <span class="font-mono text-gem-500 text-xs ml-1">tree structure</span>
+            </div>
+            <button class="copy-btn text-gem-500 flex items-center gap-1.5"
+              @click="navigator.clipboard.writeText('content/trees/navigation/\n  header.yaml\n  footer.yaml'); copied=true; setTimeout(()=>copied=false,2000)">
+              <template x-if="!copied"><span class="flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2"/></svg>Copy</span></template>
+              <template x-if="copied"><span class="flex items-center gap-1 text-acid"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Copied!</span></template>
+            </button>
+          </div>
+          <div class="p-5 text-sm leading-7">
+            <span class="text-gem-400">content/trees/navigation/</span><br/>
+            <span class="text-gem-500">&nbsp;&nbsp;├── </span><span class="text-white">header.yaml</span><br/>
+            <span class="text-gem-500">&nbsp;&nbsp;└── </span><span class="text-white">footer.yaml</span>
+          </div>
+        </div>
+
+        <!-- Visual nav tree mock-up -->
+        <div class="bg-ink-800/50 border border-gem-800/30 rounded-lg p-5 mb-4">
+          <div class="sec-label mb-4">Example Nav Tree (Visual)</div>
+          <div class="space-y-2 font-mono text-sm">
+            <!-- Root items -->
+            <div class="nav-tree-item flex items-center gap-3 p-3">
+              <span class="text-gem-500 text-xs">⠿</span>
+              <span class="text-white">Home</span>
+              <span class="ml-auto field-badge">entry</span>
+            </div>
+            <div class="space-y-2">
+              <div class="nav-tree-item flex items-center gap-3 p-3">
+                <span class="text-gem-500 text-xs">⠿</span>
+                <span class="text-white">Products</span>
+                <span class="ml-auto field-badge">text</span>
+              </div>
+              <div class="nav-tree-children space-y-2">
+                <div class="nav-tree-item flex items-center gap-3 p-3">
+                  <span class="text-gem-500 text-xs">⠿</span>
+                  <span class="text-gem-300">Features</span>
+                  <span class="ml-auto field-badge">entry</span>
+                </div>
+                <div class="nav-tree-item flex items-center gap-3 p-3">
+                  <span class="text-gem-500 text-xs">⠿</span>
+                  <span class="text-gem-300">Pricing</span>
+                  <span class="ml-auto field-badge">entry</span>
+                </div>
+              </div>
+            </div>
+            <div class="nav-tree-item flex items-center gap-3 p-3">
+              <span class="text-gem-500 text-xs">⠿</span>
+              <span class="text-white">Blog</span>
+              <span class="ml-auto field-badge">entry</span>
+            </div>
+            <div class="nav-tree-item flex items-center gap-3 p-3">
+              <span class="text-gem-500 text-xs">⠿</span>
+              <span class="text-white">GitHub ↗</span>
+              <span class="ml-auto field-badge">url</span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <!-- ── TEMPLATING ── -->
+    <section id="templating" class="s-card p-7 md:p-9">
+      <div class="sec-label mb-2">Frontend</div>
+      <h2 class="font-display font-700 text-white text-2xl mb-4">🧩 Templating</h2>
+      <p class="text-gem-300 leading-relaxed mb-5">
+        Rendering navigation in your frontend is simple using the <code class="il">nav</code> tag in Antlers. The tag name matches the nav handle — e.g. <code class="il">nav:footer</code> for the footer nav.
+      </p>
+
+      <div class="code-block rounded-lg mb-5" x-data="{copied:false}">
+        <div class="flex items-center justify-between px-4 py-2 border-b border-gem-800/30">
+          <div class="flex items-center gap-2">
+            <div class="t-r w-2.5 h-2.5 rounded-full"></div>
+            <div class="t-y w-2.5 h-2.5 rounded-full"></div>
+            <div class="t-g w-2.5 h-2.5 rounded-full"></div>
+            <span class="font-mono text-gem-500 text-xs ml-1">layout.antlers.html</span>
+          </div>
+          <button class="copy-btn text-gem-500 flex items-center gap-1.5"
+            @click="navigator.clipboard.writeText('<ul>\n  {{ nav:footer }}\n    <li>\n      <a href=\'{{ url }}\'>{{ title }}</a>\n    </li>\n  {{ /nav:footer }}\n</ul>'); copied=true; setTimeout(()=>copied=false,2000)">
+            <template x-if="!copied"><span class="flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2"/></svg>Copy</span></template>
+            <template x-if="copied"><span class="flex items-center gap-1 text-acid"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Copied!</span></template>
+          </button>
+        </div>
+        <div class="p-5 text-sm leading-7">
+          <span class="text-gem-600">&lt;</span><span class="text-gem-400">ul</span><span class="text-gem-600">&gt;</span><br/>
+          <span class="text-gem-600">&nbsp;&nbsp;</span><span class="text-acid">{{</span> <span class="text-white">nav:footer</span> <span class="text-acid">}}</span><br/>
+          <span class="text-gem-600">&nbsp;&nbsp;&nbsp;&nbsp;&lt;</span><span class="text-gem-400">li</span><span class="text-gem-600">&gt;</span><br/>
+          <span class="text-gem-600">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;</span><span class="text-gem-400">a</span> <span class="text-gem-300">href</span><span class="text-gem-600">="</span><span class="text-acid">{{</span> <span class="text-white">url</span> <span class="text-acid">}}</span><span class="text-gem-600">"&gt;</span><span class="text-acid">{{</span> <span class="text-white">title</span> <span class="text-acid">}}</span><span class="text-gem-600">&lt;/</span><span class="text-gem-400">a</span><span class="text-gem-600">&gt;</span><br/>
+          <span class="text-gem-600">&nbsp;&nbsp;&nbsp;&nbsp;&lt;/</span><span class="text-gem-400">li</span><span class="text-gem-600">&gt;</span><br/>
+          <span class="text-gem-600">&nbsp;&nbsp;</span><span class="text-acid">{{</span> <span class="text-white">/nav:footer</span> <span class="text-acid">}}</span><br/>
+          <span class="text-gem-600">&lt;/</span><span class="text-gem-400">ul</span><span class="text-gem-600">&gt;</span>
+        </div>
+      </div>
+
+      <!-- Loop variables -->
+      <section id="loop-vars">
+        <div class="sec-label mb-3">What You Get Inside the Loop</div>
+        <div class="grid sm:grid-cols-3 gap-3 mb-5">
+          <div class="info-chip p-3 text-center">
+            <div class="font-mono text-acid text-xs mb-1">{{ title }}</div>
+            <div class="text-gem-400 text-xs">The nav item's display label</div>
+          </div>
+          <div class="info-chip p-3 text-center">
+            <div class="font-mono text-acid text-xs mb-1">{{ url }}</div>
+            <div class="text-gem-400 text-xs">Resolved URL (entry route or custom URL)</div>
+          </div>
+          <div class="info-chip p-3 text-center">
+            <div class="font-mono text-acid text-xs mb-1">{{ children }}</div>
+            <div class="text-gem-400 text-xs">Nested items for dropdown rendering</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Nested / dropdown example -->
+      <div class="sec-label mb-3">Rendering Nested / Dropdown Menus</div>
+      <div class="code-block rounded-lg mb-5" x-data="{copied:false}">
+        <div class="flex items-center justify-between px-4 py-2 border-b border-gem-800/30">
+          <div class="flex items-center gap-2">
+            <div class="t-r w-2.5 h-2.5 rounded-full"></div>
+            <div class="t-y w-2.5 h-2.5 rounded-full"></div>
+            <div class="t-g w-2.5 h-2.5 rounded-full"></div>
+            <span class="font-mono text-gem-500 text-xs ml-1">header.antlers.html (nested)</span>
+          </div>
+          <button class="copy-btn text-gem-500 flex items-center gap-1.5"
+            @click="navigator.clipboard.writeText('<ul>\n  {{ nav:header }}\n    <li>\n      <a href=\'{{ url }}\'>{{ title }}</a>\n      {{ if children }}\n        <ul>\n          {{ children }}\n            <li><a href=\'{{ url }}\'>{{ title }}</a></li>\n          {{ /children }}\n        </ul>\n      {{ /if }}\n    </li>\n  {{ /nav:header }}\n</ul>'); copied=true; setTimeout(()=>copied=false,2000)">
+            <template x-if="!copied"><span class="flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2"/></svg>Copy</span></template>
+            <template x-if="copied"><span class="flex items-center gap-1 text-acid"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Copied!</span></template>
+          </button>
+        </div>
+        <div class="p-5 text-sm leading-7">
+          <span class="text-gem-600">&lt;</span><span class="text-gem-400">ul</span><span class="text-gem-600">&gt;</span><br/>
+          <span class="text-gem-500">&nbsp;&nbsp;</span><span class="text-acid">{{</span> <span class="text-white">nav:header</span> <span class="text-acid">}}</span><br/>
+          <span class="text-gem-500">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="text-gem-600">&lt;</span><span class="text-gem-400">li</span><span class="text-gem-600">&gt;</span><br/>
+          <span class="text-gem-500">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="text-gem-600">&lt;</span><span class="text-gem-400">a</span> <span class="text-gem-300">href</span><span class="text-gem-600">="</span><span class="text-acid">{{</span> <span class="text-white">url</span> <span class="text-acid">}}</span><span class="text-gem-600">"&gt;</span><span class="text-acid">{{</span> <span class="text-white">title</span> <span class="text-acid">}}</span><span class="text-gem-600">&lt;/</span><span class="text-gem-400">a</span><span class="text-gem-600">&gt;</span><br/>
+          <span class="text-gem-500">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="text-acid">{{</span> <span class="text-gem-300">if</span> <span class="text-white">children</span> <span class="text-acid">}}</span><br/>
+          <span class="text-gem-500">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="text-gem-600">&lt;</span><span class="text-gem-400">ul</span><span class="text-gem-600">&gt;</span><br/>
+          <span class="text-gem-500">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="text-acid">{{</span> <span class="text-white">children</span> <span class="text-acid">}}</span><br/>
+          <span class="text-gem-500">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="text-gem-600">&lt;</span><span class="text-gem-400">li</span><span class="text-gem-600">&gt;&lt;</span><span class="text-gem-400">a</span> <span class="text-gem-300">href</span><span class="text-gem-600">="</span><span class="text-acid">{{</span> <span class="text-white">url</span> <span class="text-acid">}}</span><span class="text-gem-600">"&gt;</span><span class="text-acid">{{</span> <span class="text-white">title</span> <span class="text-acid">}}</span><span class="text-gem-600">&lt;/</span><span class="text-gem-400">a</span><span class="text-gem-600">&gt;&lt;/</span><span class="text-gem-400">li</span><span class="text-gem-600">&gt;</span><br/>
+          <span class="text-gem-500">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="text-acid">{{</span> <span class="text-white">/children</span> <span class="text-acid">}}</span><br/>
+          <span class="text-gem-500">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="text-gem-600">&lt;/</span><span class="text-gem-400">ul</span><span class="text-gem-600">&gt;</span><br/>
+          <span class="text-gem-500">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="text-acid">{{</span> <span class="text-gem-300">/if</span> <span class="text-acid">}}</span><br/>
+          <span class="text-gem-500">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="text-gem-600">&lt;/</span><span class="text-gem-400">li</span><span class="text-gem-600">&gt;</span><br/>
+          <span class="text-gem-500">&nbsp;&nbsp;</span><span class="text-acid">{{</span> <span class="text-white">/nav:header</span> <span class="text-acid">}}</span><br/>
+          <span class="text-gem-600">&lt;/</span><span class="text-gem-400">ul</span><span class="text-gem-600">&gt;</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── COLLECTIONS ── -->
+    <section id="collections" class="s-card p-7 md:p-9">
+      <div class="sec-label mb-2">Entry Source</div>
+      <h2 class="font-display font-700 text-white text-2xl mb-4">📦 Collections</h2>
+      <p class="text-gem-300 leading-relaxed mb-5">
+        By default, the entry selector in the CP shows content from <strong class="text-white">all collections</strong>. You can restrict this in the nav config to keep things clean and relevant for editors.
+      </p>
+
+      <div class="grid sm:grid-cols-2 gap-4 mb-5">
+        <div>
+          <div class="sec-label mb-2">Default (all collections)</div>
+          <div class="code-block rounded-lg">
+            <div class="p-4 text-sm leading-7">
+              <span class="text-gem-500"># collections key omitted</span><br/>
+              <span class="text-gem-500"># all collections appear in picker</span>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="sec-label mb-2">Restricted to specific collections</div>
+          <div class="code-block rounded-lg" x-data="{copied:false}">
+            <div class="flex items-center justify-between px-4 py-2 border-b border-gem-800/30">
+              <span class="font-mono text-gem-500 text-xs">footer.yaml</span>
+              <button class="copy-btn text-gem-500 flex items-center gap-1.5"
+                @click="navigator.clipboard.writeText('collections:\n  - pages\n  - blog'); copied=true; setTimeout(()=>copied=false,2000)">
+                <template x-if="!copied"><span class="flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2"/></svg>Copy</span></template>
+                <template x-if="copied"><span class="flex items-center gap-1 text-acid"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Copied!</span></template>
+              </button>
+            </div>
+            <div class="p-4 text-sm leading-7">
+              <span class="text-gem-400">collections</span><span class="text-gem-600">:</span><br/>
+              <span class="text-gem-600">&nbsp;&nbsp;- </span><span class="text-acid">pages</span><br/>
+              <span class="text-gem-600">&nbsp;&nbsp;- </span><span class="text-acid">blog</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tip-box p-4 rounded">
+        <div class="flex items-start gap-3">
+          <span class="text-acid font-mono text-xs font-700 uppercase tracking-widest mt-0.5 flex-shrink-0">Editor UX</span>
+          <p class="text-gem-300 text-sm leading-relaxed">Restricting collections prevents editors from accidentally adding irrelevant content to a nav — e.g. blog posts appearing in the footer nav entry picker.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── BLUEPRINTS ── -->
+    <section id="blueprints" class="s-card p-7 md:p-9">
+      <div class="sec-label mb-2">Custom Fields</div>
+      <h2 class="font-display font-700 text-white text-2xl mb-4">🎨 Blueprints &amp; Custom Data</h2>
+      <p class="text-gem-300 leading-relaxed mb-5">
+        Out of the box, nav items have two basic fields. Blueprints let you extend them with anything your design requires.
+      </p>
+
+      <div class="grid sm:grid-cols-2 gap-4 mb-6">
+        <div>
+          <div class="sec-label mb-3">Default Fields</div>
+          <div class="flex flex-wrap gap-2">
+            <span class="acid-badge font-mono text-xs px-3 py-1.5 rounded">title</span>
+            <span class="acid-badge font-mono text-xs px-3 py-1.5 rounded">url / entry</span>
+          </div>
+        </div>
+        <div>
+          <div class="sec-label mb-3">Example Custom Fields</div>
+          <div class="flex flex-wrap gap-2">
+            <span class="field-badge">excerpt</span>
+            <span class="field-badge">icon</span>
+            <span class="field-badge">badge</span>
+            <span class="field-badge">css_class</span>
+            <span class="field-badge">open_in_new_tab</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid sm:grid-cols-2 gap-3 mb-5">
+        <div class="info-chip p-4">
+          <div class="font-display font-600 text-white text-sm mb-2">🖥️ CP Integration</div>
+          <p class="text-gem-400 text-xs leading-relaxed">Custom fields defined in the nav blueprint appear automatically in the CP editor for each nav item — editors never need to touch YAML.</p>
+        </div>
+        <div class="info-chip p-4">
+          <div class="font-display font-600 text-white text-sm mb-2">🔧 Any Field Type</div>
+          <p class="text-gem-400 text-xs leading-relaxed">Use text, toggle, asset, select, or any other Statamic fieldtype — the full power of blueprints is available.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── DATA STORAGE ── -->
+    <section id="data-storage" class="s-card p-7 md:p-9">
+      <div class="sec-label mb-2">Under the Hood</div>
+      <h2 class="font-display font-700 text-white text-2xl mb-4">💾 How Data is Stored</h2>
+      <p class="text-gem-300 leading-relaxed mb-5">
+        Custom blueprint fields are saved under a <code class="il">data</code> key in the tree YAML file, nested inside each nav item entry.
+      </p>
+
+      <div class="code-block rounded-lg mb-5" x-data="{copied:false}">
+        <div class="flex items-center justify-between px-4 py-2 border-b border-gem-800/30">
+          <div class="flex items-center gap-2">
+            <div class="t-r w-2.5 h-2.5 rounded-full"></div>
+            <div class="t-y w-2.5 h-2.5 rounded-full"></div>
+            <div class="t-g w-2.5 h-2.5 rounded-full"></div>
+            <span class="font-mono text-gem-500 text-xs ml-1">content/trees/navigation/header.yaml</span>
+          </div>
+          <button class="copy-btn text-gem-500 flex items-center gap-1.5"
+            @click="navigator.clipboard.writeText('-\n  title: My page\n  url: /my-page\n  data:\n    excerpt: This is my page\n    icon: page.svg'); copied=true; setTimeout(()=>copied=false,2000)">
+            <template x-if="!copied"><span class="flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2"/></svg>Copy</span></template>
+            <template x-if="copied"><span class="flex items-center gap-1 text-acid"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Copied!</span></template>
+          </button>
+        </div>
+        <div class="p-5 text-sm leading-7">
+          <span class="text-gem-600">-</span><br/>
+          <span class="text-gem-600">&nbsp;&nbsp;</span><span class="text-gem-400">title</span><span class="text-gem-600">: </span><span class="text-white">My page</span><br/>
+          <span class="text-gem-600">&nbsp;&nbsp;</span><span class="text-gem-400">url</span><span class="text-gem-600">: </span><span class="text-acid">/my-page</span><br/>
+          <span class="text-gem-600">&nbsp;&nbsp;</span><span class="text-gem-400">data</span><span class="text-gem-600">:</span><br/>
+          <span class="text-gem-600">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="text-gem-300">excerpt</span><span class="text-gem-600">: </span><span class="text-white">This is my page</span><br/>
+          <span class="text-gem-600">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="text-gem-300">icon</span><span class="text-gem-600">: </span><span class="text-white">page.svg</span>
+        </div>
+      </div>
+
+      <div class="space-y-3">
+        <div class="flex items-start gap-3">
+          <code class="il flex-shrink-0 mt-0.5">title</code>
+          <p class="text-gem-300 text-sm leading-relaxed">The nav item label — can be different from the entry's title (useful for shortened menu labels).</p>
+        </div>
+        <div class="flex items-start gap-3">
+          <code class="il flex-shrink-0 mt-0.5">url</code>
+          <p class="text-gem-300 text-sm leading-relaxed">For custom URL items. Entry-referenced items use the entry's route instead.</p>
+        </div>
+        <div class="flex items-start gap-3">
+          <code class="il flex-shrink-0 mt-0.5">data</code>
+          <p class="text-gem-300 text-sm leading-relaxed">All custom blueprint fields live here — accessible in templates just like normal variables inside the nav loop.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── QUICK RECAP TABLE ── -->
+    <section id="quick-recap" class="s-card p-7 md:p-9">
+      <div class="sec-label mb-2">Reference</div>
+      <h2 class="font-display font-700 text-white text-2xl mb-5">🧠 Quick Recap</h2>
+      <div class="overflow-x-auto rounded-lg border border-gem-800/25">
+        <table class="doc-table">
+          <thead>
+            <tr>
+              <th>Concept</th>
+              <th>Meaning</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><code class="il">Nav</code></td><td class="text-gem-300">A named menu powered by a Statamic Structure</td></tr>
+            <tr><td><code class="il">Structure</code></td><td class="text-gem-300">The drag-and-drop tree hierarchy that backs a nav</td></tr>
+            <tr><td><code class="il">Nav Config</code></td><td class="text-gem-300">YAML file in <code class="il">content/navigation/</code> — title, depth, allowed collections</td></tr>
+            <tr><td><code class="il">Nav Tree</code></td><td class="text-gem-300">YAML file in <code class="il">content/trees/navigation/</code> — the actual ordered hierarchy</td></tr>
+            <tr><td><code class="il">max_depth</code></td><td class="text-gem-300">Maximum nesting depth allowed for this nav's items</td></tr>
+            <tr><td><code class="il">{{ nav:handle }}</code></td><td class="text-gem-300">Antlers tag to loop over nav items in your templates</td></tr>
+            <tr><td><code class="il">{{ children }}</code></td><td class="text-gem-300">Nested child items — used to build dropdown menus</td></tr>
+            <tr><td><code class="il">data</code></td><td class="text-gem-300">Sub-key in tree YAML where custom blueprint fields are stored</td></tr>
+            <tr><td><code class="il">Override</code></td><td class="text-gem-300">Nav-level field value that takes precedence over the entry's own field</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ── DEV TIPS ── -->
+    <section id="tips" class="s-card p-7 md:p-9">
+      <div class="sec-label mb-2">Best Practices</div>
+      <h2 class="font-display font-700 text-white text-2xl mb-5">💡 Developer Tips</h2>
+      <div class="space-y-3">
+        <div class="flex items-start gap-4 info-chip p-4">
+          <span class="text-2xl flex-shrink-0">🗂️</span>
+          <div>
+            <div class="font-display font-600 text-white text-sm mb-1">One Nav Per Zone</div>
+            <p class="text-gem-400 text-xs leading-relaxed">Create separate navs for separate areas — <code class="il">header</code>, <code class="il">footer</code>, <code class="il">sidebar</code>. Avoid one "mega nav" that tries to do everything.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-4 info-chip p-4">
+          <span class="text-2xl flex-shrink-0">🎯</span>
+          <div>
+            <div class="font-display font-600 text-white text-sm mb-1">Restrict Collections per Nav</div>
+            <p class="text-gem-400 text-xs leading-relaxed">Lock down the <code class="il">collections</code> list in each nav's config — editors will only see relevant entries in the picker, reducing mistakes.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-4 info-chip p-4">
+          <span class="text-2xl flex-shrink-0">🔭</span>
+          <div>
+            <div class="font-display font-600 text-white text-sm mb-1">Use max_depth Deliberately</div>
+            <p class="text-gem-400 text-xs leading-relaxed">Set <code class="il">max_depth: 1</code> for flat navs (footer) and higher values only when dropdowns are actually needed (header). Prevents accidental deep nesting.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-4 info-chip p-4">
+          <span class="text-2xl flex-shrink-0">🧩</span>
+          <div>
+            <div class="font-display font-600 text-white text-sm mb-1">Reuse Fields Across Blueprints</div>
+            <p class="text-gem-400 text-xs leading-relaxed">Define common fields (like <code class="il">icon</code>) in a shared fieldset and import it into both entry and nav blueprints — consistent fieldtypes prevent override mismatches.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── FINAL THOUGHT ── -->
+    <section class="cta-glow bg-ink-800/60 rounded-2xl p-10 border border-gem-800/30 text-center">
+      <div class="text-5xl mb-4">🧭</div>
+      <h2 class="font-display font-800 text-3xl text-white mb-3">
+        The Navigation Trifecta
+      </h2>
+      <div class="flex flex-wrap items-center justify-center gap-4 mb-6 text-lg">
+        <span class="acid-badge px-4 py-2 rounded-lg font-display font-600">🏗️ Structure</span>
+        <span class="text-gem-600 text-2xl font-display">+</span>
+        <span class="acid-badge px-4 py-2 rounded-lg font-display font-600">🎨 Blueprints</span>
+        <span class="text-gem-600 text-2xl font-display">+</span>
+        <span class="acid-badge px-4 py-2 rounded-lg font-display font-600">🧩 Antlers Tags</span>
+      </div>
+      <p class="text-gem-400 mb-8 leading-relaxed max-w-lg mx-auto">
+        Together, these give you complete control over every menu on your site — drag-and-drop for editors, full flexibility for developers. Now go build something great.
+      </p>
+      <div class="flex flex-wrap gap-3 justify-center">
+        <a href="https://statamic.dev/navigation" target="_blank"
+           class="inline-flex items-center gap-2 bg-acid text-ink-950 font-display font-700 px-5 py-2.5 rounded text-sm hover:bg-white transition-colors">
+          Full Navigation Docs ↗
+        </a>
+        <a href="statamic-globals.html"
+           class="inline-flex items-center gap-2 border border-gem-600/40 text-gem-200 font-display px-5 py-2.5 rounded text-sm hover:border-acid/40 hover:text-white transition-colors">
+          ← Back to Globals
+        </a>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ─── FOOTER ─────────────────────────────────────────────── -->
+<footer class="cl border-t border-gem-900/50 py-8 px-6">
+  <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+    <div class="flex items-center gap-2">
+      <div class="w-5 h-5 rounded border border-gem-600/30 flex items-center justify-center bg-gem-800/20">
+        <svg viewBox="0 0 20 20" fill="none" class="w-3 h-3 text-gem-400" xmlns="http://www.w3.org/2000/svg">
+          <polygon points="10,2 18,7 18,13 10,18 2,13 2,7" stroke="currentColor" stroke-width="1.5" fill="none"/>
+        </svg>
+      </div>
+      <span class="text-gem-500 text-xs font-mono">Statamic — Navigation</span>
+    </div>
+    <div class="flex items-center gap-4 text-xs font-mono text-gem-600">
+      <a href="#overview" class="hover:text-gem-400 transition-colors">↑ Back to top</a>
+      <span>·</span>
+      <span>v5.x docs</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

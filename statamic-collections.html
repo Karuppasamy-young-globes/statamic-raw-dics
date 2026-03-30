@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="en" x-data="{}" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Statamic — Collections & Content Modelling</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['Syne', 'sans-serif'],
+            mono:    ['Space Mono', 'monospace'],
+          },
+          colors: {
+            gem: {
+              50:  '#f0fdf9', 100: '#ccfbef', 200: '#99f3df',
+              300: '#58e4c6', 400: '#22cda8', 500: '#0ab28e',
+              600: '#048f73', 700: '#07725d', 800: '#095a4b', 900: '#0a4a3e',
+            },
+            ink: {
+              950: '#04100d', 900: '#081a14', 800: '#0d2a20',
+              700: '#133d2f', 600: '#1c5440',
+            },
+            acid: '#39ff84',
+          },
+        }
+      }
+    }
+  </script>
+
+  <style>
+    :root { --acid: #39ff84; --ink-dark: #04100d; }
+
+    * { box-sizing: border-box; }
+
+    body {
+      background-color: #04100d;
+      color: #c8ddd6;
+      font-family: 'Syne', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* Grid texture */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image:
+        linear-gradient(rgba(57,255,132,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(57,255,132,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none; z-index: 0;
+    }
+
+    /* Noise */
+    body::after {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 0; opacity: 0.4;
+    }
+
+    .cl { position: relative; z-index: 1; }
+
+    /* Code block */
+    .code-block {
+      background: #020c09;
+      border: 1px solid rgba(57,255,132,0.18);
+      border-left: 3px solid var(--acid);
+      border-radius: 6px;
+      font-family: 'Space Mono', monospace;
+      position: relative; overflow: hidden;
+    }
+    .code-block::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 100%;
+      background: linear-gradient(180deg, transparent 0%, rgba(57,255,132,0.03) 50%, transparent 100%);
+      background-size: 100% 8px;
+      pointer-events: none;
+      animation: scan 6s linear infinite;
+    }
+    @keyframes scan {
+      0%   { background-position: 0 -100%; }
+      100% { background-position: 0 200%; }
+    }
+
+    /* Section cards */
+    .s-card {
+      border: 1px solid rgba(57,255,132,0.1);
+      background: linear-gradient(135deg, rgba(13,42,32,0.65) 0%, rgba(4,16,13,0.9) 100%);
+      backdrop-filter: blur(8px);
+      border-radius: 12px;
+      transition: border-color 0.3s;
+    }
+    .s-card:hover { border-color: rgba(57,255,132,0.28); }
+
+    /* Inline code */
+    code.il {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.78em;
+      background: rgba(57,255,132,0.08);
+      border: 1px solid rgba(57,255,132,0.18);
+      color: var(--acid);
+      padding: 2px 7px;
+      border-radius: 4px;
+    }
+
+    /* Acid badge */
+    .acid-badge {
+      background: rgba(57,255,132,0.1);
+      border: 1px solid rgba(57,255,132,0.28);
+      color: var(--acid);
+    }
+
+    /* Prereq-style chip */
+    .info-chip {
+      background: rgba(10,178,142,0.08);
+      border: 1px solid rgba(10,178,142,0.22);
+      border-radius: 8px;
+      transition: all 0.22s;
+    }
+    .info-chip:hover { background: rgba(10,178,142,0.16); border-color: rgba(10,178,142,0.45); }
+
+    /* Tip box */
+    .tip-box {
+      background: rgba(57,255,132,0.04);
+      border-left: 3px solid var(--acid);
+      border-radius: 0 6px 6px 0;
+    }
+
+    /* Acid underline nav */
+    .acid-underline { position: relative; display: inline-block; }
+    .acid-underline::after {
+      content: ''; position: absolute; bottom: -3px; left: 0; right: 0;
+      height: 2px; background: var(--acid);
+      box-shadow: 0 0 10px var(--acid);
+      transform: scaleX(0); transform-origin: left; transition: transform 0.35s ease;
+    }
+    .acid-underline:hover::after { transform: scaleX(1); }
+
+    /* Pulse dot */
+    @keyframes pulseDot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.7)} }
+    .pulse-dot { animation: pulseDot 2s ease-in-out infinite; }
+
+    /* Copy button */
+    .copy-btn { font-family: 'Space Mono', monospace; font-size: 11px; transition: all 0.2s; }
+    .copy-btn:hover { color: var(--acid); }
+
+    /* Terminal dots */
+    .t-r{background:#ff5f56} .t-y{background:#ffbd2e} .t-g{background:#27c93f}
+
+    /* Section label */
+    .sec-label { font-family: 'Space Mono', monospace; font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: #0ab28e; }
+
+    /* Table */
+    .doc-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+    .doc-table th { font-family: 'Space Mono', monospace; font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: #0ab28e; padding: 10px 14px; border-bottom: 1px solid rgba(57,255,132,0.15); text-align: left; }
+    .doc-table td { padding: 11px 14px; border-bottom: 1px solid rgba(57,255,132,0.06); color: #c8ddd6; vertical-align: top; }
+    .doc-table tr:last-child td { border-bottom: none; }
+    .doc-table tr:hover td { background: rgba(57,255,132,0.03); }
+
+    /* Image placeholder */
+    .img-placeholder {
+      background: linear-gradient(135deg, #081a14 0%, #0d2a20 100%);
+      border: 1px dashed rgba(57,255,132,0.25);
+      border-radius: 8px;
+      position: relative;
+      overflow: hidden;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 10px;
+    }
+    .img-placeholder::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: repeating-linear-gradient(
+        45deg,
+        transparent, transparent 8px,
+        rgba(57,255,132,0.025) 8px, rgba(57,255,132,0.025) 9px
+      );
+    }
+    /* Actual image inside placeholder */
+    .img-placeholder img {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+    .img-placeholder .img-label {
+      position: relative; z-index: 2;
+      text-align: center;
+    }
+
+    /* Fade-up animation */
+    @keyframes fadeUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
+    .animate-fade-up { animation: fadeUp 0.65s ease both; }
+    .d1{animation-delay:0.1s} .d2{animation-delay:0.2s} .d3{animation-delay:0.3s} .d4{animation-delay:0.4s}
+
+    /* Glow pulse CTA */
+    @keyframes glowPulse {
+      0%,100%{box-shadow:0 0 0 1px rgba(57,255,132,0.2),0 0 40px rgba(57,255,132,0.08)}
+      50%{box-shadow:0 0 0 1px rgba(57,255,132,0.4),0 0 80px rgba(57,255,132,0.2)}
+    }
+    .cta-glow { animation: glowPulse 3s ease-in-out infinite; }
+
+    /* Hero glow text */
+    .hero-glow { text-shadow: 0 0 60px rgba(57,255,132,0.2); }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar{width:6px} ::-webkit-scrollbar-track{background:#04100d} ::-webkit-scrollbar-thumb{background:rgba(57,255,132,0.22);border-radius:3px}
+
+    /* Section divider */
+    .sec-divider { border: none; border-top: 1px solid rgba(57,255,132,0.07); margin: 0; }
+
+    /* TOC sidebar */
+    .toc-link { font-family: 'Space Mono', monospace; font-size: 0.72rem; color: #0ab28e; transition: color 0.2s; display: block; padding: 5px 0; border-left: 2px solid transparent; padding-left: 12px; transition: all 0.2s; }
+    .toc-link:hover { color: var(--acid); border-left-color: var(--acid); }
+
+    /* Tree view */
+    .tree-line { border-left: 1px solid rgba(57,255,132,0.2); }
+    .tree-connector { color: rgba(57,255,132,0.4); }
+
+    /* Status badge */
+    .status-badge { font-family: 'Space Mono', monospace; font-size: 0.65rem; padding: 2px 8px; border-radius: 20px; }
+    .status-pub  { background: rgba(57,255,132,0.12); color: var(--acid); border: 1px solid rgba(57,255,132,0.3); }
+    .status-sched{ background: rgba(251,191,36,0.12); color: #fbbf24; border: 1px solid rgba(251,191,36,0.3); }
+    .status-exp  { background: rgba(248,113,113,0.12); color: #f87171; border: 1px solid rgba(248,113,113,0.3); }
+    .status-draft{ background: rgba(156,163,175,0.12); color: #9ca3af; border: 1px solid rgba(156,163,175,0.3); }
+
+    /* Cascade steps */
+    .cascade-step { border: 1px solid rgba(57,255,132,0.12); background: rgba(13,42,32,0.5); border-radius: 8px; }
+    .cascade-arrow { color: rgba(57,255,132,0.5); }
+  </style>
+</head>
+<body>
+
+<!-- ─── NAV ─────────────────────────────────────────────────── -->
+<nav class="cl sticky top-0 z-50 border-b border-gem-800/40 bg-ink-950/85 backdrop-blur-md">
+  <div class="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <a href="statamic-docs.html" class="flex items-center gap-2 group">
+        <div class="w-7 h-7 rounded border border-gem-500/50 flex items-center justify-center bg-gem-800/30 group-hover:border-acid/60 transition-colors">
+          <svg viewBox="0 0 20 20" fill="none" class="w-4 h-4 text-acid" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="10,2 18,7 18,13 10,18 2,13 2,7" stroke="currentColor" stroke-width="1.5" fill="none"/>
+            <polygon points="10,6 14,8.5 14,11.5 10,14 6,11.5 6,8.5" fill="currentColor" opacity="0.6"/>
+          </svg>
+        </div>
+        <span class="font-display font-700 text-white text-sm tracking-widest uppercase">Statamic</span>
+      </a>
+      <span class="text-gem-700">/</span>
+      <span class="acid-badge text-xs px-2 py-0.5 rounded font-mono">Collections</span>
+    </div>
+    <div class="hidden md:flex items-center gap-5 text-xs text-gem-400 font-mono">
+      <a href="#what-is" class="acid-underline hover:text-white transition-colors">What is a Collection</a>
+      <a href="#file-structure" class="acid-underline hover:text-white transition-colors">File Structure</a>
+      <a href="#entries" class="acid-underline hover:text-white transition-colors">Entries</a>
+      <a href="#blueprints" class="acid-underline hover:text-white transition-colors">Blueprints</a>
+      <a href="#routing" class="acid-underline hover:text-white transition-colors">Routing</a>
+    </div>
+    <div class="flex items-center gap-2">
+      <div class="pulse-dot w-2 h-2 rounded-full bg-acid"></div>
+      <span class="text-xs font-mono text-gem-400">v5.x</span>
+    </div>
+  </div>
+</nav>
+
+<!-- ─── HERO ─────────────────────────────────────────────────── -->
+<section class="cl pt-20 pb-14 px-6 text-center relative overflow-hidden">
+  <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[380px] rounded-full opacity-15 pointer-events-none"
+       style="background:radial-gradient(ellipse,#39ff84 0%,transparent 70%);filter:blur(60px)"></div>
+  <div class="max-w-3xl mx-auto">
+    <div class="inline-flex items-center gap-2 acid-badge px-3 py-1 rounded-full text-xs font-mono mb-5 animate-fade-up">
+      <span>📦</span> Content Modelling Guide
+    </div>
+    <h1 class="hero-glow font-display font-800 text-5xl md:text-6xl text-white leading-[1.06] mb-5 animate-fade-up d1">
+      Collections &amp;<br/>
+      <span style="color:var(--acid)">Content Modelling</span>
+    </h1>
+    <p class="text-gem-300 text-lg leading-relaxed max-w-2xl mx-auto mb-8 animate-fade-up d2">
+      The backbone of every Statamic project. Learn how to structure, route, and model your content like a pro.
+    </p>
+    <div class="flex flex-wrap justify-center gap-3 animate-fade-up d3">
+      <a href="#what-is"    class="inline-flex items-center gap-2 bg-acid text-ink-950 font-display font-700 px-5 py-2.5 rounded text-sm hover:bg-white transition-colors">Start Reading ↓</a>
+      <a href="#quick-recap" class="inline-flex items-center gap-2 border border-gem-600/40 text-gem-200 font-display px-5 py-2.5 rounded text-sm hover:border-acid/40 hover:text-white transition-colors">Quick Recap</a>
+    </div>
+  </div>
+</section>
+
+<!-- ─── MAIN LAYOUT ──────────────────────────────────────────── -->
+<div class="cl max-w-6xl mx-auto px-4 pb-24 flex gap-8">
+
+  <!-- TOC Sidebar -->
+  <aside class="hidden lg:block w-52 flex-shrink-0 pt-2">
+    <div class="sticky top-20">
+      <div class="sec-label mb-4">On This Page</div>
+      <nav class="space-y-0.5">
+        <a href="#what-is"      class="toc-link">What is a Collection?</a>
+        <a href="#concepts"     class="toc-link">Concept Overview</a>
+        <a href="#file-structure" class="toc-link">File Structure</a>
+        <a href="#config"       class="toc-link">Configuration</a>
+        <a href="#entries"      class="toc-link">Entries</a>
+        <a href="#blueprints"   class="toc-link">Blueprints</a>
+        <a href="#titles"       class="toc-link">Titles</a>
+        <a href="#slugs"        class="toc-link">Slugs</a>
+        <a href="#dates"        class="toc-link">Dates &amp; Visibility</a>
+        <a href="#status"       class="toc-link">Entry Status</a>
+        <a href="#ordering"     class="toc-link">Ordering</a>
+        <a href="#nested"       class="toc-link">Nested Content</a>
+        <a href="#routing"      class="toc-link">Routing</a>
+        <a href="#redirects"    class="toc-link">Redirects</a>
+        <a href="#taxonomies"   class="toc-link">Taxonomies</a>
+        <a href="#mounting"     class="toc-link">Mounting</a>
+        <a href="#quick-recap"  class="toc-link">Quick Recap</a>
+        <a href="#tips"         class="toc-link">Dev Tips</a>
+      </nav>
+    </div>
+  </aside>
+
+  <!-- Content -->
+  <main class="flex-1 min-w-0 space-y-10 pt-2">
+
+    <!-- ── WHAT IS A COLLECTION ── -->
+    <section id="what-is" class="s-card p-7 md:p-9">
+      <div class="sec-label mb-2">Introduction</div>
+      <h2 class="font-display font-700 text-white text-2xl md:text-3xl mb-4">📦 What is a Collection?</h2>
+      <p class="text-gem-300 leading-relaxed mb-6">
+        A <strong class="text-white">Collection</strong> in Statamic is a structured container used to organize related content. Think of it as the foundation of your content architecture.
+      </p>
+      <div class="grid sm:grid-cols-3 gap-3 mb-6">
+        <div class="info-chip p-4">
+          <div class="text-2xl mb-2">📁</div>
+          <div class="font-display font-600 text-white text-sm mb-1">A Folder</div>
+          <p class="text-gem-400 text-xs leading-relaxed">Physically lives as a directory inside your project.</p>
+        </div>
+        <div class="info-chip p-4">
+          <div class="text-2xl mb-2">🧠</div>
+          <div class="font-display font-600 text-white text-sm mb-1">A Database Table</div>
+          <p class="text-gem-400 text-xs leading-relaxed">Acts like a table, but file-based — no DB required.</p>
+        </div>
+        <div class="info-chip p-4">
+          <div class="text-2xl mb-2">📝</div>
+          <div class="font-display font-600 text-white text-sm mb-1">A Content Type</div>
+          <p class="text-gem-400 text-xs leading-relaxed">"Blog", "Products", "Docs" — each is a collection.</p>
+        </div>
+      </div>
+      <div class="tip-box p-4 rounded">
+        <div class="flex items-start gap-3">
+          <span class="text-acid font-mono text-xs font-700 uppercase tracking-widest mt-0.5 flex-shrink-0">In simple terms</span>
+          <p class="text-gem-200 text-sm font-display font-600">
+            Collection = <span class="text-acid">Rules</span> + <span class="text-acid">Structure</span> + <span class="text-acid">Content Group</span>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── CONCEPT OVERVIEW ── -->
+    <section id="concepts" class="s-card p-7 md:p-9">
+      <div class="sec-label mb-2">Architecture</div>
+      <h2 class="font-display font-700 text-white text-2xl mb-4">🧠 Concept Overview</h2>
+      <p class="text-gem-300 leading-relaxed mb-6">A collection defines three essential things about your content:</p>
+      <div class="space-y-3">
+        <div class="flex items-start gap-4 bg-ink-800/50 border border-gem-800/30 rounded-lg p-4">
+          <span class="text-acid font-mono text-lg mt-0.5">01</span>
+          <div>
+            <div class="font-display font-600 text-white mb-1">How content is structured</div>
+            <p class="text-gem-400 text-sm">Defined via <strong class="text-gem-200">blueprints</strong> — field schemas for your entries.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-4 bg-ink-800/50 border border-gem-800/30 rounded-lg p-4">
+          <span class="text-acid font-mono text-lg mt-0.5">02</span>
+          <div>
+            <div class="font-display font-600 text-white mb-1">How URLs are generated</div>
+            <p class="text-gem-400 text-sm">Controlled via <strong class="text-gem-200">routes</strong> — flexible pattern-based URL building.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-4 bg-ink-800/50 border border-gem-800/30 rounded-lg p-4">
+          <span class="text-acid font-mono text-lg mt-0.5">03</span>
+          <div>
+            <div class="font-display font-600 text-white mb-1">Default behaviours</div>
+            <p class="text-gem-400 text-sm">Publishing rules, sort direction, injected default values, and more.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── FILE STRUCTURE ── -->
+    <section id="file-structure" class="s-card p-7 md:p-9">
+      <div class="sec-label mb-2">On Disk</div>
+      <h2 class="font-display font-700 text-white text-2xl mb-4">📁 File Structure</h2>
+      <p class="text-gem-300 leading-relaxed mb-5">Collections live inside your project under <code class="il">content/collections/</code>. Each collection is a folder containing its entries and a config file.</p>
+
+      <div class="code-block rounded-lg mb-5" x-data="{copied:false}">
+        <div class="flex items-center justify-between px-4 py-2 border-b border-gem-800/30">
+          <div class="flex items-center gap-2">
+            <div class="t-r w-2.5 h-2.5 rounded-full"></div>
+            <div class="t-y w-2.5 h-2.5 rounded-full"></div>
+            <div class="t-g w-2.5 h-2.5 rounded-full"></div>
+            <span class="font-mono text-gem-500 text-xs ml-1">project structure</span>
+          </div>
+          <button class="copy-btn text-gem-500 flex items-center gap-1.5"
+            @click="navigator.clipboard.writeText('content/\n└── collections/\n    └── blog/\n        ├── first-post.md\n        ├── second-post.md\n        └── blog.yaml'); copied=true; setTimeout(()=>copied=false,2000)">
+            <template x-if="!copied"><span class="flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2"/></svg>Copy</span></template>
+            <template x-if="copied"><span class="flex items-center gap-1 text-acid"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Copied!</span></template>
+          </button>
+        </div>
+        <div class="p-5 text-sm leading-7">
+          <span class="text-gem-400">content/</span><br/>
+          <span class="text-gem-500">└── </span><span class="text-gem-300">collections/</span><br/>
+          <span class="text-gem-500">&nbsp;&nbsp;&nbsp;&nbsp;└── </span><span class="text-acid">blog/</span><br/>
+          <span class="text-gem-500">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── </span><span class="text-white">first-post.md</span><br/>
+          <span class="text-gem-500">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── </span><span class="text-white">second-post.md</span><br/>
+          <span class="text-gem-500">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── </span><span class="text-gem-300">blog.yaml</span>
+        </div>
+      </div>
+
+      <div class="grid sm:grid-cols-2 gap-3">
+        <div class="flex items-start gap-3 bg-ink-800/40 border border-gem-800/25 rounded-lg p-4">
+          <span class="text-white font-mono text-sm mt-0.5">.md</span>
+          <p class="text-gem-400 text-sm">Files are <strong class="text-gem-200">entries</strong> — your actual content, written in Markdown.</p>
+        </div>
+        <div class="flex items-start gap-3 bg-ink-800/40 border border-gem-800/25 rounded-lg p-4">
+          <span class="text-gem-300 font-mono text-sm mt-0.5">.yaml</span>
+          <p class="text-gem-400 text-sm">The <strong class="text-gem-200">collection config</strong> — routes, templates, sort order, defaults.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── CONFIG ── -->
+    <section id="config" class="s-card p-7 md:p-9">
+      <div class="sec-label mb-2">YAML</div>
+      <h2 class="font-display font-700 text-white text-2xl mb-4">⚙️ Collection Configuration</h2>
+      <p class="text-gem-300 leading-relaxed mb-5">Each collection has a <code class="il">.yaml</code> config file that controls its core behaviour:</p>
+
+      <div class="code-block rounded-lg mb-6" x-data="{copied:false}">
+        <div class="flex items-center justify-between px-4 py-2 border-b border-gem-800/30">
+          <div class="flex items-center gap-2">
+            <div class="t-r w-2.5 h-2.5 rounded-full"></div>
+            <div class="t-y w-2.5 h-2.5 rounded-full"></div>
+            <div class="t-g w-2.5 h-2.5 rounded-full"></div>
+            <span class="font-mono text-gem-500 text-xs ml-1">blog.yaml</span>
+          </div>
+          <button class="copy-btn text-gem-500 flex items-center gap-1.5"
+            @click="navigator.clipboard.writeText('title: Blog\nroute: /blog/{slug}\ntemplate: blog/show\nsort_dir: desc\n\ninject:\n  author: admin\n  show_sidebar: true'); copied=true; setTimeout(()=>copied=false,2000)">
+            <template x-if="!copied"><span class="flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2"/></svg>Copy</span></template>
+            <template x-if="copied"><span class="flex items-center gap-1 text-acid"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Copied!</span></template>
+          </button>
+        </div>
+        <div class="p-5 text-sm leading-7">
+          <span class="text-gem-400">title</span><span class="text-gem-600">: </span><span class="text-white">Blog</span><br/>
+          <span class="text-gem-400">route</span><span class="text-gem-600">: </span><span class="text-acid">/blog/{slug}</span><br/>
+          <span class="text-gem-400">template</span><span class="text-gem-600">: </span><span class="text-white">blog/show</span><br/>
+          <span class="text-gem-400">sort_dir</span><span class="text-gem-600">: </span><span class="text-white">desc</span><br/>
+        </div>
+      </div>
+
+      <div class="space-y-3">
+        <div class="flex items-start gap-3">
+          <code class="il flex-shrink-0 mt-0.5">route</code>
+          <p class="text-gem-300 text-sm leading-relaxed">Defines the URL structure for every entry in this collection.</p>
+        </div>
+        <div class="flex items-start gap-3">
+          <code class="il flex-shrink-0 mt-0.5">template</code>
+          <p class="text-gem-300 text-sm leading-relaxed">Controls which Antlers/Blade template is used for frontend rendering.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── ENTRIES ── -->
+    <section id="entries" class="s-card p-7 md:p-9">
+      <div class="sec-label mb-2">Content Units</div>
+      <h2 class="font-display font-700 text-white text-2xl mb-4">📝 Entries</h2>
+      <p class="text-gem-300 leading-relaxed mb-5">
+        Entries are the actual content items inside a collection. Each <code class="il">.md</code> file is one entry, containing frontmatter (YAML) and body content (Markdown).
+      </p>
+
+      <div class="code-block rounded-lg mb-6" x-data="{copied:false}">
+        <div class="flex items-center justify-between px-4 py-2 border-b border-gem-800/30">
+          <div class="flex items-center gap-2">
+            <div class="t-r w-2.5 h-2.5 rounded-full"></div>
+            <div class="t-y w-2.5 h-2.5 rounded-full"></div>
+            <div class="t-g w-2.5 h-2.5 rounded-full"></div>
+            <span class="font-mono text-gem-500 text-xs ml-1">first-post.md</span>
+          </div>
+          <button class="copy-btn text-gem-500 flex items-center gap-1.5"
+            @click="navigator.clipboard.writeText('---\ntitle: Tony Hawk lands the first-ever 900\nid: 3a28f050\n---\n\nTony Hawk made history by landing the 900 at the 1999 X Games.'); copied=true; setTimeout(()=>copied=false,2000)">
+            <template x-if="!copied"><span class="flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2"/></svg>Copy</span></template>
+            <template x-if="copied"><span class="flex items-center gap-1 text-acid"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Copied!</span></template>
+          </button>
+        </div>
+        <div class="p-5 text-sm leading-7">
+          <span class="text-gem-600">---</span><br/>
+          <span class="text-gem-400">title</span><span class="text-gem-600">: </span><span class="text-white">Tony Hawk lands the first-ever 900</span><br/>
+          <span class="text-gem-400">id</span><span class="text-gem-600">: </span><span class="text-gem-300">3a28f050</span><br/>
+          <span class="text-gem-600">---</span><br/><br/>
+          <span class="text-gem-200">Tony Hawk made history by landing the 900 at the 1999 X Games.</span>
+        </div>
+      </div>
+
+      <div class="grid sm:grid-cols-3 gap-3 mb-6">
+        <div class="info-chip p-3 text-center">
+          <div class="font-mono text-acid text-xs mb-1">Title</div>
+          <div class="text-gem-400 text-xs">Required. Display name of the entry.</div>
+        </div>
+        <div class="info-chip p-3 text-center">
+          <div class="font-mono text-acid text-xs mb-1">Content</div>
+          <div class="text-gem-400 text-xs">Markdown body below the frontmatter.</div>
+        </div>
+        <div class="info-chip p-3 text-center">
+          <div class="font-mono text-acid text-xs mb-1">Metadata</div>
+          <div class="text-gem-400 text-xs">YAML frontmatter fields.</div>
+        </div>
+      </div>
+
+      <!-- Image placeholder: Control Panel -->
+      <div class="img-placeholder h-[350px] rounded-lg" id="img-cp">
+        <!-- REPLACE THIS IMAGE URL WITH YOUR ACTUAL SCREENSHOT -->
+        <img src="./asserts/img/Screenshot from 2026-03-30 10-26-31.png"
+             alt="Statamic Control Panel Entry Editor"
+             />
+
+      </div>
+      <p class="text-gem-500 text-xs font-mono text-center mt-2">👉 What you write in the UI is saved as Markdown behind the scenes.</p>
+    </section>
+
+    <!-- ── BLUEPRINTS ── -->
+    <section id="blueprints" class="s-card p-7 md:p-9">
+      <div class="sec-label mb-2">Field Definitions</div>
+      <h2 class="font-display font-700 text-white text-2xl mb-4">🧩 Blueprints</h2>
+      <p class="text-gem-300 leading-relaxed mb-5">
+        Blueprints define the <strong class="text-white">structure</strong> of your entries — which fields exist, what type they are, and how they appear in the Control Panel.
+      </p>
+
+      <div class="mb-5">
+        <div class="sec-label mb-3">Default Fields</div>
+        <div class="flex flex-wrap gap-2">
+          <span class="acid-badge font-mono text-xs px-3 py-1.5 rounded">title</span>
+          <span class="acid-badge font-mono text-xs px-3 py-1.5 rounded">content</span>
+          <span class="acid-badge font-mono text-xs px-3 py-1.5 rounded">slug</span>
+          <span class="acid-badge font-mono text-xs px-3 py-1.5 rounded">author</span>
+          <span class="acid-badge font-mono text-xs px-3 py-1.5 rounded">date</span>
+        </div>
+      </div>
+
+      <div class="grid sm:grid-cols-2 gap-3 mb-5">
+        <div class="info-chip p-4">
+          <div class="font-display font-600 text-white text-sm mb-2">➕ Add Custom Fields</div>
+          <p class="text-gem-400 text-xs leading-relaxed">Text, images, booleans, selects, relationships — any field type you need.</p>
+        </div>
+        <div class="info-chip p-4">
+          <div class="font-display font-600 text-white text-sm mb-2">📋 Multiple Blueprints</div>
+          <p class="text-gem-400 text-xs leading-relaxed">A single collection can have multiple blueprints — useful when entry types differ.</p>
+        </div>
+      </div>
+
+      <div class="tip-box p-4 rounded">
+        <div class="flex items-start gap-2">
+          <span class="text-acid font-mono text-xs font-700 uppercase tracking-widest mt-0.5 flex-shrink-0">Use Case</span>
+          <p class="text-gem-300 text-sm">A "Reviews" collection might have separate blueprints for "Book Reviews" and "Movie Reviews" — each with different custom fields.</p>
+        </div>
+      </div>
+      <div class="img-placeholder mt-5 h-[350px] rounded-lg" id="img-cp">
+        <!-- REPLACE THIS IMAGE URL WITH YOUR ACTUAL SCREENSHOT -->
+        <img src="./asserts/img/Screenshot from 2026-03-30 10-36-43.png"
+             alt="Statamic Control Panel Entry Editor"
+             />
+
+      </div>
+      <p class="text-gem-500 text-xs font-mono text-center mt-2">👉 Blueprint field schema for the pages</p>
+    </section>
+
+    <!-- ── TITLES ── -->
+    <section id="titles" class="s-card p-7 md:p-9">
+      <div class="sec-label mb-2">Identifiers</div>
+      <h2 class="font-display font-700 text-white text-2xl mb-4">🎯 Titles</h2>
+      <p class="text-gem-300 leading-relaxed mb-5">Every entry requires a title. You can also automate it using a format string — perfect for consistent naming patterns.</p>
+
+      <div class="code-block rounded-lg mb-5" x-data="{copied:false}">
+        <div class="flex items-center justify-between px-4 py-2 border-b border-gem-800/30">
+          <div class="flex items-center gap-2">
+            <div class="t-r w-2.5 h-2.5 rounded-full"></div>
+            <div class="t-y w-2.5 h-2.5 rounded-full"></div>
+            <div class="t-g w-2.5 h-2.5 rounded-full"></div>
+            <span class="font-mono text-gem-500 text-xs ml-1">collection.yaml</span>
+          </div>
+          <button class="copy-btn text-gem-500 flex items-center gap-1.5"
+            @click="navigator.clipboard.writeText('title_format: \"{stars} star rating by {author:name}\"'); copied=true; setTimeout(()=>copied=false,2000)">
+            <template x-if="!copied"><span class="flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2"/></svg>Copy</span></template>
+            <template x-if="copied"><span class="flex items-center gap-1 text-acid"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Copied!</span></template>
+          </button>
+        </div>
+        <div class="p-4 text-sm">
+          <span class="text-gem-400">title_format</span><span class="text-gem-600">: </span><span class="text-acid">"{stars} star rating by {author:name}"</span>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3 bg-acid/5 border border-acid/20 rounded-lg p-4">
+        <span class="text-acid text-lg">✨</span>
+        <div>
+          <div class="font-mono text-xs text-gem-400 mb-0.5">Example output</div>
+          <div class="font-display font-600 text-white">5 star rating by John Doe</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── SLUGS ── -->
+    <section id="slugs" class="s-card p-7 md:p-9">
+      <div class="sec-label mb-2">URL Identifiers</div>
+      <h2 class="font-display font-700 text-white text-2xl mb-4">🔗 Slugs</h2>
+      <p class="text-gem-300 leading-relaxed mb-5">Slugs are URL-friendly versions of titles, automatically generated and used in your routes.</p>
+
+      <div class="flex items-center gap-4 mb-5 flex-wrap">
+        <div class="bg-ink-800/60 border border-gem-800/30 rounded-lg px-4 py-3 font-mono text-sm">
+          <span class="text-gem-500 text-xs block mb-1">Title</span>
+          <span class="text-white">My First Blog</span>
+        </div>
+        <span class="text-acid text-xl font-display">→</span>
+        <div class="bg-ink-800/60 border border-acid/20 rounded-lg px-4 py-3 font-mono text-sm">
+          <span class="text-gem-500 text-xs block mb-1">Slug</span>
+          <span class="text-acid">my-first-blog</span>
+        </div>
+        <span class="text-acid text-xl font-display">→</span>
+        <div class="bg-ink-800/60 border border-gem-800/30 rounded-lg px-4 py-3 font-mono text-sm">
+          <span class="text-gem-500 text-xs block mb-1">URL</span>
+          <span class="text-gem-200">/blog/my-first-blog</span>
+        </div>
+      </div>
+
+      <div class="code-block rounded-lg" x-data="{copied:false}">
+        <div class="flex items-center justify-between px-4 py-2 border-b border-gem-800/30">
+          <div class="flex items-center gap-2">
+            <div class="t-r w-2.5 h-2.5 rounded-full"></div>
+            <div class="t-y w-2.5 h-2.5 rounded-full"></div>
+            <div class="t-g w-2.5 h-2.5 rounded-full"></div>
+            <span class="font-mono text-gem-500 text-xs ml-1">Disable slugs</span>
+          </div>
+        </div>
+        <div class="p-4 text-sm">
+          <span class="text-gem-500"># If slugs are disabled, entry ID is used as filename</span><br/>
+          <span class="text-gem-400">slugs</span><span class="text-gem-600">: </span><span class="text-acid">false</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── DATES ── -->
+    <section id="dates" class="s-card p-7 md:p-9">
+      <div class="sec-label mb-2">Scheduling</div>
+      <h2 class="font-display font-700 text-white text-2xl mb-4">📅 Dates &amp; Visibility</h2>
+      <p class="text-gem-300 leading-relaxed mb-5">Collections can use dates to automatically control entry visibility — no manual publishing needed.</p>
+
+      <div class="code-block rounded-lg mb-5" x-data="{copied:false}">
+        <div class="flex items-center justify-between px-4 py-2 border-b border-gem-800/30">
+          <div class="flex items-center gap-2">
+            <div class="t-r w-2.5 h-2.5 rounded-full"></div>
+            <div class="t-y w-2.5 h-2.5 rounded-full"></div>
+            <div class="t-g w-2.5 h-2.5 rounded-full"></div>
+            <span class="font-mono text-gem-500 text-xs ml-1">collection.yaml</span>
+          </div>
+        </div>
+        <div class="p-4 text-sm leading-7">
+          <span class="text-gem-400">date</span><span class="text-gem-600">: </span><span class="text-acid">true</span><br/>
+          <span class="text-gem-400">date_behavior</span><span class="text-gem-600">:</span><br/>
+          <span class="text-gem-600">&nbsp;&nbsp;future</span><span class="text-gem-600">: </span><span class="text-white">private</span><br/>
+          <span class="text-gem-600">&nbsp;&nbsp;past</span><span class="text-gem-600">: </span><span class="text-white">public</span>
+        </div>
+      </div>
+
+      <div class="grid sm:grid-cols-3 gap-3">
+        <div class="bg-ink-800/40 border border-gem-800/25 rounded-lg p-3 text-center">
+          <code class="il text-xs">public</code>
+          <p class="text-gem-400 text-xs mt-2">Visible everywhere and in all listings.</p>
+        </div>
+        <div class="bg-ink-800/40 border border-gem-800/25 rounded-lg p-3 text-center">
+          <code class="il text-xs">unlisted</code>
+          <p class="text-gem-400 text-xs mt-2">Hidden from listings but direct URL works.</p>
+        </div>
+        <div class="bg-ink-800/40 border border-gem-800/25 rounded-lg p-3 text-center">
+          <code class="il text-xs">private</code>
+          <p class="text-gem-400 text-xs mt-2">Completely hidden. Returns 404.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── STATUS ── -->
+    <section id="status" class="s-card p-7 md:p-9">
+      <div class="sec-label mb-2">Computed State</div>
+      <h2 class="font-display font-700 text-white text-2xl mb-4">📊 Entry Status System</h2>
+      <p class="text-gem-300 leading-relaxed mb-5">Each entry gets a computed status based on its date and publish settings. Use <code class="il">status</code> (not <code class="il">published</code>) for filtering.</p>
+
+      <div class="space-y-2">
+        <div class="flex items-center justify-between bg-ink-800/40 border border-gem-800/20 rounded-lg px-4 py-3">
+          <div>
+            <div class="font-display font-600 text-white text-sm">Published</div>
+            <div class="text-gem-500 text-xs mt-0.5">Live and visible to all users</div>
+          </div>
+          <span class="status-badge status-pub">published</span>
+        </div>
+        <div class="flex items-center justify-between bg-ink-800/40 border border-gem-800/20 rounded-lg px-4 py-3">
+          <div>
+            <div class="font-display font-600 text-white text-sm">Scheduled</div>
+            <div class="text-gem-500 text-xs mt-0.5">Future-dated, not yet live</div>
+          </div>
+          <span class="status-badge status-sched">scheduled</span>
+        </div>
+        <div class="flex items-center justify-between bg-ink-800/40 border border-gem-800/20 rounded-lg px-4 py-3">
+          <div>
+            <div class="font-display font-600 text-white text-sm">Expired</div>
+            <div class="text-gem-500 text-xs mt-0.5">Past the expiry date</div>
+          </div>
+          <span class="status-badge status-exp">expired</span>
+        </div>
+        <div class="flex items-center justify-between bg-ink-800/40 border border-gem-800/20 rounded-lg px-4 py-3">
+          <div>
+            <div class="font-display font-600 text-white text-sm">Draft</div>
+            <div class="text-gem-500 text-xs mt-0.5">Manually hidden from public</div>
+          </div>
+          <span class="status-badge status-draft">draft</span>
+        </div>
+      </div>
+
+      <div class="tip-box p-4 rounded mt-5">
+        <div class="flex items-start gap-2">
+          <span class="text-acid font-mono text-xs font-700 uppercase tracking-widest mt-0.5 flex-shrink-0">Time Support</span>
+          <p class="text-gem-300 text-sm">Enable time alongside dates to publish at exact times (e.g. 10:30 AM) and maintain correct order for same-day entries.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── ORDERING ── -->
+    <section id="ordering" class="s-card p-7 md:p-9">
+      <div class="sec-label mb-2">Structure</div>
+      <h2 class="font-display font-700 text-white text-2xl mb-4">📚 Ordering &amp; Structure</h2>
+      <p class="text-gem-300 leading-relaxed mb-5">Enable manual drag-and-drop ordering for custom content hierarchies.</p>
+
+      <div class="code-block rounded-lg mb-5" x-data="{copied:false}">
+        <div class="flex items-center justify-between px-4 py-2 border-b border-gem-800/30">
+          <div class="flex items-center gap-2">
+            <div class="t-r w-2.5 h-2.5 rounded-full"></div>
+            <div class="t-y w-2.5 h-2.5 rounded-full"></div>
+            <div class="t-g w-2.5 h-2.5 rounded-full"></div>
+            <span class="font-mono text-gem-500 text-xs ml-1">collection.yaml</span>
+          </div>
+        </div>
+        <div class="p-4 text-sm">
+          <span class="text-gem-400">orderable</span><span class="text-gem-600">: </span><span class="text-acid">true</span>
+        </div>
+      </div>
+
+      <div class="grid sm:grid-cols-2 gap-3">
+        <div class="info-chip p-4 flex items-start gap-3">
+          <span class="text-acid text-xl">⠿</span>
+          <div>
+            <div class="font-display font-600 text-white text-sm mb-1">Drag &amp; Drop UI</div>
+            <p class="text-gem-400 text-xs">Reorder entries visually in the Control Panel.</p>
+          </div>
+        </div>
+        <div class="info-chip p-4 flex items-start gap-3">
+          <span class="text-acid text-xl">🌳</span>
+          <div>
+            <div class="font-display font-600 text-white text-sm mb-1">Custom Hierarchy</div>
+            <p class="text-gem-400 text-xs">Build nested content trees for docs and structured sites.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── NESTED ── -->
+    <section id="nested" class="s-card p-7 md:p-9">
+      <div class="sec-label mb-2">Hierarchical Content</div>
+      <h2 class="font-display font-700 text-white text-2xl mb-4">🌳 Nested Content (Structure)</h2>
+      <p class="text-gem-300 leading-relaxed mb-5">Collections can be hierarchical — great for documentation, category trees, or nested pages.</p>
+
+      <!-- Tree viz -->
+      <div class="code-block rounded-lg mb-5">
+        <div class="flex items-center gap-2 px-4 py-2 border-b border-gem-800/30">
+          <div class="t-r w-2.5 h-2.5 rounded-full"></div>
+          <div class="t-y w-2.5 h-2.5 rounded-full"></div>
+          <div class="t-g w-2.5 h-2.5 rounded-full"></div>
+          <span class="font-mono text-gem-500 text-xs ml-1">structure example</span>
+        </div>
+        <div class="p-5 text-sm leading-7 font-mono">
+          <span class="text-acid">📁 Docs</span><br/>
+          <span class="text-gem-500">&nbsp;├── </span><span class="text-white">Getting Started</span><br/>
+          <span class="text-gem-500">&nbsp;├── </span><span class="text-white">API</span><br/>
+          <span class="text-gem-500">&nbsp;│&nbsp;&nbsp;&nbsp;└── </span><span class="text-gem-300">Authentication</span><br/>
+          <span class="text-gem-500">&nbsp;└── </span><span class="text-white">Deployment</span>
+        </div>
+      </div>
+
+      <div class="grid sm:grid-cols-2 gap-3">
+        <div class="code-block rounded-lg" x-data="{copied:false}">
+          <div class="flex items-center justify-between px-4 py-2 border-b border-gem-800/30">
+            <span class="font-mono text-gem-500 text-xs">Limit nesting depth</span>
+          </div>
+          <div class="p-4 text-sm">
+            <span class="text-gem-400">max_depth</span><span class="text-gem-600">: </span><span class="text-acid">1</span>
+          </div>
+        </div>
+        <div class="tip-box p-4 rounded self-start mt-2 sm:mt-0">
+          <div class="sec-label mb-1">Root Page</div>
+          <p class="text-gem-300 text-xs leading-relaxed">Define a root entry that acts as <code class="il">/ </code>. Useful for homepages and section landing pages.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── ROUTING ── -->
+    <section id="routing" class="s-card p-7 md:p-9">
+      <div class="sec-label mb-2">URL System</div>
+      <h2 class="font-display font-700 text-white text-2xl mb-4">🌐 Routing</h2>
+      <p class="text-gem-300 leading-relaxed mb-5">Routes define how URLs are generated for entries using dynamic placeholders wrapped in <code class="il">{curly braces}</code>.</p>
+
+      <div class="space-y-3 mb-6">
+        <div class="code-block rounded-lg">
+          <div class="flex items-center gap-2 px-4 py-2 border-b border-gem-800/30">
+            <span class="font-mono text-gem-500 text-xs">Blog style</span>
+          </div>
+          <div class="p-4 text-sm">
+            <span class="text-gem-400">route</span><span class="text-gem-600">: </span><span class="text-acid">/news/{year}/{month}/{day}/{slug}</span>
+          </div>
+        </div>
+        <div class="code-block rounded-lg">
+          <div class="flex items-center gap-2 px-4 py-2 border-b border-gem-800/30">
+            <span class="font-mono text-gem-500 text-xs">SEO-focused</span>
+          </div>
+          <div class="p-4 text-sm">
+            <span class="text-gem-400">route</span><span class="text-gem-600">: </span><span class="text-acid">/{parent_uri}/{slug}.html</span>
+          </div>
+        </div>
+        <div class="code-block rounded-lg">
+          <div class="flex items-center gap-2 px-4 py-2 border-b border-gem-800/30">
+            <span class="font-mono text-gem-500 text-xs">Minimal (ID-based)</span>
+          </div>
+          <div class="p-4 text-sm">
+            <span class="text-gem-400">route</span><span class="text-gem-600">: </span><span class="text-acid">/{id}</span>
+          </div>
+        </div>
+      </div>
+
+
+
+      <div class="tip-box p-4 rounded mt-5">
+        <div class="flex items-start gap-2">
+          <span class="text-acid font-mono text-xs font-700 uppercase tracking-widest mt-0.5 flex-shrink-0">Pro Tip</span>
+          <p class="text-gem-300 text-sm">Plan your routes <strong class="text-white">early</strong> to avoid restructuring later — changing routes breaks existing URLs and can hurt SEO.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── REDIRECTS ── -->
+    <section id="redirects" class="s-card p-7 md:p-9">
+      <div class="sec-label mb-2">Navigation</div>
+      <h2 class="font-display font-700 text-white text-2xl mb-4">🔁 Redirects</h2>
+      <p class="text-gem-300 leading-relaxed mb-5">Entries can act as redirects — perfect for external links or navigation shortcuts.</p>
+
+      <div class="grid sm:grid-cols-2 gap-3">
+        <div class="code-block rounded-lg" x-data="{copied:false}">
+          <div class="flex items-center justify-between px-4 py-2 border-b border-gem-800/30">
+            <span class="font-mono text-gem-500 text-xs">Simple redirect</span>
+          </div>
+          <div class="p-4 text-sm leading-7">
+            <span class="text-gem-400">redirect</span><span class="text-gem-600">: </span><span class="text-acid">https://example.com</span>
+          </div>
+        </div>
+        <div class="code-block rounded-lg" x-data="{copied:false}">
+          <div class="flex items-center justify-between px-4 py-2 border-b border-gem-800/30">
+            <span class="font-mono text-gem-500 text-xs">With status code</span>
+          </div>
+          <div class="p-4 text-sm leading-7">
+            <span class="text-gem-400">redirect</span><span class="text-gem-600">:</span><br/>
+            <span class="text-gem-600">&nbsp;&nbsp;url</span><span class="text-gem-600">: </span><span class="text-acid">https://example.com</span><br/>
+            <span class="text-gem-600">&nbsp;&nbsp;status</span><span class="text-gem-600">: </span><span class="text-white">301</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── TAXONOMIES ── -->
+    <section id="taxonomies" class="s-card p-7 md:p-9">
+      <div class="sec-label mb-2">Categories &amp; Tags</div>
+      <h2 class="font-display font-700 text-white text-2xl mb-4">🏷️ Taxonomies</h2>
+      <p class="text-gem-300 leading-relaxed mb-5">Define taxonomies at the collection level — they'll be automatically available in all entries.</p>
+
+      <div class="code-block rounded-lg mb-5" x-data="{copied:false}">
+        <div class="flex items-center justify-between px-4 py-2 border-b border-gem-800/30">
+          <div class="flex items-center gap-2">
+            <div class="t-r w-2.5 h-2.5 rounded-full"></div>
+            <div class="t-y w-2.5 h-2.5 rounded-full"></div>
+            <div class="t-g w-2.5 h-2.5 rounded-full"></div>
+            <span class="font-mono text-gem-500 text-xs ml-1">collection.yaml</span>
+          </div>
+          <button class="copy-btn text-gem-500 flex items-center gap-1.5"
+            @click="navigator.clipboard.writeText('taxonomies:\n  - categories\n  - tags'); copied=true; setTimeout(()=>copied=false,2000)">
+            <template x-if="!copied"><span class="flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2"/></svg>Copy</span></template>
+            <template x-if="copied"><span class="flex items-center gap-1 text-acid"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Copied!</span></template>
+          </button>
+        </div>
+        <div class="p-4 text-sm leading-7">
+          <span class="text-gem-400">taxonomies</span><span class="text-gem-600">:</span><br/>
+          <span class="text-gem-600">&nbsp;&nbsp;- </span><span class="text-acid">categories</span><br/>
+          <span class="text-gem-600">&nbsp;&nbsp;- </span><span class="text-acid">tags</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── MOUNTING ── -->
+    <section id="mounting" class="s-card p-7 md:p-9">
+      <div class="sec-label mb-2">Page Attachment</div>
+      <h2 class="font-display font-700 text-white text-2xl mb-4">🔗 Mounting Collections</h2>
+      <p class="text-gem-300 leading-relaxed mb-5">Attach a collection under a specific page to automatically nest its URLs beneath that page's path.</p>
+
+      <div class="code-block rounded-lg mb-5">
+        <div class="flex items-center gap-2 px-4 py-2 border-b border-gem-800/30">
+          <span class="font-mono text-gem-500 text-xs">collection.yaml</span>
+        </div>
+        <div class="p-4 text-sm">
+          <span class="text-gem-400">mount</span><span class="text-gem-600">: </span><span class="text-acid">blog-page-id</span>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3 bg-acid/5 border border-acid/20 rounded-lg p-4 font-mono text-sm">
+        <span class="text-acid">Result:</span>
+        <div class="space-y-1">
+          <div class="text-gem-200">/blog/post-1</div>
+          <div class="text-gem-200">/blog/post-2</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── QUICK RECAP TABLE ── -->
+    <section id="quick-recap" class="s-card p-7 md:p-9">
+      <div class="sec-label mb-2">Reference</div>
+      <h2 class="font-display font-700 text-white text-2xl mb-5">🧠 Quick Recap</h2>
+      <div class="overflow-x-auto rounded-lg border border-gem-800/25">
+        <table class="doc-table">
+          <thead>
+            <tr>
+              <th>Concept</th>
+              <th>Meaning</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><code class="il">Collection</code></td><td class="text-gem-300">Structured content container (folder + config)</td></tr>
+            <tr><td><code class="il">Entry</code></td><td class="text-gem-300">Single content item (.md file)</td></tr>
+            <tr><td><code class="il">Blueprint</code></td><td class="text-gem-300">Field schema defining entry structure</td></tr>
+            <tr><td><code class="il">Route</code></td><td class="text-gem-300">URL generation logic with dynamic placeholders</td></tr>
+            <tr><td><code class="il">Slug</code></td><td class="text-gem-300">URL-friendly version of the entry title</td></tr>
+            <tr><td><code class="il">Inject</code></td><td class="text-gem-300">Default values applied to all entries</td></tr>
+            <tr><td><code class="il">Cascade</code></td><td class="text-gem-300">Fallback chain: Entry → Origin → Collection</td></tr>
+            <tr><td><code class="il">Taxonomy</code></td><td class="text-gem-300">Shared terms like categories or tags</td></tr>
+            <tr><td><code class="il">Mount</code></td><td class="text-gem-300">Attach collection beneath a page URL</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ── DEV TIPS ── -->
+    <section id="tips" class="s-card p-7 md:p-9">
+      <div class="sec-label mb-2">Best Practices</div>
+      <h2 class="font-display font-700 text-white text-2xl mb-5">💡 Developer Tips</h2>
+      <div class="space-y-3">
+        <div class="flex items-start gap-4 info-chip p-4">
+          <span class="text-2xl flex-shrink-0">⚡</span>
+          <div>
+            <div class="font-display font-600 text-white text-sm mb-1">Use Control Panel for Speed</div>
+            <p class="text-gem-400 text-xs leading-relaxed">The CP is optimised for fast content creation — great for day-to-day editing without touching files.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-4 info-chip p-4">
+          <span class="text-2xl flex-shrink-0">🔧</span>
+          <div>
+            <div class="font-display font-600 text-white text-sm mb-1">Code Editor for Precision</div>
+            <p class="text-gem-400 text-xs leading-relaxed">Prefer your code editor + git for version-controlled, team-friendly content workflows.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-4 info-chip p-4">
+          <span class="text-2xl flex-shrink-0">🚧</span>
+          <div>
+            <div class="font-display font-600 text-white text-sm mb-1">Plan Routes Early</div>
+            <p class="text-gem-400 text-xs leading-relaxed">Restructuring routes later breaks URLs. Design your URL schema before you start publishing content.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-4 info-chip p-4">
+          <span class="text-2xl flex-shrink-0">🧩</span>
+          <div>
+            <div class="font-display font-600 text-white text-sm mb-1">Keep Blueprints Reusable</div>
+            <p class="text-gem-400 text-xs leading-relaxed">Design clean, modular blueprints. Avoid duplicating field definitions — reuse across collections where possible.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── FINAL THOUGHT ── -->
+    <section class="cta-glow bg-ink-800/60 rounded-2xl p-10 border border-gem-800/30 text-center">
+      <div class="text-5xl mb-4">🎉</div>
+      <h2 class="font-display font-800 text-3xl text-white mb-3">
+        The Statamic Trifecta
+      </h2>
+      <div class="flex flex-wrap items-center justify-center gap-4 mb-6 text-lg">
+        <span class="acid-badge px-4 py-2 rounded-lg font-display font-600">📄 Markdown</span>
+        <span class="text-gem-600 text-2xl font-display">+</span>
+        <span class="acid-badge px-4 py-2 rounded-lg font-display font-600">⚙️ YAML</span>
+        <span class="text-gem-600 text-2xl font-display">+</span>
+        <span class="acid-badge px-4 py-2 rounded-lg font-display font-600">🧠 Smart Structure</span>
+      </div>
+      <p class="text-gem-400 mb-8 leading-relaxed max-w-lg mx-auto">
+        Together, these give you a flexible, developer-first CMS experience. Now go build something great.
+      </p>
+      <div class="flex flex-wrap gap-3 justify-center">
+        <a href="https://statamic.dev/collections" target="_blank"
+           class="inline-flex items-center gap-2 bg-acid text-ink-950 font-display font-700 px-5 py-2.5 rounded text-sm hover:bg-white transition-colors">
+          Full Collections Docs ↗
+        </a>
+        <a href="/statamic-installation.html"
+           class="inline-flex items-center gap-2 border border-gem-600/40 text-gem-200 font-display px-5 py-2.5 rounded text-sm hover:border-acid/40 hover:text-white transition-colors">
+          ← Back to Installation
+        </a>
+      </div>
+    </section>
+  
+  <div class="flex flex-wrap gap-3 justify-center">
+    <a href="/statamic-taxonomies.html"
+        class="inline-flex items-center gap-2 bg-acid text-ink-950 font-display font-700 px-5 py-2.5 rounded text-sm hover:bg-white transition-colors">
+      Content Modeling - Taxonomies
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M13 5l7 7-7 7"/>
+      </svg>
+      </svg>
+    </a>
+  </div>
+
+  </main>
+</div>
+
+
+
+<!-- ─── FOOTER ─────────────────────────────────────────────── -->
+<footer class="cl border-t border-gem-900/50 py-8 px-6">
+  <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+    <div class="flex items-center gap-2">
+      <div class="w-5 h-5 rounded border border-gem-600/30 flex items-center justify-center bg-gem-800/20">
+        <svg viewBox="0 0 20 20" fill="none" class="w-3 h-3 text-gem-400" xmlns="http://www.w3.org/2000/svg">
+          <polygon points="10,2 18,7 18,13 10,18 2,13 2,7" stroke="currentColor" stroke-width="1.5" fill="none"/>
+        </svg>
+      </div>
+      <span class="text-gem-500 text-xs font-mono">Statamic — Collections &amp; Content Modelling</span>
+    </div>
+    <div class="flex items-center gap-4 text-xs font-mono text-gem-600">
+      <a href="#what-is" class="hover:text-gem-400 transition-colors">↑ Back to top</a>
+      <span>·</span>
+      <span>v5.x docs</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
